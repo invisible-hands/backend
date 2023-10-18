@@ -1,4 +1,4 @@
-package com.betting.ground.exception;
+package com.betting.ground.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

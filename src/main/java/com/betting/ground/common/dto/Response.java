@@ -1,4 +1,4 @@
-package com.betting.ground.common;
+package com.betting.ground.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

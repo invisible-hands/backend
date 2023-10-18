@@ -1,0 +1,9 @@
+namespace: default
+resources:
+  - deployment.yaml
+  - mysql.yaml
+  - redis.yaml
+configMapGenerator:
+  - name: init-db
+    files:
+      - configs/init.sql
