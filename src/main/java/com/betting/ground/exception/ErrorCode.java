@@ -10,6 +10,7 @@ public enum ErrorCode {
 
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
 
+
     private final HttpStatus status;
     private final String message;
 }
