@@ -43,14 +43,14 @@ spec:
               value: "root"
             - name: SPRING_DATASOURCE_MASTER_PASSWORD
               value: "1234"
-          resources: # 컨테이너에 할당된 자원의 제한 및 요청
-            limits: # 자원의 최대 제한량
-              cpu: 500m # CPU의 최대 사용량을 0.5 코어로 설정
+          resources:
+            limits:
+              cpu: 500m
             requests: 
               cpu: 200m 
           readinessProbe:
             httpGet:
-              path: /api/test
+              path: /api/health
               port: 8080 
             initialDelaySeconds: 5 
             periodSeconds: 10
