@@ -31,7 +31,7 @@ spec:
         run: my-app
     spec:
       containers:
-        - image: jsj6121/bg:1.1
+        - image: jsj6121/bg:1.2
           name: my-app
           ports:
             - containerPort: 8080
