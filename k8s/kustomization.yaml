@@ -4,7 +4,7 @@ resources:
   - deployment.yaml
   - mysql.yaml
   - redis.yaml
-#configMapGenerator:
-#  - name: init-db
-#    files:
-#      - configs/init.sql
+configMapGenerator:
+  - name: init-db
+    files:
+      - configs/init.sql
