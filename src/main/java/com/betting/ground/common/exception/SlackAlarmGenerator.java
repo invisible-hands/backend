@@ -1,4 +1,4 @@
-package com.betting.ground.exception;
+package com.betting.ground.common.exception;
 
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;

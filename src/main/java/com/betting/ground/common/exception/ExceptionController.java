@@ -1,6 +1,6 @@
-package com.betting.ground.exception;
+package com.betting.ground.common.exception;
 
-import com.betting.ground.common.Response;
+import com.betting.ground.common.dto.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
