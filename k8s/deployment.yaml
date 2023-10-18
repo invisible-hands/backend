@@ -23,7 +23,6 @@ spec:
   selector:
     matchLabels:
       run: my-app
-  strategy: {}
   template:
     metadata:
       creationTimestamp: null
@@ -47,11 +46,11 @@ spec:
           resources: # 컨테이너에 할당된 자원의 제한 및 요청
             limits: # 자원의 최대 제한량
               cpu: 500m # CPU의 최대 사용량을 0.5 코어로 설정
-            requests: # 자원의 최소 요청량
-              cpu: 200m # CPU의 최소 사용량을 0.2 코어로 설정
-          readinessProbe: # Pod의 준비 상태를 체크하는 메커니즘
-            httpGet: # HTTP GET 요청을 통한 검사 방법
-              path: / # 체크할 URL 경로
-              port: 8080 # 체크할 포트
-            initialDelaySeconds: 5 # 컨테이너 시작 후 처음으로 준비 상태 검사를 시작하기 전의 대기 시간 (5초)
-            periodSeconds: 10 # 준비 상태 검사를 반복하는 주기 (10초)
+            requests: 
+              cpu: 200m 
+          readinessProbe:
+            httpGet:
+              path: /api/test
+              port: 8080 
+            initialDelaySeconds: 5 
+            periodSeconds: 10
