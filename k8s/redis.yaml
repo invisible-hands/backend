@@ -6,8 +6,6 @@ data:
   redis-config: |
     maxmemory 100mb
     maxmemory-policy allkeys-lru
-    appendonly yes        # AOF 활성화
-    appendfsync everysec  # 매 초마다 AOF 파일에 변경 내용을 동기화
 
 ---
 
