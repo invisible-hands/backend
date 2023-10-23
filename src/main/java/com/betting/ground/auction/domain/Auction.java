@@ -32,8 +32,4 @@ public class Auction extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-    public Auction(String title) {
-        this.title = title;
-    }
 }
