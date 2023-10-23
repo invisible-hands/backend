@@ -2,6 +2,7 @@ package com.betting.ground.auction.service;
 
 import com.betting.ground.auction.dto.ItemResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,15 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuctionService {
-    public ItemResponse getNewItem() {
+    public ItemResponse getNewItem(Pageable pageable) {
         return null;
     }
 
-    public ItemResponse getDeadline() {
+    public ItemResponse getDeadline(Pageable pageable) {
         return null;
     }
 
-    public ItemResponse getMostView() {
+    public ItemResponse getMostView(Pageable pageable) {
         return null;
     }
 }
