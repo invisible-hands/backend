@@ -28,9 +28,10 @@ public class AuctionController {
         return Response.success("게시글 조회 성공", SearchResponse.builder().build());
     }
 
-    @Operation(summary = "경매 생성")
+    @Operation(summary = "경매 생성", description = "request는 json으로 보내주셔야 합니다!")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Response<Void> create(
+            @Parameter(description = "request는 json으로 보내주셔야 합니다!")
             @RequestPart AuctionCreateRequest request,
             @RequestParam List<MultipartFile> images
     ) {

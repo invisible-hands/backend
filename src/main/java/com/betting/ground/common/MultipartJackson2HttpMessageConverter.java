@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
 
     /**
+     * Swagger
      * "Content-Type: multipart/form-data" 헤더를 지원하는 HTTP 요청 변환기
      */
     public MultipartJackson2HttpMessageConverter(ObjectMapper objectMapper) {
