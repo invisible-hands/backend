@@ -13,11 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import com.betting.ground.auction.dto.ItemResponse;
+import com.betting.ground.auction.service.AuctionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auction")
+@Tag(name = "경매", description = "경매 관련 api")
 public class AuctionController {
+    private final AuctionService auctionService;
 
     @Operation(summary = "게시글 검색")
     @GetMapping("/search")
@@ -47,5 +52,32 @@ public class AuctionController {
     @PostMapping("/{auctionId}/bid")
     public Response<Void> bid(@PathVariable Long auctionId, @RequestBody BidRequest request){
         return Response.success("경매 참여 완료", null);
+    }
+
+    @GetMapping("/new")
+    @Operation(summary = "메인페이지", description = "새로 들어온 제품 (최신순)")
+    public Response<ItemResponse> getNewItem(
+            @Parameter(
+                    description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
+            ) Pageable pageable) {
+        return Response.success("새로 들어온 제품", auctionService.getNewItem(pageable));
+    }
+
+    @GetMapping("/deadline")
+    @Operation(summary = "메인페이지", description = "마감 임박한 상품")
+    public Response<ItemResponse> getDeadline(
+            @Parameter(
+                    description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
+            ) Pageable pageable) {
+        return Response.success("마감 임박한 상품", auctionService.getDeadline(pageable));
+    }
+
+    @GetMapping("/view")
+    @Operation(summary = "메인페이지", description = "조회수 많은 상품")
+    public Response<ItemResponse> getMostView(
+            @Parameter(
+                    description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
+            ) Pageable pageable) {
+        return Response.success("조회수 많은 상품", auctionService.getMostView(pageable));
     }
 }

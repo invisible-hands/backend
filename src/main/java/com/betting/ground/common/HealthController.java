@@ -1,15 +1,28 @@
 package com.betting.ground.common;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/health")
+@RequiredArgsConstructor
 public class HealthController {
+    private final StringRedisTemplate stringRedisTemplate;
 
     @GetMapping
     public String check() {
         return "ok";
+    }
+
+    @GetMapping("/redis/set")
+    public String setRedisValue(@RequestParam String key, @RequestParam String value) {
+        stringRedisTemplate.opsForValue().set(key, value);
+        return "key : " + key + " value : " + value;
+    }
+
+    @GetMapping("/redis/get/{key}")
+    public String getRedisValue(@PathVariable String key) {
+        return "value: " + stringRedisTemplate.opsForValue().get(key);
     }
 }
