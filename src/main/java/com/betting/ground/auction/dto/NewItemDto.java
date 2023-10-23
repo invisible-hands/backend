@@ -3,7 +3,6 @@ package com.betting.ground.auction.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -22,4 +21,6 @@ public class NewItemDto {
     private String auctionStartTime;
     @Schema(description = "경매 기간", example="24")
     private int duration;
+    @Schema(description = "경매 상태", example="경매 진행중")
+    private String auctionStatus;
 }
