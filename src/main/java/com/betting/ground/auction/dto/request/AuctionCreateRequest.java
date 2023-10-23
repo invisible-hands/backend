@@ -1,4 +1,4 @@
-package com.betting.ground.auction.domain.request;
+package com.betting.ground.auction.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

@@ -3,15 +3,13 @@ import com.betting.ground.common.dto.Response;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
-import com.betting.ground.user.dto.UserNameDTO;
+import com.betting.ground.user.dto.UserNicknameDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
-//import org.springframework.http.HttpStatus;
-//import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,8 +24,8 @@ public class UserController {
 
     @PutMapping("/nickname")
     @Operation(summary = "닉네임 수정")
-    public Response<UserNameDTO> editNickname(@RequestBody UserNameDTO requestDTO) {
-        return Response.success("닉네임 수정 완료", new UserNameDTO());
+    public Response<UserNicknameDTO> editNickname(@RequestBody UserNicknameDTO requestDTO) {
+        return Response.success("닉네임 수정 완료", new UserNicknameDTO());
     }
 
     @PostMapping("/account")

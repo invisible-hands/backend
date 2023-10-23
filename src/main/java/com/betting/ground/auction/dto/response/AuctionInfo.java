@@ -1,4 +1,4 @@
-package com.betting.ground.auction.domain.response;
+package com.betting.ground.auction.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

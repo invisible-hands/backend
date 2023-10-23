@@ -1,11 +1,10 @@
 package com.betting.ground.auction.controller;
 
-import com.betting.ground.auction.domain.dto.BidHistoryDto;
-import com.betting.ground.auction.domain.dto.BidInfo;
-import com.betting.ground.auction.domain.dto.ItemDetailDto;
-import com.betting.ground.auction.domain.request.AuctionCreateRequest;
-import com.betting.ground.auction.domain.request.BidRequest;
-import com.betting.ground.auction.domain.response.SearchResponse;
+import com.betting.ground.auction.dto.BidHistoryDto;
+import com.betting.ground.auction.dto.ItemDetailDto;
+import com.betting.ground.auction.dto.SellerInfo;
+import com.betting.ground.auction.dto.request.AuctionCreateRequest;
+import com.betting.ground.auction.dto.request.BidRequest;
 import com.betting.ground.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-import com.betting.ground.auction.dto.ItemResponse;
+import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -29,40 +28,49 @@ public class AuctionController {
   
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 정보", description = "")
-    @Parameter(name = "auctionId", description = "경매글 아이디", example = "1")
-    public Response<ItemDetailDto> getItemDetail(@PathVariable Long auctionId) {
+    public Response<ItemDetailDto> getItemDetail(
+            @Parameter(description = "경매글 아이디", example = "1")
+            @PathVariable Long auctionId
+    ) {
         return Response.success("해당 경매글 보기 성공", new ItemDetailDto());
     }
 
     @GetMapping("/{auctionId}/bidHistory")
     @Operation(summary = "입찰 내역", description = "")
-    @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-    @Parameter(name = "pageable", description = "page 와 size 보내주세요")
-    public Response<BidHistoryDto> getBidHistory(@PathVariable Long auctionId, Pageable pageable) {
+    public Response<BidHistoryDto> getBidHistory(
+            @Parameter(description = "경매글 아이디", example = "4")
+            @PathVariable Long auctionId,
+            @Parameter(description = "page 와 size 보내주세요")
+            Pageable pageable) {
         return Response.success("해당 경매글의 입찰 내역 보기 성공", new BidHistoryDto());
     }
 
     @GetMapping("/{auctionId}/seller")
     @Operation(summary = "판매자 정보", description = "")
-    @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-    public Response<SellerInfo> getSeller(@PathVariable Long auctionId) {
+    public Response<SellerInfo> getSeller(
+            @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
+            @PathVariable Long auctionId
+    ) {
         return Response.success("해당 경매글의 판매자 정보 보기 성공", new SellerInfo());
     }
 
     @PostMapping("/{auctionId}/instant")
     @Operation(summary = "즉시 결제", description = "")
-    @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-    public Response<Void> instantBuy(@PathVariable Long auctionId) {
+    public Response<Void> instantBuy(
+            @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
+            @PathVariable Long auctionId
+    ) {
         return Response.success("해당 경매글의 즉시 결제 성공", null);
     }
 
     @Operation(summary = "게시글 검색")
     @GetMapping("/search")
-    public Response<SearchResponse> search(
+    public Response<ItemResponse> search(
             @RequestParam String keyword,
             @Parameter(description = "page랑 size만 주시면 됩니다. ")
-            Pageable pageable){
-        return Response.success("게시글 조회 성공", SearchResponse.builder().build());
+            Pageable pageable
+    ) {
+        return Response.success("게시글 조회 성공", new ItemResponse());
     }
 
     @Operation(summary = "경매 생성", description = "request는 json으로 보내주셔야 합니다!")
@@ -88,7 +96,7 @@ public class AuctionController {
     }
 
     @GetMapping("/new")
-    @Operation(summary = "메인페이지", description = "새로 들어온 제품 (최신순)")
+    @Operation(summary = "새로 들어온 제품 (최신순)")
     public Response<ItemResponse> getNewItem(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
@@ -97,7 +105,7 @@ public class AuctionController {
     }
 
     @GetMapping("/deadline")
-    @Operation(summary = "메인페이지", description = "마감 임박한 상품")
+    @Operation(summary = "마감 임박한 상품")
     public Response<ItemResponse> getDeadline(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
@@ -106,7 +114,7 @@ public class AuctionController {
     }
 
     @GetMapping("/view")
-    @Operation(summary = "메인페이지", description = "조회수 많은 상품")
+    @Operation(summary = "조회수 많은 상품")
     public Response<ItemResponse> getMostView(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"

@@ -1,11 +1,8 @@
-package com.betting.ground.auction.domain.dto;
+package com.betting.ground.auction.dto;
 
-import com.betting.ground.auction.domain.Duration;
-import com.betting.ground.auction.domain.ItemCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter

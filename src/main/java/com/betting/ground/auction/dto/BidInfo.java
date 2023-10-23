@@ -1,9 +1,7 @@
-package com.betting.ground.auction.domain.dto;
+package com.betting.ground.auction.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class BidInfo {

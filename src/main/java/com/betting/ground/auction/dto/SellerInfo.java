@@ -1,7 +1,5 @@
-package com.betting.ground.auction.controller;
+package com.betting.ground.auction.dto;
 
-import com.betting.ground.auction.domain.Auction;
-import com.betting.ground.auction.domain.dto.biddingItemDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
