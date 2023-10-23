@@ -16,11 +16,7 @@ public class SellerInfo {
     private String nickname;
     @Schema(description = "판매자 경매글 수", example="5")
     private int auctionCnt;
-    @Schema(description = "판매자 경매글 목록")
+    @Schema(description = "판매자 경매글 목록 3개만 보여줌")
     private List<biddingItemDto> auctionList;
-    @Schema(description = "현재 페이지", example="1")
-    private int currentPage;
-    @Schema(description = "전체 페이지", example="2")
-    private int totalPage;
 
 }

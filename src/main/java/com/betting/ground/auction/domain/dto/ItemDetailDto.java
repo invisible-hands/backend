@@ -19,13 +19,15 @@ public class ItemDetailDto {
     @Schema(description = "상품 설명", example="미개봉 새 제품, 스카이블루")
     private String content;
     @Schema(description = "상품 상태", example="NEW")
-    private ItemCondition itemCondition;
+    private String itemCondition;
     @Schema(description = "현재 입찰 가격", example="175000")
     private Long nowPrice;
     @Schema(description = "즉시 구매 가격", example="200000")
     private Long instantPrice;
-    @Schema(description = "경매 시작 시간", example="2023-10-20T01:48:29.348Z")
-    private LocalDateTime startTime;
+    @Schema(description = "경매 등록 시간", example="2023-10-20 13:35:10")
+    private String createdAt;
+    @Schema(description = "경매 시작 시간", example="2023-10-20 13:40:10") // 2023-10-20 13:40:10
+    private String auctionStartTime;
     @Schema(description = "경매 기간", example="24")
     private int duration;
     @Schema(description = "태그", example="")

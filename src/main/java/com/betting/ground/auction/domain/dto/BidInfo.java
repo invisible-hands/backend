@@ -13,8 +13,8 @@ public class BidInfo {
     private Long bidderId;
     @Schema(description = "입찰자 이메일", example="harok@naver.com")
     private String bidderEmail;
-    @Schema(description = "입찰 시간", example="2023-10-20T01:48:29.348Z")
-    private LocalDateTime bidTime;
+    @Schema(description = "입찰 시간", example="2023-10-20 13:35:10")
+    private String bidTime;
     @Schema(description = "입찰 가격", example="185000")
     private Long bidPrice;
 }

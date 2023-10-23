@@ -7,6 +7,7 @@ import com.betting.ground.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +24,8 @@ public class AuctionController {
     @GetMapping("/{auctionId}/bidHistory")
     @Operation(summary = "입찰 내역", description = "")
     @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-    public Response<BidHistoryDto> getBidHistory(@PathVariable Long auctionId) {
+    @Parameter(name = "pageable", description = "page 와 size 보내주세요")
+    public Response<BidHistoryDto> getBidHistory(@PathVariable Long auctionId, Pageable pageable) {
         return Response.success("해당 경매글의 입찰 내역 보기 성공", new BidHistoryDto());
     }
 
