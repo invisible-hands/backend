@@ -32,25 +32,25 @@ public class UserController {
 
     @PostMapping("/account")
     @Operation(summary = "계좌 번호 등록")
-    public Response<UserAccountDTO> registerAccountNumber(@RequestBody String accountNumber) {
+    public Response<UserAccountDTO> registerAccountNumber(@RequestBody UserAccountDTO accountNumber) {
         return Response.success("계좌 번호 등록 완료", new UserAccountDTO());
     }
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 수정")
-    public Response<UserAccountDTO> editAccountNumber(@RequestBody String accountNumber) {
+    public Response<UserAccountDTO> editAccountNumber(@RequestBody UserAccountDTO accountNumber) {
         return Response.success("계좌 번호 수정 완료", new UserAccountDTO());
     }
 
     @PostMapping("/address")
     @Operation(summary = "주소 등록")
-    public Response<UserAddressDTO> registerAddress(@RequestBody String address) {
+    public Response<UserAddressDTO> registerAddress(@RequestBody UserAddressDTO address) {
         return Response.success("주소 등록 완료", new UserAddressDTO());
     }
 
     @PutMapping("/address")
     @Operation(summary = "주소 수정")
-    public Response<UserAddressDTO> editAddress(@RequestBody String address) {
+    public Response<UserAddressDTO> editAddress(@RequestBody UserAddressDTO address) {
         return Response.success("주소 수정 완료", new UserAddressDTO());
     }
 
