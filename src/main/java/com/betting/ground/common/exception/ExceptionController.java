@@ -29,6 +29,8 @@ public class ExceptionController {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Response<Void>> unhandledException(Exception e, HttpServletRequest request) {
+        log.error("error occur {}",e);
+
 //        slackAlarmGenerator.sendSlackAlertErrorLog(e, request);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
