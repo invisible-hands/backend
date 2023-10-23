@@ -12,7 +12,7 @@ public class HealthController {
 
     @GetMapping
     public String check() {
-        return "okok";
+        return "okokok";
     }
 
     @GetMapping("/redis/set")
