@@ -23,19 +23,13 @@ public class ExceptionController {
 
     @ExceptionHandler(value = GlobalException.class)
     public ResponseEntity<Response<Void>> handleGlobalExceptionHandler(GlobalException e) {
-        log.error("error occur: {}" , e);
-
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(Response.error(e.getErrorCode().getStatus().toString(), e.getErrorCode().getMessage()));
     }
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Response<Void>> unhandledException(Exception e, HttpServletRequest request) {
-        log.error("error occur: {}" , e);
-
-        if(!e.getClass().getSimpleName().equals(InternalAuthenticationServiceException.class.getSimpleName())) {
-            slackAlarmGenerator.sendSlackAlertErrorLog(e, request);
-        }
+//        slackAlarmGenerator.sendSlackAlertErrorLog(e, request);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage()));
@@ -43,8 +37,6 @@ public class ExceptionController {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<List<Response<Void>>> argsValidHandler(MethodArgumentNotValidException e) {
-        log.error("error occur: {}" , e);
-
         List<Response<Void>> errors = new ArrayList<>();
         e.getFieldErrors().stream()
                 .forEach(error -> errors.add(Response.error(error.getField(), error.getDefaultMessage())));
