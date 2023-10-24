@@ -5,9 +5,16 @@ import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.response.BiddingInfoResponse;
+import com.betting.ground.user.dto.response.PurchaseInfoResponse;
+import com.betting.ground.user.dto.response.SalesInfoResponse;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "유저", description = "유저 관련 api")
@@ -58,5 +65,31 @@ public class UserController {
             return Response.success("활성 유저 전환 완료", null);
     }
 
+    @GetMapping("/purchases")
+    @Operation(summary = "구매 목록 조회")
+    public Response<PurchaseInfoResponse> getPurchaseList(
+            @Parameter(description = "filter 기능용 변수명 정해야함")
+            @RequestParam(required = false) String status
+    ){
+        return Response.success("구매 목록 조회 완료", new PurchaseInfoResponse());
+    }
+
+    @GetMapping( "/bids")
+    @Operation(summary = "경매 목록 조회")
+    public Response<BiddingInfoResponse> getBiddingList(
+            @Parameter(description = "filter 기능용 변수명 정해야함")
+            @RequestParam(required = false) String status
+    ){
+        return Response.success("경매 목록 조회 완료", new BiddingInfoResponse());
+    }
+
+    @GetMapping("/sales")
+    @Operation(summary = "판매 목록 조회")
+    public Response<SalesInfoResponse> getSalesList(
+            @Parameter(description = "filter 기능용 변수명 정해야함")
+            @RequestParam(required = false) String status
+    ){
+        return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
+    }
 }
 

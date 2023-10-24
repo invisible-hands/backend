@@ -18,7 +18,7 @@ public class Item {
     private Long sellerId;
     private Long buyerId;
     private Long finalPrice;
-    private LocalDateTime endAuctionTime;
+    private LocalDateTime closeAuctionTime;
     @Enumerated(EnumType.STRING)
     private AuctionStatus auctionStatus;
 

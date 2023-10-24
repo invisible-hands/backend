@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,6 @@ public class AuctionCreateRequest {
     private Long instantPrice;
     @Schema(description = "경매 시간", example = "6")
     private Integer duration;
+    @Schema(description = "태그", example = "")
+    private List<String> tags;
 }
