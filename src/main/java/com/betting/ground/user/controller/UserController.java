@@ -52,14 +52,11 @@ public class UserController {
         return Response.success("주소 수정 완료", new UserAddressDTO());
     }
 
-    @PostMapping("/Role")
+    @PostMapping("/role")
     @Operation(summary = "약관 동의시 활성 유저")
-    public Response<?> userRoleUpdate(@RequestBody UserDTO userDTO) {
-        if(userDTO.getRole().equals("guest"))
-            return Response.success("활성 유저 전환 완료", userDTO);
-        else
-            return Response.error("401","이미 전환된 유저입니다.");
+    public Response<Void> userRoleUpdate() {
+            return Response.success("활성 유저 전환 완료", null);
     }
 
-    }
+}
 
