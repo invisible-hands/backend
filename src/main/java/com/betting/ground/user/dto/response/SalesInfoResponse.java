@@ -11,6 +11,8 @@ import java.util.List;
 public class SalesInfoResponse {
     @Schema(description = "판매 정보")
     private List<SalesInfo> sales;
+    @Schema(description = "상태 개수")
+    private SalesStatusCnt cnt;
     @Schema(description = "현재 페이지", example="0")
     private int currentPage;
     @Schema(description = "총 페이지", example="4")

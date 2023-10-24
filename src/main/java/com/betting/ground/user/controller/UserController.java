@@ -56,29 +56,29 @@ public class UserController {
         return Response.success("주소 수정 완료", new UserAddressDTO());
     }
 
-    @GetMapping(value = {"/purchaseList/{status}", "/purchaseList"})
+    @GetMapping("/purchaseList")
     @Operation(summary = "구매 목록 조회")
     public Response<PurchaseInfoResponse> getPurchaseList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
-            @PathVariable(required = false) String status
+            @RequestParam(required = false) String status
     ){
         return Response.success("구매 목록 조회 완료", new PurchaseInfoResponse());
     }
 
-    @GetMapping(value = {"/biddingList/{status}", "/biddingList"})
+    @GetMapping( "/biddingList")
     @Operation(summary = "경매 목록 조회")
     public Response<BiddingInfoResponse> getBiddingList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
-            @PathVariable(required = false) String status
+            @RequestParam(required = false) String status
     ){
         return Response.success("경매 목록 조회 완료", new BiddingInfoResponse());
     }
 
-    @GetMapping(value = {"/salesList/{status}", "/salesList"})
+    @GetMapping("/salesList")
     @Operation(summary = "판매 목록 조회")
     public Response<SalesInfoResponse> getSalesList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
-            @PathVariable(required = false) String status
+            @RequestParam(required = false) String status
     ){
         return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
     }

@@ -1,6 +1,5 @@
 package com.betting.ground.auction.dto.response;
 
-import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.dto.AuctionImageDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -22,6 +21,4 @@ public class BidInfoResponse {
     private String endAuctionTime;
     @Schema(description = "보유 포인트", example="10000")
     private Long money;
-    @Schema(description = "판매자 구매자 일치 여부", example = "false")
-    private Boolean isAuthor;
 }

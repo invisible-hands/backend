@@ -10,8 +10,12 @@ public class BiddingInfo {
 
     @Schema(description = "상품 아이디", example="1")
     private Long auctionId;
+    @Schema(description = "상품 이미지", example="https://~~~")
+    private String imageUrl;
     @Schema(description = "상품명", example="최하록이 만든 마법의 아이폰 25 mini")
     private String title;
+    @Schema(description = "경매 종료 시각", example = "2027-04-12 12:00:00")
+    private String endAuctionTime;
     @Schema(description = "현재 입찰가", example="500")
     private Long currentPrice;
     @Schema(description = "내 입찰 금액", example="500")
