@@ -1,6 +1,7 @@
 package com.betting.ground.auction.service;
 
 import com.betting.ground.auction.dto.response.AuctionInfo;
+import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.repository.AuctionRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,11 @@ public class AuctionService {
     public ItemResponse search(String keyword, Pageable pageable) {
         PageImpl<AuctionInfo> auctionInfo = auctionRepository.findItemByKeywordByOrderByCreatedAtDesc(keyword, pageable);
         return new ItemResponse(auctionInfo);
+    }
+
+    @Transactional(readOnly = true)
+    public BidInfoResponse getBidInfo(Long auctionId, Long userId){
+        return auctionRepository.getBidInfo(auctionId, userId);
     }
 
 }

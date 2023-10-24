@@ -2,12 +2,15 @@ package com.betting.ground.auction.dto.response;
 
 import com.betting.ground.auction.dto.AuctionImageDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class BidInfoResponse {
 
@@ -21,4 +24,12 @@ public class BidInfoResponse {
     private String endAuctionTime;
     @Schema(description = "보유 포인트", example="10000")
     private Long money;
+
+    public BidInfoResponse(String title, Long currentPrice, LocalDateTime endAuctionTime, Long money) {
+        this.images = new ArrayList<>();
+        this.title = title;
+        this.currentPrice = currentPrice;
+        this.endAuctionTime = endAuctionTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.money = money;
+    }
 }

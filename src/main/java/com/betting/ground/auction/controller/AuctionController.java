@@ -7,10 +7,12 @@ import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.BidRequest;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,7 +128,7 @@ public class AuctionController {
 
     @GetMapping("/{auctionId}/bid")
     @Operation(summary = "상품 입찰하기 페이지 조회")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId){
-        return Response.success("입찰 조회 완료", new BidInfoResponse());
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal User user){
+        return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, 1L));
     }
 }
