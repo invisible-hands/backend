@@ -1,4 +1,5 @@
 package com.betting.ground.user.controller;
+
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "유저", description = "유저 관련 api")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -56,7 +59,13 @@ public class UserController {
         return Response.success("주소 수정 완료", new UserAddressDTO());
     }
 
-    @GetMapping("/purchaseList")
+    @PostMapping("/role")
+    @Operation(summary = "약관 동의시 활성 유저")
+    public Response<Void> userRoleUpdate() {
+            return Response.success("활성 유저 전환 완료", null);
+    }
+
+    @GetMapping("/purchases")
     @Operation(summary = "구매 목록 조회")
     public Response<PurchaseInfoResponse> getPurchaseList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
@@ -65,7 +74,7 @@ public class UserController {
         return Response.success("구매 목록 조회 완료", new PurchaseInfoResponse());
     }
 
-    @GetMapping( "/biddingList")
+    @GetMapping( "/bids")
     @Operation(summary = "경매 목록 조회")
     public Response<BiddingInfoResponse> getBiddingList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
@@ -74,7 +83,7 @@ public class UserController {
         return Response.success("경매 목록 조회 완료", new BiddingInfoResponse());
     }
 
-    @GetMapping("/salesList")
+    @GetMapping("/sales")
     @Operation(summary = "판매 목록 조회")
     public Response<SalesInfoResponse> getSalesList(
             @Parameter(description = "filter 기능용 변수명 정해야함")
@@ -83,3 +92,4 @@ public class UserController {
         return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
     }
 }
+
