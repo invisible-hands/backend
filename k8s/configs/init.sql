@@ -55,7 +55,7 @@ create table item (
                       id bigint not null auto_increment,
                       auction_status varchar(255),
                       buyer_id bigint,
-                      end_auction_time datetime(6),
+                      close_auction_time datetime(6),
                       final_price bigint,
                       seller_id bigint,
                       auction_id bigint,
