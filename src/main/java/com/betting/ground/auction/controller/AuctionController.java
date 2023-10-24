@@ -70,7 +70,7 @@ public class AuctionController {
             @Parameter(description = "page랑 size만 주시면 됩니다. ")
             Pageable pageable
     ) {
-        return Response.success("게시글 조회 성공", new ItemResponse());
+        return Response.success("게시글 조회 성공", auctionService.search(keyword, pageable));
     }
 
     @Operation(summary = "경매 생성", description = "request는 json으로 보내주셔야 합니다!")
