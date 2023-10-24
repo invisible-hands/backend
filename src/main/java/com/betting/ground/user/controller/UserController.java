@@ -1,16 +1,16 @@
 package com.betting.ground.user.controller;
+
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "유저", description = "유저 관련 api")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -52,4 +52,14 @@ public class UserController {
         return Response.success("주소 수정 완료", new UserAddressDTO());
     }
 
-}
+    @PostMapping("/Role")
+    @Operation(summary = "약관 동의시 활성 유저")
+    public Response<?> userRoleUpdate(@RequestBody UserDTO userDTO) {
+        if(userDTO.getRole().equals("guest"))
+            return Response.success("활성 유저 전환 완료", userDTO);
+        else
+            return Response.error("401","이미 전환된 유저입니다.");
+    }
+
+    }
+

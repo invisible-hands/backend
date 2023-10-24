@@ -1,13 +1,11 @@
 package com.betting.ground.user.dto;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import com.betting.ground.user.domain.Address;
-import com.betting.ground.user.domain.Bank;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -46,5 +44,7 @@ public class UserDTO {
     @Schema(description = "이메일", example = "betting@gmail.com")
     private String emailAddress;
 
+    @Schema(description = "권한", example = "guest")
+    private String role;
 
 }
