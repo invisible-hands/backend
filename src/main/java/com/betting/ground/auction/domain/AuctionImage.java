@@ -18,4 +18,9 @@ public class AuctionImage {
     @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
 
+
+    public AuctionImage(String imageUrl, Auction auction) {
+        this.imageUrl = imageUrl;
+        this.auction = auction;
+    }
 }

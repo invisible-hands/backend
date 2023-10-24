@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,6 +28,7 @@ public class Auction extends BaseTimeEntity {
     private Long startPrice;
     @Enumerated(EnumType.STRING)
     private Duration duration;
+    private LocalDateTime endAuctionTime;
     private Long instantPrice;
     private int viewCnt;
     private boolean isDeleted;
