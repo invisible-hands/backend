@@ -22,6 +22,7 @@ create table auction (
                          updated_at datetime(6),
                          content varchar(255),
                          duration varchar(255),
+                         end_auction_time datetime(6),
                          instant_price bigint,
                          is_deleted bit not null,
                          item_condition varchar(255),
