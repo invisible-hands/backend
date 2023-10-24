@@ -5,6 +5,7 @@ import com.betting.ground.auction.dto.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.BidRequest;
+import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/auction")
 @Tag(name = "경매", description = "경매 관련 api")
 public class AuctionController {
+
     private final AuctionService auctionService;
   
     @GetMapping("/{auctionId}")
@@ -120,5 +122,11 @@ public class AuctionController {
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
             ) Pageable pageable) {
         return Response.success("조회수 많은 상품", auctionService.getMostView(pageable));
+    }
+
+    @GetMapping("/{auctionId}/bid")
+    @Operation(summary = "상품 입찰하기 페이지 조회")
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId){
+        return Response.success("입찰 조회 완료", new BidInfoResponse());
     }
 }

@@ -1,11 +1,8 @@
 package com.betting.ground.auction.domain;
 
-import com.betting.ground.common.entity.BaseTimeEntity;
 import com.betting.ground.user.domain.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -16,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_Deleted = true WHERE id = ?")
 @Where(clause = "is_Deleted = false")
-public class Auction extends BaseTimeEntity {
+public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,6 +28,8 @@ public class Auction extends BaseTimeEntity {
     private LocalDateTime endAuctionTime;
     private Long instantPrice;
     private int viewCnt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
