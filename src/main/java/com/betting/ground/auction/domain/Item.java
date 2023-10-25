@@ -24,4 +24,8 @@ public class Item {
 
     @OneToOne(fetch = FetchType.LAZY)
     private Auction auction;
+
+    public void updateStatus(AuctionStatus status){
+        this.auctionStatus = status;
+    }
 }
