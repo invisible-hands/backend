@@ -13,8 +13,8 @@ public class BiddingInfoResponse {
 
     @Schema(description = "상품 정보")
     private List<BiddingInfo> auctions;
-    @Schema(description = "상태 개수")
-    private BiddingStatusCnt cnt;
+    @Schema(description = "게시물 개수", example="4")
+    private int cnt;
     @Schema(description = "현재 페이지", example="0")
     private int currentPage;
     @Schema(description = "총 페이지", example="4")
