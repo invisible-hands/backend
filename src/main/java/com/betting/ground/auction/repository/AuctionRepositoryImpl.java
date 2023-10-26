@@ -63,10 +63,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auctionImage
                 ))
                 .from(auction)
-                .where(auction.endAuctionTime.lt(LocalDateTime.now()))
+                .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(auction.endAuctionTime.desc())
+                .orderBy(auction.endAuctionTime.asc())
                 .fetch();
 
 
@@ -74,7 +74,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.count()
                 )
                 .from(auction)
-                .where(auction.endAuctionTime.lt(LocalDateTime.now()))
+                .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .fetchOne();
 
         return new PageImpl<>(auctions, pageable, count);
