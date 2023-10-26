@@ -82,6 +82,8 @@ public class AuctionController {
             @RequestPart AuctionCreateRequest request,
             @RequestParam List<MultipartFile> images
     ) {
+
+
         return Response.success("게시글 생성 성공", null);
     }
 

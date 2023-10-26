@@ -7,6 +7,7 @@ import com.betting.ground.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,23 @@ public class UserController {
 
     private final UserService userService;
     @GetMapping("/login/kakao")
-    public Response<LoginResponseDto> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    @Operation(summary = "카카오 로그인")
+    public Response<LoginResponseDto> kakaoLogin(
+            @Parameter(description = "카카오에서 받은 code", example = "")
+            @RequestParam String code) throws JsonProcessingException {
 
         return Response.success("카카오 로그인 성공", userService.login(code));
     }
 
     @PostMapping("/reissue")
-    public Response<LoginResponseDto> reissue(@Valid @RequestBody ReissueRequestDto request) {
+    @Operation(summary = "토큰 재발급")
+    public Response<LoginResponseDto> reissue(
+            @Valid @RequestBody ReissueRequestDto request) {
         return Response.success("토큰 재발행을 성공했습니다.", userService.reissue(request));
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
     public Response<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
         String nickname = loginUser.getUser().getNickname();
 
