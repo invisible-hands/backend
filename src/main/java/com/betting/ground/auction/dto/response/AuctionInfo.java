@@ -43,7 +43,7 @@ public class AuctionInfo {
         this.duration = duration.getTime();
         this.viewCnt = viewCnt;
         this.auctionStatus = endAuctionTime.isBefore(LocalDateTime.now()) ?
-                AuctionStatus.AUCTION_FINISH.getStatus() : AuctionStatus.AUCTION_PROGRESS.getStatus();
+                AuctionStatus.AUCTION_SUCCESS.getStatus() : AuctionStatus.AUCTION_PROGRESS.getStatus();
         this.imageUrl = imageUrl;
     }
 }

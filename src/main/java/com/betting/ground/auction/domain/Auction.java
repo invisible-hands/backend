@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE auction SET is_Deleted = true WHERE id = ?")
-@Where(clause = "is_Deleted = false")
+@SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,13 @@ public class Auction {
     @Enumerated(EnumType.STRING)
     private ItemCondition itemCondition;
     private Long startPrice;
+    private Long instantPrice;
+    private Long currentPrice;
+    @Enumerated(EnumType.STRING)
+    private AuctionStatus auctionStatus;
     @Enumerated(EnumType.STRING)
     private Duration duration;
     private LocalDateTime endAuctionTime;
-    private Long instantPrice;
     private int viewCnt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -17,7 +17,7 @@ public class BidHistory {
 
     private LocalDateTime createdAt;
     private Long price;
-    private String email;
+    private String nickname;
     private Long bidderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
