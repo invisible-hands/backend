@@ -1,16 +1,17 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
-import com.betting.ground.user.dto.response.BiddingInfoResponse;
-import com.betting.ground.user.dto.response.PurchaseInfoResponse;
-import com.betting.ground.user.dto.response.SalesInfoResponse;
-import io.swagger.v3.oas.annotations.Parameter;
+import com.betting.ground.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ObjectUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Tag(name = "유저", description = "유저 관련 api")
 @RestController
 @RequiredArgsConstructor
@@ -115,12 +117,15 @@ public class UserController {
     public Response<?> userRoleUpdate(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userDTO);
         //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userDTO.getEmail())) {
+        if (ObjectUtils.isEmpty(userDTO.getEmail())) {
             //유효성 검증 에러 추가
             bindingResult.addError(new FieldError("UserDTO"
                     , "email"
                     , "이메일을 입력하셔야 됩니다."));
             return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
         }
+
+        return Response.success("", null);
+    }
 }
 

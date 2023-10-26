@@ -1,6 +1,7 @@
 package com.betting.ground.auction.repository;
 
 import com.betting.ground.auction.dto.response.AuctionInfo;
+import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -14,6 +15,7 @@ import java.util.List;
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QTag.tag;
+import static com.betting.ground.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
@@ -158,5 +160,20 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                                 .from(auctionImage)
                                 .where(auctionImage.auction.eq(auction))
                 ));
+    }
+
+    @Override
+    public BidInfoResponse getBidInfo(Long auctionId, Long userId){
+        return jpaQueryFactory.select(Projections.constructor(BidInfoResponse.class,
+                        getAuctionImage(),
+                        auction.title,
+                        auction.currentPrice,
+                        auction.endAuctionTime,
+                        user.money
+                ))
+                .from(auction)
+                .leftJoin(user).on(auction.user.id.eq(userId))
+                .where(auction.id.eq(auctionId))
+                .fetchOne();
     }
 }
