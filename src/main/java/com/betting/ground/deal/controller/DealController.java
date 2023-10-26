@@ -42,7 +42,7 @@ public class DealController {
             @PathVariable Long dealId
     ){
         dealService.purchaseComplete(dealId);
-        return Response.success("구매 확정", null);
+        return Response.success("구매 확정 완료", null);
     }
 
     @GetMapping( "/bids")
