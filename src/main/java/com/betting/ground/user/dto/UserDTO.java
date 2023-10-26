@@ -1,16 +1,16 @@
 package com.betting.ground.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Email;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class UserDTO {
 
     //프로필조회
@@ -41,10 +41,10 @@ public class UserDTO {
     @Schema(description = "가상머니", example = "20000")
     private String money;
 
+    @Email
     @Schema(description = "이메일", example = "betting@gmail.com")
-    private String emailAddress;
+    private String email;
 
-    @Schema(description = "권한", example = "guest")
+    @Schema(description = "권한", example = "role")
     private String role;
-
 }
