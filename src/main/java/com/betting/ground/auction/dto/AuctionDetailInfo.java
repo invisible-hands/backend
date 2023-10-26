@@ -1,7 +1,12 @@
 package com.betting.ground.auction.dto;
 
+import com.betting.ground.auction.domain.Duration;
+import com.betting.ground.auction.domain.ItemCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 public class AuctionDetailInfo {
@@ -29,4 +34,19 @@ public class AuctionDetailInfo {
     private Long bidderCnt;
     @Schema(description = "조회수", example = "32")
     private int viewCnt;
+
+    public AuctionDetailInfo(Long auctionId, Long sellerId, String title, String content, ItemCondition itemCondition, Long currentPrice, Long instantPrice, LocalDateTime createdAt, LocalDateTime endAuctionTime, Duration duration, Long bidderCnt, int viewCnt) {
+        this.auctionId = auctionId;
+        this.sellerId = sellerId;
+        this.title = title;
+        this.content = content;
+        this.itemCondition = itemCondition.name();
+        this.currentPrice = currentPrice;
+        this.instantPrice = instantPrice;
+        this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.endAuctionTime = endAuctionTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.duration = duration.getTime();
+        this.bidderCnt = bidderCnt;
+        this.viewCnt = viewCnt;
+    }
 }
