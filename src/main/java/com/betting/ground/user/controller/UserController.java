@@ -25,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/userProfile/{email}")
+    @GetMapping //토큰값으로 유저 정보를 가져올수있음, UserID로 유저 정보를 뿌림.
     @Operation(summary = "유저 프로필 조회")
     public Response<?> getProfile(@PathVariable String email) {
         log.info("입력값 : {}", email);
@@ -40,7 +40,7 @@ public class UserController {
             return Response.error("401", "해당 유저는 없는 유저입니다.");
     }
 
-    @PostMapping("/nicknameUpdate")
+    @PutMapping ("/nickname")
     @Operation(summary = "닉네임 수정")
     public Response<?> editNickname(@RequestBody @Valid UserNicknameDTO userNicknameDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userNicknameDTO);
@@ -68,27 +68,8 @@ public class UserController {
         return Response.success("닉네임 수정 완료", userNicknameDTO);
     }
 
-    @PostMapping("/account")
-    @Operation(summary = "계좌 번호 등록")
-    public Response<?> registerAccountNumber(@RequestBody @Valid UserAccountDTO userAccountDTO, BindingResult bindingResult) {
-        log.info("입력값 : {}", userAccountDTO);
-        //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userAccountDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserAccountDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
-        }
 
-        //2. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500", "시스템 에러");
-
-        //결과 리턴
-        return Response.success("계좌 번호 등록 완료", userAccountDTO);
-    }
-
-    @PostMapping("/accountUpdate")
+    @PutMapping("/account")
     @Operation(summary = "계좌 번호 수정")
     public Response<?> editAccountNumber(@RequestBody @Valid UserAccountDTO userAccountDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userAccountDTO);
@@ -109,27 +90,8 @@ public class UserController {
         return Response.success("계좌 번호 수정 완료", userAccountDTO);
     }
 
-    @PostMapping("/address")
-    @Operation(summary = "주소 등록")
-    public Response<?> registerAddress(@RequestBody @Valid UserAddressDTO userAddressDTO, BindingResult bindingResult) {
-        log.info("입력값 : {}", userAddressDTO);
-        //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userAddressDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserAddressDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
-        }
 
-        //2. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러(db 연결 불가)");
-
-        //결과리턴
-        return Response.success("주소 등록 완료", userAddressDTO);
-    }
-
-    @PostMapping("/addressUpdate")
+    @PutMapping("/address")
     @Operation(summary = "주소 수정")
     public Response<?> editAddress(@RequestBody @Valid UserAddressDTO userAddressDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userAddressDTO);
@@ -149,7 +111,7 @@ public class UserController {
         return Response.success("주소 수정 완료", userAddressDTO);
     }
 
-    @PostMapping("/userRoleUpdate")
+    @PostMapping("/role")
     @Operation(summary = "활성 유저 전환")
     public Response<?> userRoleUpdate(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userDTO);
