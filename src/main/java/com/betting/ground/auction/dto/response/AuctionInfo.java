@@ -23,7 +23,7 @@ public class AuctionInfo {
     private Long currentPrice;
     @Schema(description = "즉시구매 가격", example = "12000")
     private Long instantPrice;
-    @Schema(description = "경매 시작 시각", example = "2023-10-24 09:00:01")
+    @Schema(description = "경매 시작 시각 => 경매등록시간+5분", example = "2023-10-24 09:00:01")
     private String auctionStartTime;
     @Schema(description = "경매 기간", example = "6")
     private int duration;
@@ -43,7 +43,7 @@ public class AuctionInfo {
         this.duration = duration.getTime();
         this.viewCnt = viewCnt;
         this.auctionStatus = endAuctionTime.isBefore(LocalDateTime.now()) ?
-                AuctionStatus.AUCTION_FINISH.getStatus() : AuctionStatus.AUCTION_PROGRESS.getStatus();
+                "경매 종료" : AuctionStatus.AUCTION_PROGRESS.getStatus();
         this.imageUrl = imageUrl;
     }
 }

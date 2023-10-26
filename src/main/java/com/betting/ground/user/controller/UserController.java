@@ -9,11 +9,8 @@ import com.betting.ground.user.dto.UserNicknameDTO;
 import com.betting.ground.user.dto.response.BiddingInfoResponse;
 import com.betting.ground.user.dto.response.PurchaseInfoResponse;
 import com.betting.ground.user.dto.response.SalesInfoResponse;
-import com.betting.ground.user.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,77 +28,99 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "유저 프로필 조회")
-    public Response<UserDTO> getProfile() {
-        return Response.success("유저 프로필 조회 완료", new UserDTO());
+    public Response<?> getProfile(@PathVariable String email) {
+        log.info("입력값 : {}", email);
+        //조회한 정보를 반환([예시] - 추후 db에서 반환)
+        UserDTO userDTO = UserDTO.builder()
+                .email(email)
+                .build();
+        //결과 리턴
+        if(email != null)
+            return Response.success("유저 프로필 조회 완료", userDTO);
+        else
+            return Response.error("401", "해당 유저는 없는 유저입니다.");
     }
 
-    @PutMapping("/nickname")
+    @PutMapping ("/nickname")
     @Operation(summary = "닉네임 수정")
-    public Response<UserNicknameDTO> editNickname(@RequestBody UserNicknameDTO requestDTO) {
-        return Response.success("닉네임 수정 완료", new UserNicknameDTO());
-    }
+    public Response<?> editNickname(@RequestBody @Valid UserNicknameDTO userNicknameDTO, BindingResult bindingResult) {
+        log.info("입력값 : {}", userNicknameDTO);
 
-    @PostMapping("/account")
-    @Operation(summary = "계좌 번호 등록")
-    public Response<UserAccountDTO> registerAccountNumber(@RequestBody UserAccountDTO accountNumber) {
-        return Response.success("계좌 번호 등록 완료", new UserAccountDTO());
+        //1. email검증
+        if(ObjectUtils.isEmpty(userNicknameDTO.getEmail())) {
+            //유효성 검증 에러 추가
+            bindingResult.addError(new FieldError("UserNicknameDTO"
+                    , "email"
+                    , "이메일을 입력하셔야 됩니다."));
+        }
+
+        //2. 닉네임 유효성 검증
+        String nicknameRegex = "^[a-zA-Z0-9가-힣]*$"; // 닉네임에는 영어,숫자,한글만 사용가능
+        if(!userNicknameDTO.getNickname().matches(nicknameRegex)) {
+            bindingResult.addError(new FieldError("UserNicknameDTO"
+                    , "nickname"
+                    , "닉네임은 영어, 숫자, 한글만 포함할 수 있습니다."));
+        }
+
+        //3. 에러가 존재하면 error리턴
+        if(bindingResult.hasErrors()) return Response.error("500", bindingResult.getFieldError().getDefaultMessage());
+
+        //결과 리턴
+        return Response.success("닉네임 수정 완료", userNicknameDTO);
     }
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 수정")
-    public Response<UserAccountDTO> editAccountNumber(@RequestBody UserAccountDTO accountNumber) {
-        return Response.success("계좌 번호 수정 완료", new UserAccountDTO());
-    }
+    public Response<?> editAccountNumber(@RequestBody @Valid UserAccountDTO userAccountDTO, BindingResult bindingResult) {
+        log.info("입력값 : {}", userAccountDTO);
 
-    @PostMapping("/address")
-    @Operation(summary = "주소 등록")
-    public Response<UserAddressDTO> registerAddress(@RequestBody UserAddressDTO address) {
-        return Response.success("주소 등록 완료", new UserAddressDTO());
+        //1. 이메일 검증
+        if(ObjectUtils.isEmpty(userAccountDTO.getEmail())) {
+            //유효성 검증 에러 추가
+            bindingResult.addError(new FieldError("UserAccountDTO"
+                    , "email"
+                    , "이메일을 입력하셔야 됩니다."));
+            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
+        }
+
+        //2. 에러가 존재하면 error리턴
+        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러");
+
+        //결과리턴
+        return Response.success("계좌 번호 수정 완료", userAccountDTO);
     }
 
     @PutMapping("/address")
     @Operation(summary = "주소 수정")
-    public Response<UserAddressDTO> editAddress(@RequestBody UserAddressDTO address) {
-        return Response.success("주소 수정 완료", new UserAddressDTO());
+    public Response<?> editAddress(@RequestBody @Valid UserAddressDTO userAddressDTO, BindingResult bindingResult) {
+        log.info("입력값 : {}", userAddressDTO);
+        //1. 이메일 검증
+        if(ObjectUtils.isEmpty(userAddressDTO.getEmail())) {
+            //유효성 검증 에러 추가
+            bindingResult.addError(new FieldError("UserAddressDTO"
+                    , "email"
+                    , "이메일을 입력하셔야 됩니다."));
+            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
+        }
+
+        //2. 에러가 존재하면 error리턴
+        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러(db 연결 불가)");
+
+        //결과 리턴
+        return Response.success("주소 수정 완료", userAddressDTO);
     }
 
     @PostMapping("/role")
-    @Operation(summary = "약관 동의시 활성 유저")
-    public Response<Void> userRoleUpdate() {
-            return Response.success("활성 유저 전환 완료", null);
-    }
-
-    @GetMapping("/purchases")
-    @Operation(summary = "구매 목록 조회")
-    public Response<PurchaseInfoResponse> getPurchaseList(
-            @Parameter(description = "all/before/progress/finish")
-            @RequestParam(required = false, defaultValue = "all") String status,
-            Pageable pageable,
-            @AuthenticationPrincipal User user
-    ){
-        PurchaseInfoResponse response = new PurchaseInfoResponse();
-        if(status.equals("all")) response = userService.getAllPurchases(1L, pageable);
-        else if(status.equals("before")) response = userService.getBeforeShippingPurchases(1L, pageable);
-
-        return Response.success("구매 목록 조회 완료", response);
-    }
-
-    @GetMapping( "/bids")
-    @Operation(summary = "경매 목록 조회")
-    public Response<BiddingInfoResponse> getBiddingList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status
-    ){
-        return Response.success("경매 목록 조회 완료", new BiddingInfoResponse());
-    }
-
-    @GetMapping("/sales")
-    @Operation(summary = "판매 목록 조회")
-    public Response<SalesInfoResponse> getSalesList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status
-    ){
-        return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
-    }
+    @Operation(summary = "활성 유저 전환")
+    public Response<?> userRoleUpdate(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+        log.info("입력값 : {}", userDTO);
+        //1. 이메일 검증
+        if(ObjectUtils.isEmpty(userDTO.getEmail())) {
+            //유효성 검증 에러 추가
+            bindingResult.addError(new FieldError("UserDTO"
+                    , "email"
+                    , "이메일을 입력하셔야 됩니다."));
+            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
+        }
 }
 

@@ -1,18 +1,16 @@
 package com.betting.ground.auction.dto.response;
 
-import com.betting.ground.auction.dto.AuctionImageDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class BidInfoResponse {
 
-    @Schema(description = "상품 이미지")
-    private List<AuctionImageDto> images;
+    @Schema(description = "상품 이미지", example = "https://~~")
+    private String image;
     @Schema(description = "상품명", example="최진영이 말아준 버블티")
     private String title;
     @Schema(description = "현재 가격", example="20000")

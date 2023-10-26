@@ -13,7 +13,6 @@ import java.util.List;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
-import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
 import static com.betting.ground.auction.domain.QTag.tag;
 
 @RequiredArgsConstructor
@@ -23,13 +22,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
-        JPQLQuery<Long> currentPrice = getCurrentPriceFromBidHistory();
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
                         auction.id,
                         auction.title,
-                        currentPrice,
+                        auction.currentPrice,
                         auction.instantPrice,
                         auction.createdAt,
                         auction.endAuctionTime,
@@ -54,13 +52,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByEndAuctionTimeAsc(Pageable pageable) {
-        JPQLQuery<Long> currentPrice = getCurrentPriceFromBidHistory();
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
                         auction.id,
                         auction.title,
-                        currentPrice,
+                        auction.currentPrice,
                         auction.instantPrice,
                         auction.createdAt,
                         auction.endAuctionTime,
@@ -86,13 +83,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByViewCntDesc(Pageable pageable) {
-        JPQLQuery<Long> currentPrice = getCurrentPriceFromBidHistory();
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
                         auction.id,
                         auction.title,
-                        currentPrice,
+                        auction.currentPrice,
                         auction.instantPrice,
                         auction.createdAt,
                         auction.endAuctionTime,
@@ -117,13 +113,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     @Override
     public PageImpl<AuctionInfo> findItemByKeywordByOrderByCreatedAtDesc(String keyword, Pageable pageable) {
-        JPQLQuery<Long> currentPrice = getCurrentPriceFromBidHistory();
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
                         auction.id,
                         auction.title,
-                        currentPrice,
+                        auction.currentPrice,
                         auction.instantPrice,
                         auction.createdAt,
                         auction.endAuctionTime,
@@ -150,17 +145,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .fetchOne();
 
         return new PageImpl<>(auctions, pageable, count);
-    }
-
-    private static JPQLQuery<Long> getCurrentPriceFromBidHistory() {
-        return JPAExpressions.select(bidHistory.price)
-                .from(bidHistory)
-                .where(bidHistory.id.eq(JPAExpressions.select(
-                                        bidHistory.id.max()
-                                )
-                                .from(bidHistory)
-                                .where(bidHistory.auction.eq(auction))
-                ));
     }
 
     private static JPQLQuery<String> getAuctionImage() {
