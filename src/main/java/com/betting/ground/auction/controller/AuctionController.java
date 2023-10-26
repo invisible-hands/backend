@@ -1,7 +1,7 @@
 package com.betting.ground.auction.controller;
 
 import com.betting.ground.auction.dto.BidHistoryDto;
-import com.betting.ground.auction.dto.ItemDetailDto;
+import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.BidRequest;

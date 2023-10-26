@@ -1,5 +1,6 @@
 package com.betting.ground.common;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/health")
 @RequiredArgsConstructor
+@Hidden
 public class HealthController {
     private final StringRedisTemplate stringRedisTemplate;
 
