@@ -2,6 +2,7 @@ package com.betting.ground.deal.controller;
 
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.deal.dto.response.BiddingInfoResponse;
+import com.betting.ground.deal.dto.response.DealCountResponse;
 import com.betting.ground.deal.dto.response.PurchaseInfoResponse;
 import com.betting.ground.deal.dto.response.SalesInfoResponse;
 import com.betting.ground.deal.service.DealService;
@@ -68,4 +69,21 @@ public class DealController {
         return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
     }
 
+    @GetMapping("/purchases/count")
+    @Operation(summary = "구매 목록 게시물 수 조회")
+    public Response<DealCountResponse> getPurchasesCount(){
+        return Response.success("조회 완료", DealCountResponse.purchases(0, 0, 0));
+    }
+
+    @GetMapping("/bids/count")
+    @Operation(summary = "경매 목록 게시물 수 조회")
+    public Response<DealCountResponse> getBidsCount(){
+        return Response.success("조회 완료", DealCountResponse.bids(0, 0, 0));
+    }
+
+    @GetMapping("/sales/count")
+    @Operation(summary = "판매 목록 게시물 수 조회")
+    public Response<DealCountResponse> getSalesCount(){
+        return Response.success("조회 완료", DealCountResponse.sales(0, 0,0, 0));
+    }
 }
