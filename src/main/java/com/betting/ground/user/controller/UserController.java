@@ -1,6 +1,7 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
@@ -8,8 +9,11 @@ import com.betting.ground.user.dto.UserNicknameDTO;
 import com.betting.ground.user.dto.response.BiddingInfoResponse;
 import com.betting.ground.user.dto.response.PurchaseInfoResponse;
 import com.betting.ground.user.dto.response.SalesInfoResponse;
+import com.betting.ground.user.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
+
+    private final UserService userService;
 
     @GetMapping
     @Operation(summary = "유저 프로필 조회")
@@ -68,10 +74,16 @@ public class UserController {
     @GetMapping("/purchases")
     @Operation(summary = "구매 목록 조회")
     public Response<PurchaseInfoResponse> getPurchaseList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status
+            @Parameter(description = "all/before/progress/finish")
+            @RequestParam(required = false, defaultValue = "all") String status,
+            Pageable pageable,
+            @AuthenticationPrincipal User user
     ){
-        return Response.success("구매 목록 조회 완료", new PurchaseInfoResponse());
+        PurchaseInfoResponse response = new PurchaseInfoResponse();
+        if(status.equals("all")) response = userService.getAllPurchases(1L, pageable);
+        else if(status.equals("before")) response = userService.getBeforeShippingPurchases(1L, pageable);
+
+        return Response.success("구매 목록 조회 완료", response);
     }
 
     @GetMapping( "/bids")
