@@ -6,12 +6,14 @@ import com.betting.ground.deal.dto.response.DealCountResponse;
 import com.betting.ground.deal.dto.response.PurchaseInfoResponse;
 import com.betting.ground.deal.dto.response.SalesInfoResponse;
 import com.betting.ground.deal.service.DealService;
+import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,18 +33,17 @@ public class DealController {
             @RequestParam(defaultValue = "all") String status,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal LoginUser loginUser
     ){
-        // TODO : @AuthenticationPrincipal
-
         PurchaseInfoResponse response;
 
         if(status.equals("all"))
-            response = dealService.getAllPurchases(1L, pageable, startDate, endDate);
+            response = dealService.getAllPurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
         else if(status.equals("progress"))
-            response = dealService.getProgressPurchases(1L, pageable, startDate, endDate);
+            response = dealService.getProgressPurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
         else
-            response = dealService.getCompletePurchases(1L, pageable, startDate, endDate);
+            response = dealService.getCompletePurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
 
         return Response.success("구매 목록 조회 완료", response);
     }

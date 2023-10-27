@@ -57,14 +57,12 @@ public class AuctionService {
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND, "존재 하지 않는 경매글입니다.")
         );
 
-        Optional<Deal> deal = dealRepository.findByAuctionId(auctionId);
-
-        if(auction.getEndAuctionTime().isAfter(LocalDateTime.now()) && auction.getAuctionStatus().equals(AuctionStatus.AUCTION_PROGRESS)){
+        if(auction.getEndAuctionTime().isBefore(LocalDateTime.now()) && auction.getAuctionStatus().equals(AuctionStatus.AUCTION_PROGRESS)){
             // 시간 지나고 status 업데이트 안 된 상태에서 get요청 들어오면 status 업데이트
-            if(deal.isPresent())
-                auction.updateStatus(AuctionStatus.AUCTION_SUCCESS);
+            if(auction.getCurrentPrice() != null)
+                auction.updateAuctionStatus(AuctionStatus.AUCTION_SUCCESS);
             else
-                auction.updateStatus(AuctionStatus.AUCTION_FAIL);
+                auction.updateAuctionStatus(AuctionStatus.AUCTION_FAIL);
 
             // 경매 종료시간 지났을 경우 예외
             throw new GlobalException(ErrorCode.AUCTION_TIME_OUT, "만료된 경매입니다.");
