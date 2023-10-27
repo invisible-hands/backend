@@ -30,7 +30,7 @@ public class UserDTO {
     private String addressName;
 
     @Schema(description = "우편번호", example = "19524")
-    private String zipcode;
+    private Integer zipcode;
 
     @Schema(description = "상세주소", example = "1011호")
     private String detailAddress;
@@ -47,4 +47,5 @@ public class UserDTO {
 
     @Schema(description = "권한", example = "role")
     private String role;
+
 }
