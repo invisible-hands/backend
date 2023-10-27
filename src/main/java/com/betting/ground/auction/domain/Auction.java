@@ -24,6 +24,7 @@ public class Auction {
     private ItemCondition itemCondition;
     private Long startPrice;
     private Long instantPrice;
+    private Long bidderId;
     private Long currentPrice;
     @Enumerated(EnumType.STRING)
     private AuctionStatus auctionStatus;
