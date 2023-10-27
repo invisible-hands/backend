@@ -24,7 +24,6 @@ public class Auction {
     private ItemCondition itemCondition;
     private Long startPrice;
     private Long instantPrice;
-    private Long bidderId;
     private Long currentPrice;
     @Enumerated(EnumType.STRING)
     private AuctionStatus auctionStatus;
@@ -38,6 +37,10 @@ public class Auction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    public void updateViewCnt() {
+        this.viewCnt++;
+    }
 
     public void updateAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
