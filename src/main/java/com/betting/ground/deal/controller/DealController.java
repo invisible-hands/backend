@@ -27,13 +27,24 @@ public class DealController {
     @GetMapping("/purchases")
     @Operation(summary = "구매 목록 조회")
     public Response<PurchaseInfoResponse> getPurchaseList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status,
+            @Parameter(description = "all/progress/complete")
+            @RequestParam(defaultValue = "all") String status,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             Pageable pageable
     ){
-        return Response.success("구매 목록 조회 완료", new PurchaseInfoResponse());
+        // TODO : @AuthenticationPrincipal
+
+        PurchaseInfoResponse response;
+
+        if(status.equals("all"))
+            response = dealService.getAllPurchases(1L, pageable, startDate, endDate);
+        else if(status.equals("progress"))
+            response = dealService.getProgressPurchases(1L, pageable, startDate, endDate);
+        else
+            response = dealService.getCompletePurchases(1L, pageable, startDate, endDate);
+
+        return Response.success("구매 목록 조회 완료", response);
     }
 
     @PutMapping("/{dealId}")
@@ -48,13 +59,22 @@ public class DealController {
     @GetMapping( "/bids")
     @Operation(summary = "경매 목록 조회")
     public Response<BiddingInfoResponse> getBiddingList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status,
+            @Parameter(description = "all/progress/complete")
+            @RequestParam(defaultValue = "all") String status,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             Pageable pageable
     ){
-        return Response.success("경매 목록 조회 완료", new BiddingInfoResponse());
+        BiddingInfoResponse response;
+
+        if(status.equals("all"))
+            response = dealService.getAllBidding(1L, pageable, startDate, endDate);
+        else if(status.equals("progress"))
+            response = dealService.getProgressBidding(1L, pageable, startDate, endDate);
+        else
+            response = dealService.getCompleteBidding(1L, pageable, startDate, endDate);
+
+        return Response.success("경매 목록 조회 완료", response);
     }
 
     @GetMapping("/sales")

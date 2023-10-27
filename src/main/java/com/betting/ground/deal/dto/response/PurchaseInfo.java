@@ -1,5 +1,6 @@
 package com.betting.ground.deal.dto.response;
 
+import com.betting.ground.deal.domain.DealStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,14 +30,14 @@ public class PurchaseInfo {
     private String status;
 
     @QueryProjection
-    public PurchaseInfo(Long auctionId, Long dealId, String imageUrl, String title, LocalDateTime endAuctionTime, Long purchasePrice, String status) {
+    public PurchaseInfo(Long auctionId, Long dealId, String imageUrl, String title, LocalDateTime endAuctionTime, Long purchasePrice, DealStatus status) {
         this.auctionId = auctionId;
         this.dealId = dealId;
         this.imageUrl = imageUrl;
         this.title = title;
         this.endAuctionTime = endAuctionTime;
         this.purchasePrice = purchasePrice;
-        this.status = status;
+        this.status = status.getStatus();
     }
 
 }
