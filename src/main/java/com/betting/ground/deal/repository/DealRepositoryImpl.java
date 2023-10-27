@@ -2,10 +2,7 @@ package com.betting.ground.deal.repository;
 
 import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.deal.domain.DealStatus;
-import com.betting.ground.deal.dto.response.BiddingInfo;
-import com.betting.ground.deal.dto.response.PurchaseInfo;
-import com.betting.ground.deal.dto.response.QBiddingInfo;
-import com.betting.ground.deal.dto.response.QPurchaseInfo;
+import com.betting.ground.deal.dto.response.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -291,5 +288,149 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 
     private BooleanExpression auctionStatusNe(AuctionStatus status) {
         return status != null ? auction.auctionStatus.ne(status) : null;
+    }
+
+    @Override
+    public PageImpl<SalesInfo> getAllSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
+                        auction.id,
+                        deal.id,
+                        getAuctionImage(),
+                        auction.title,
+                        deal.dealTime,
+                        deal.dealDeadLine,
+                        deal.dealPrice,
+                        deal.dealStatus
+                ))
+                .from(deal)
+                .leftJoin(auction).on(deal.auction.id.eq(auction.id))
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(deal.dealTime.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory.select(deal.countDistinct())
+                .from(deal)
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(sales, pageable, count);
+    }
+
+    @Override
+    public PageImpl<SalesInfo> getBeforeSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
+                        auction.id,
+                        deal.id,
+                        getAuctionImage(),
+                        auction.title,
+                        deal.dealTime,
+                        deal.dealDeadLine,
+                        deal.dealPrice,
+                        deal.dealStatus
+                ))
+                .from(deal)
+                .leftJoin(auction).on(deal.auction.id.eq(auction.id))
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.DELIVERY_WAITING)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(deal.dealTime.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory.select(deal.countDistinct())
+                .from(deal)
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.DELIVERY_WAITING)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(sales, pageable, count);
+    }
+
+    @Override
+    public PageImpl<SalesInfo> getProgressSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
+                        auction.id,
+                        deal.id,
+                        getAuctionImage(),
+                        auction.title,
+                        deal.dealTime,
+                        deal.dealDeadLine,
+                        deal.dealPrice,
+                        deal.dealStatus
+                ))
+                .from(deal)
+                .leftJoin(auction).on(deal.auction.id.eq(auction.id))
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(deal.dealTime.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory.select(deal.countDistinct())
+                .from(deal)
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING),
+                        dealStatusEq(DealStatus.PURCHASE_CANCEL)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(sales, pageable, count);
+    }
+
+    @Override
+    public PageImpl<SalesInfo> getCompleteSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
+                        auction.id,
+                        deal.id,
+                        getAuctionImage(),
+                        auction.title,
+                        deal.dealTime,
+                        deal.dealDeadLine,
+                        deal.dealPrice,
+                        deal.dealStatus
+                ))
+                .from(deal)
+                .leftJoin(auction).on(deal.auction.id.eq(auction.id))
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.PURCHASE_COMPLETE),
+                        dealStatusEq(DealStatus.PURCHASE_CANCEL)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(deal.dealTime.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory.select(deal.countDistinct())
+                .from(deal)
+                .where(
+                        deal.sellerId.eq(userId),
+                        dealPeriodDate(startDate, endDate),
+                        dealStatusEq(DealStatus.PURCHASE_COMPLETE)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(sales, pageable, count);
     }
 }

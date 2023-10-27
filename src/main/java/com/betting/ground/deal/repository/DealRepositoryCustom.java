@@ -2,6 +2,7 @@ package com.betting.ground.deal.repository;
 
 import com.betting.ground.deal.dto.response.BiddingInfo;
 import com.betting.ground.deal.dto.response.PurchaseInfo;
+import com.betting.ground.deal.dto.response.SalesInfo;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -19,4 +20,12 @@ public interface DealRepositoryCustom {
     PageImpl<BiddingInfo> getProgressBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
 
     PageImpl<BiddingInfo> getCompleteBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<SalesInfo> getAllSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<SalesInfo> getBeforeSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<SalesInfo> getProgressSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<SalesInfo> getCompleteSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
 }

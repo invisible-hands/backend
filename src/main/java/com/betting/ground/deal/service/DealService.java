@@ -7,6 +7,7 @@ import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.deal.domain.DealStatus;
 import com.betting.ground.deal.dto.response.BiddingInfoResponse;
 import com.betting.ground.deal.dto.response.PurchaseInfoResponse;
+import com.betting.ground.deal.dto.response.SalesInfoResponse;
 import com.betting.ground.deal.repository.DealRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -53,5 +54,21 @@ public class DealService {
 
     public BiddingInfoResponse getCompleteBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
         return new BiddingInfoResponse(dealRepository.getCompleteBidding(userId, pageable, startDate, endDate));
+    }
+
+    public SalesInfoResponse getAllSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        return new SalesInfoResponse(dealRepository.getAllSales(userId, pageable, startDate, endDate));
+    }
+
+    public SalesInfoResponse getBeforeSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        return new SalesInfoResponse(dealRepository.getBeforeSales(userId, pageable, startDate, endDate));
+    }
+
+    public SalesInfoResponse getProgressSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        return new SalesInfoResponse(dealRepository.getProgressSales(userId, pageable, startDate, endDate));
+    }
+
+    public SalesInfoResponse getCompleteSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        return new SalesInfoResponse(dealRepository.getCompleteSales(userId, pageable, startDate, endDate));
     }
 }

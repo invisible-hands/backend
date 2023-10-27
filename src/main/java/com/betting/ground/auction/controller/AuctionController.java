@@ -7,7 +7,7 @@ import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.BidRequest;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.domain.User;
+import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -131,7 +131,7 @@ public class AuctionController {
 
     @GetMapping("/{auctionId}/bid")
     @Operation(summary = "상품 입찰하기 페이지 조회")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal User user){
-        return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, user.getId()));
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal LoginUser loginUser){
+        return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, loginUser.getUser().getId()));
     }
 }

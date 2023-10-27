@@ -64,16 +64,17 @@ public class DealController {
             @RequestParam(defaultValue = "all") String status,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal LoginUser user
     ){
         BiddingInfoResponse response;
 
         if(status.equals("all"))
-            response = dealService.getAllBidding(1L, pageable, startDate, endDate);
+            response = dealService.getAllBidding(user.getUser().getId(), pageable, startDate, endDate);
         else if(status.equals("progress"))
-            response = dealService.getProgressBidding(1L, pageable, startDate, endDate);
+            response = dealService.getProgressBidding(user.getUser().getId(), pageable, startDate, endDate);
         else
-            response = dealService.getCompleteBidding(1L, pageable, startDate, endDate);
+            response = dealService.getCompleteBidding(user.getUser().getId(), pageable, startDate, endDate);
 
         return Response.success("경매 목록 조회 완료", response);
     }
@@ -81,13 +82,25 @@ public class DealController {
     @GetMapping("/sales")
     @Operation(summary = "판매 목록 조회")
     public Response<SalesInfoResponse> getSalesList(
-            @Parameter(description = "filter 기능용 변수명 정해야함")
-            @RequestParam(required = false) String status,
+            @Parameter(description = "all/before/progress/complete")
+            @RequestParam(defaultValue = "all") String status,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal LoginUser user
     ){
-        return Response.success("판매 목록 조회 완료", new SalesInfoResponse());
+        SalesInfoResponse response;
+
+        if(status.equals("all"))
+            response = dealService.getAllSales(user.getUser().getId(), pageable, startDate, endDate);
+        else if(status.equals("before"))
+            response = dealService.getBeforeSales(user.getUser().getId(), pageable, startDate, endDate);
+        else if(status.equals("progress"))
+            response = dealService.getProgressSales(user.getUser().getId(), pageable, startDate, endDate);
+        else
+            response = dealService.getCompleteSales(user.getUser().getId(), pageable, startDate, endDate);
+
+        return Response.success("판매 목록 조회 완료", response);
     }
 
     @GetMapping("/purchases/count")
