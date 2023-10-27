@@ -10,6 +10,8 @@ import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.deal.domain.Deal;
+import com.betting.ground.deal.domain.DealEvent;
+import com.betting.ground.deal.repository.DealEventRepository;
 import com.betting.ground.deal.repository.DealRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final DealRepository dealRepository;
+    private final DealEventRepository dealEventRepository;
 
     @Transactional(readOnly = true)
     public ItemResponse getNewItem(Pageable pageable) {
@@ -63,6 +66,11 @@ public class AuctionService {
                 auction.updateAuctionStatus(AuctionStatus.AUCTION_SUCCESS);
             else
                 auction.updateAuctionStatus(AuctionStatus.AUCTION_FAIL);
+
+            Deal deal = new Deal(auction);
+            dealRepository.save(deal);
+            DealEvent dealEvent = new DealEvent(deal);
+            dealEventRepository.save(dealEvent);
 
             // 경매 종료시간 지났을 경우 예외
             throw new GlobalException(ErrorCode.AUCTION_TIME_OUT, "만료된 경매입니다.");
