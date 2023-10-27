@@ -1,6 +1,10 @@
 package com.betting.ground.auction.repository;
 
+import com.betting.ground.auction.dto.AuctionDetailInfo;
+import com.betting.ground.auction.dto.AuctionImageDto;
+import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
+import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -13,6 +17,7 @@ import java.util.List;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
+import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
 import static com.betting.ground.auction.domain.QTag.tag;
 
 @RequiredArgsConstructor
@@ -29,9 +34,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
-                        auction.createdAt,
                         auction.endAuctionTime,
-                        auction.duration,
                         auction.viewCnt,
                         auctionImage
                 ))
@@ -59,9 +62,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
-                        auction.createdAt,
                         auction.endAuctionTime,
-                        auction.duration,
                         auction.viewCnt,
                         auctionImage
                 ))
@@ -90,9 +91,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
-                        auction.createdAt,
                         auction.endAuctionTime,
-                        auction.duration,
                         auction.viewCnt,
                         auctionImage
                 ))
@@ -120,9 +119,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
-                        auction.createdAt,
                         auction.endAuctionTime,
-                        auction.duration,
                         auction.viewCnt,
                         auctionImage
                 ))
@@ -145,6 +142,48 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .fetchOne();
 
         return new PageImpl<>(auctions, pageable, count);
+    }
+
+    @Override
+    public ItemDetailDto findDetailAuctionById(Long userId, Long auctionId) {
+        AuctionDetailInfo auctionDetailInfo = jpaQueryFactory.select(Projections.constructor(AuctionDetailInfo.class,
+                        auction.id,
+                        auction.user.id,
+                        auction.title,
+                        auction.content,
+                        auction.itemCondition,
+                        auction.currentPrice,
+                        auction.instantPrice,
+                        auction.createdAt,
+                        auction.endAuctionTime,
+                        auction.duration,
+                        bidHistory.count(),
+                        auction.viewCnt
+                ))
+                .from(auction)
+                .leftJoin(bidHistory).on(bidHistory.auction.eq(auction))
+                .where(auction.id.eq(auctionId))
+                .fetchOne();
+
+        List<AuctionImageDto> images = jpaQueryFactory.select(Projections.constructor(AuctionImageDto.class,
+                        auctionImage.id,
+                        auctionImage.imageUrl
+                ))
+                .from(auctionImage)
+                .where(auctionImage.auction.id.eq(auctionId))
+                .fetch();
+
+        List<TagDto> tags = jpaQueryFactory.select(Projections.constructor(TagDto.class,
+                        tag.id,
+                        tag.tagName
+                ))
+                .from(tag)
+                .where(tag.auction.id.eq(auctionId))
+                .fetch();
+
+        boolean authorCheck = auctionDetailInfo.getSellerId().equals(userId);
+
+        return new ItemDetailDto(auctionDetailInfo, images, tags, authorCheck);
     }
 
     private static JPQLQuery<String> getAuctionImage() {
