@@ -1,11 +1,16 @@
 package com.betting.ground.deal.service;
 
+import com.betting.ground.auction.domain.Auction;
+import com.betting.ground.auction.domain.AuctionStatus;
+import com.betting.ground.auction.domain.BidHistory;
 import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.auction.repository.BidHistoryRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.deal.domain.DealStatus;
 import com.betting.ground.deal.dto.response.BiddingInfoResponse;
+import com.betting.ground.deal.dto.response.DealCountResponse;
 import com.betting.ground.deal.dto.response.PurchaseInfoResponse;
 import com.betting.ground.deal.dto.response.SalesInfoResponse;
 import com.betting.ground.deal.repository.DealRepository;
@@ -15,14 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class DealService {
 
-    private final AuctionRepository auctionRepository;
     private final DealRepository dealRepository;
+    private final AuctionRepository auctionRepository;
 
     public PurchaseInfoResponse getAllPurchases(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate){
         return new PurchaseInfoResponse(dealRepository.getAllPurchases(userId, pageable, startDate, endDate));
@@ -70,5 +76,55 @@ public class DealService {
 
     public SalesInfoResponse getCompleteSales(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
         return new SalesInfoResponse(dealRepository.getCompleteSales(userId, pageable, startDate, endDate));
+    }
+
+    public DealCountResponse getPurchasesCount(Long userId){
+        int progress = 0;
+        int complete = 0;
+
+        List<Deal> list = dealRepository.findAllByBuyerId(userId);
+        for (Deal deal : list) {
+            if(deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE) || deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE))
+                complete++;
+            else
+                progress++;
+        }
+
+        return DealCountResponse.purchases(progress + complete, progress, complete);
+    }
+
+    public DealCountResponse getBiddingCount(Long userId){
+        int progress = 0;
+        int complete = 0;
+
+        List<AuctionStatus> list = auctionRepository.getAuctionByBidderId(userId);
+
+        for (AuctionStatus status : list) {
+            if (status.equals(AuctionStatus.AUCTION_PROGRESS))
+                progress++;
+            else
+                complete++;
+        }
+
+        return DealCountResponse.bids(progress+complete, progress, complete);
+    }
+
+    public DealCountResponse getSalesCount(Long userId) {
+        int before = 0;
+        int progress = 0;
+        int complete = 0;
+
+        List<Deal> sales = dealRepository.findAllBySellerId(userId);
+
+        for (Deal deal : sales) {
+            if(deal.getDealStatus().equals(DealStatus.DELIVERY_WAITING))
+                before++;
+            else if(deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE_WAITING))
+                progress++;
+            else
+                complete++;
+        }
+
+        return DealCountResponse.sales(before+progress+complete, before, progress, complete);
     }
 }

@@ -1,5 +1,7 @@
 package com.betting.ground.auction.repository;
 
+import com.betting.ground.auction.domain.Auction;
+import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.dto.AuctionDetailInfo;
 import com.betting.ground.auction.dto.AuctionImageDto;
 import com.betting.ground.auction.dto.TagDto;
@@ -223,5 +225,21 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .leftJoin(user).on(auction.user.id.eq(userId))
                 .where(auction.id.eq(auctionId))
                 .fetchOne();
+    }
+
+    public List<AuctionStatus> getAuctionByBidderId(Long userId) {
+        return jpaQueryFactory.select(
+                        auction.auctionStatus
+                )
+                .from(auction)
+                .where(auction.id.in(
+                        JPAExpressions.select(
+                                        bidHistory.auction.id
+                                )
+                                .from(bidHistory)
+                                .where(bidHistory.bidderId.eq(userId))
+                                .distinct()
+                ))
+                .fetch();
     }
 }
