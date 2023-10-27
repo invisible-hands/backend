@@ -21,4 +21,10 @@ public class DealEvent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Deal deal;
+
+    public DealEvent(Deal deal) {
+        this.dealStatus = deal.getDealStatus();
+        this.createdAt = LocalDateTime.now();
+        this.deal = deal;
+    }
 }

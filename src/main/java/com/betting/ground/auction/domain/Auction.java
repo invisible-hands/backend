@@ -38,7 +38,11 @@ public class Auction {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    public void updateStatus(AuctionStatus status){
-        this.auctionStatus = status;
+    public void updateViewCnt() {
+        this.viewCnt++;
+    }
+
+    public void updateAuctionStatus(AuctionStatus auctionStatus) {
+        this.auctionStatus = auctionStatus;
     }
 }

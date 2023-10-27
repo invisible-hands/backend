@@ -1,22 +1,21 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.dto.UserAccountDTO;
-import com.betting.ground.user.dto.UserAddressDTO;
-import com.betting.ground.user.dto.UserDTO;
-import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.*;
+import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,8 +26,47 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    @GetMapping("/login/kakao")
+    @Operation(summary = "카카오 로그인")
+    public Response<LoginResponseDto> kakaoLogin(
+            @Parameter(description = "카카오에서 받은 code", example = "")
+            @RequestParam String code) throws JsonProcessingException {
 
-    @GetMapping
+        return Response.success("카카오 로그인 성공", userService.login(code));
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급")
+    public Response<LoginResponseDto> reissue(
+            @Valid @RequestBody ReissueRequestDto request) {
+        return Response.success("토큰 재발행을 성공했습니다.", userService.reissue(request));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
+    public Response<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
+        String nickname = loginUser.getUser().getNickname();
+
+        return Response.success(nickname + " 로그아웃 성공", null);
+    }
+
+    @Hidden
+    @GetMapping("test1")
+    public String test1() {
+        return "test1";
+    }
+    @Hidden
+    @GetMapping("/auth/test2")
+    public String test2(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
+    @Hidden
+    @GetMapping("test3")
+    public String test3(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
+
+    @GetMapping //토큰값으로 유저 정보를 가져올수있음, UserID로 유저 정보를 뿌림.
     @Operation(summary = "유저 프로필 조회")
     public Response<?> getProfile(@PathVariable String email) {
         log.info("입력값 : {}", email);
@@ -71,6 +109,7 @@ public class UserController {
         return Response.success("닉네임 수정 완료", userNicknameDTO);
     }
 
+
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 수정")
     public Response<?> editAccountNumber(@RequestBody @Valid UserAccountDTO userAccountDTO, BindingResult bindingResult) {
@@ -91,6 +130,7 @@ public class UserController {
         //결과리턴
         return Response.success("계좌 번호 수정 완료", userAccountDTO);
     }
+
 
     @PutMapping("/address")
     @Operation(summary = "주소 수정")
@@ -117,7 +157,7 @@ public class UserController {
     public Response<?> userRoleUpdate(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
         log.info("입력값 : {}", userDTO);
         //1. 이메일 검증
-        if (ObjectUtils.isEmpty(userDTO.getEmail())) {
+        if(ObjectUtils.isEmpty(userDTO.getEmail())) {
             //유효성 검증 에러 추가
             bindingResult.addError(new FieldError("UserDTO"
                     , "email"
@@ -125,7 +165,15 @@ public class UserController {
             return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
         }
 
-        return Response.success("", null);
+        //2. 에러가 존재하면 error리턴
+        if (bindingResult.hasErrors()) return Response.error("500", "시스템 에러(db 연결 불가)");
+
+        //3. user의 role이 guest일 경우엔 전환
+        if (userDTO.getRole().equals("guest")) return Response.success("활성 유저 전환 완료", userDTO);
+
+        //결과 리턴
+        return Response.error("402", "이미 전환된 유저입니다.");
     }
+
 }
 

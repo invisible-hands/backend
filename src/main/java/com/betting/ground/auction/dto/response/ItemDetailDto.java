@@ -18,4 +18,11 @@ public class ItemDetailDto {
     private List<TagDto> tags;
     @Schema(description = "본인 경매글인지 여부", example= "false")
     private boolean authorCheck;
+
+    public ItemDetailDto(AuctionDetailInfo auctionInfo, List<AuctionImageDto> images, List<TagDto> tags, boolean authorCheck) {
+        this.auctionInfo = auctionInfo;
+        this.images = images;
+        this.tags = tags;
+        this.authorCheck = authorCheck;
+    }
 }

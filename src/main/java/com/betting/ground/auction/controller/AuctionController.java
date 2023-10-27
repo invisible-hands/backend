@@ -36,7 +36,8 @@ public class AuctionController {
             @Parameter(description = "경매글 아이디", example = "1")
             @PathVariable Long auctionId
     ) {
-        return Response.success("해당 경매글 보기 성공", new ItemDetailDto());
+        Long userId = 1L;
+        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(userId, auctionId));
     }
 
     @GetMapping("/{auctionId}/bidHistory")
@@ -84,6 +85,8 @@ public class AuctionController {
             @RequestPart AuctionCreateRequest request,
             @RequestParam List<MultipartFile> images
     ) {
+
+
         return Response.success("게시글 생성 성공", null);
     }
 
