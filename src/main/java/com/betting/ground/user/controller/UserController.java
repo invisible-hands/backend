@@ -6,7 +6,11 @@ import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.*;
+import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,10 +19,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +37,45 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    @GetMapping("/login/kakao")
+    @Operation(summary = "카카오 로그인")
+    public Response<LoginResponseDto> kakaoLogin(
+            @Parameter(description = "카카오에서 받은 code", example = "")
+            @RequestParam String code) throws JsonProcessingException {
+
+        return Response.success("카카오 로그인 성공", userService.login(code));
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급")
+    public Response<LoginResponseDto> reissue(
+            @Valid @RequestBody ReissueRequestDto request) {
+        return Response.success("토큰 재발행을 성공했습니다.", userService.reissue(request));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
+    public Response<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
+        String nickname = loginUser.getUser().getNickname();
+
+        return Response.success(nickname + " 로그아웃 성공", null);
+    }
+
+    @Hidden
+    @GetMapping("test1")
+    public String test1() {
+        return "test1";
+    }
+    @Hidden
+    @GetMapping("/auth/test2")
+    public String test2(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
+    @Hidden
+    @GetMapping("test3")
+    public String test3(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
 
     @GetMapping //토큰값으로 유저 정보를 가져올수있음, UserID로 유저 정보를 뿌림.
     @Operation(summary = "유저 프로필 조회")
@@ -159,5 +203,3 @@ public class UserController {
         //return loginUser.getUser().getEmail();
         return null;
     }
-
-}

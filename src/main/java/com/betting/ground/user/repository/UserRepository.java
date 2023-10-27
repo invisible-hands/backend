@@ -10,4 +10,3 @@ public interface UserRepository extends JpaRepository<User,Long> {
     int countByNickname(String Nickname);
     boolean existsByEmail(String email);
 }
-
