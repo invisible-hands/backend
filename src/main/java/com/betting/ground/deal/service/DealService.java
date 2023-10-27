@@ -48,10 +48,10 @@ public class DealService {
     }
 
     public BiddingInfoResponse getProgressBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
-        return new BiddingInfoResponse();
+        return new BiddingInfoResponse(dealRepository.getProgressBidding(userId, pageable, startDate, endDate));
     }
 
     public BiddingInfoResponse getCompleteBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
-        return new BiddingInfoResponse();
+        return new BiddingInfoResponse(dealRepository.getCompleteBidding(userId, pageable, startDate, endDate));
     }
 }

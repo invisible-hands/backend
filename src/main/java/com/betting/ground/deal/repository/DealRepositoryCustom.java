@@ -15,4 +15,8 @@ public interface DealRepositoryCustom {
     PageImpl<PurchaseInfo> getCompletePurchases(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
 
     PageImpl<BiddingInfo> getAllBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<BiddingInfo> getProgressBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
+
+    PageImpl<BiddingInfo> getCompleteBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate);
 }

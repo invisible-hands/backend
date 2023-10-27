@@ -1,5 +1,6 @@
 package com.betting.ground.deal.repository;
 
+import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.deal.domain.DealStatus;
 import com.betting.ground.deal.dto.response.BiddingInfo;
 import com.betting.ground.deal.dto.response.PurchaseInfo;
@@ -206,5 +207,89 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 
         return bidHistory.createdAt.between(LocalDateTime.of(startDate, LocalTime.MIN),
                 LocalDateTime.of(endDate, LocalTime.MAX));
+    }
+
+    @Override
+    public PageImpl<BiddingInfo> getProgressBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<BiddingInfo> bidding = jpaQueryFactory.select(new QBiddingInfo(
+                        auction.id,
+                        getAuctionImage(),
+                        auction.title,
+                        bidHistory.createdAt,
+                        auction.endAuctionTime,
+                        auction.currentPrice,
+                        bidHistory.price,
+                        auction.auctionStatus
+                ))
+                .from(auction)
+                .leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id))
+                .where(
+                        bidHistory.price.eq(getMaxPrice(userId)),
+                        bidPeriodTime(startDate, endDate),
+                        auctionStatusEq(AuctionStatus.AUCTION_PROGRESS)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(bidHistory.createdAt.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory
+                .select(auction.countDistinct())
+                .from(auction)
+                .leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id))
+                .where(
+                        bidHistory.price.eq(getMaxPrice(userId)),
+                        bidPeriodTime(startDate, endDate),
+                        auctionStatusEq(AuctionStatus.AUCTION_PROGRESS)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(bidding, pageable, count);
+    }
+
+    @Override
+    public PageImpl<BiddingInfo> getCompleteBidding(long userId, Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        List<BiddingInfo> bidding = jpaQueryFactory.select(new QBiddingInfo(
+                        auction.id,
+                        getAuctionImage(),
+                        auction.title,
+                        bidHistory.createdAt,
+                        auction.endAuctionTime,
+                        auction.currentPrice,
+                        bidHistory.price,
+                        auction.auctionStatus
+                ))
+                .from(auction)
+                .leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id))
+                .where(
+                        bidHistory.price.eq(getMaxPrice(userId)),
+                        bidPeriodTime(startDate, endDate),
+                        auctionStatusNe(AuctionStatus.AUCTION_PROGRESS)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(bidHistory.createdAt.desc())
+                .fetch();
+
+        Long count = jpaQueryFactory
+                .select(auction.countDistinct())
+                .from(auction)
+                .leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id))
+                .where(
+                        bidHistory.price.eq(getMaxPrice(userId)),
+                        bidPeriodTime(startDate, endDate),
+                        auctionStatusNe(AuctionStatus.AUCTION_PROGRESS)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(bidding, pageable, count);
+    }
+
+    private BooleanExpression auctionStatusEq(AuctionStatus status) {
+        return status != null ? auction.auctionStatus.eq(status) : null;
+    }
+
+    private BooleanExpression auctionStatusNe(AuctionStatus status) {
+        return status != null ? auction.auctionStatus.ne(status) : null;
     }
 }
