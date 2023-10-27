@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
@@ -67,6 +68,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auctionImage
                 ))
                 .from(auction)
+                .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(auction.endAuctionTime.asc())
@@ -77,6 +79,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.count()
                 )
                 .from(auction)
+                .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .fetchOne();
 
         return new PageImpl<>(auctions, pageable, count);

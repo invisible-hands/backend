@@ -41,4 +41,8 @@ public class Auction {
     public void updateViewCnt() {
         this.viewCnt++;
     }
+
+    public void updateAuctionStatus(AuctionStatus auctionStatus) {
+        this.auctionStatus = auctionStatus;
+    }
 }
