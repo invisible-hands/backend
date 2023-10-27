@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    // todo code 받아오는 api 짜기
+
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인")
     public Response<LoginResponseDto> kakaoLogin(
