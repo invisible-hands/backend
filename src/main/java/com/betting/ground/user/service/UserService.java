@@ -16,6 +16,7 @@ import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -48,6 +49,9 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper;
 
+    @Value("${kakao.login.password}")
+    private String password;
+
     public LoginResponseDto login(String code) throws JsonProcessingException {
         // 토큰 받아오기
         RestTemplate tokenRt = new RestTemplate();
@@ -56,7 +60,8 @@ public class UserService {
         MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
         tokenParams.add("grant_type", "authorization_code");
         tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
-        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
+//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
+        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
         tokenParams.add("code", code);
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
         ResponseEntity<String> response = tokenRt.exchange(
@@ -86,7 +91,7 @@ public class UserService {
             // 회원 가입
             user = User.builder()
                     .email(kakaoProfile.getKakao_account().getEmail())
-                    .password(passwordEncoder.encode("password"))
+                    .password(passwordEncoder.encode(password))
                     .role(Role.GUEST)
                     .username(kakaoProfile.getKakao_account().getName())
                     .nickname(kakaoProfile.getKakao_account().getProfile().getNickname() + "(" + kakaoProfile.getId() + ")")
@@ -100,7 +105,7 @@ public class UserService {
         }
 
         // 로그인
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(kakaoProfile.getKakao_account().getEmail(), "password"));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(kakaoProfile.getKakao_account().getEmail(), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

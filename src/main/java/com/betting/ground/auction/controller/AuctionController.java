@@ -1,5 +1,7 @@
 package com.betting.ground.auction.controller;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
@@ -9,29 +11,38 @@ import com.betting.ground.auction.dto.request.BidRequest;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.repository.AuctionImageRepository;
 import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.auction.repository.TagRepository;
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.config.s3.S3Config;
+import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.login.LoginUser;
+import com.betting.ground.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import com.betting.ground.auction.domain.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auction")
-@Tag(name = "경매", description = "경매 관련 api")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "경매", description = "경매 관련 api")
 public class AuctionController {
 
     private final AuctionService auctionService;
@@ -84,43 +95,16 @@ public class AuctionController {
         return Response.success("게시글 조회 성공", auctionService.search(keyword, pageable));
     }
 
-    private final AuctionRepository auctionRepository;
-    private final AuctionImageRepository auctionImageRepository;
-
     @Operation(summary = "경매 생성", description = "request는 json으로 보내주셔야 합니다!")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Response<Void> create(
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "request는 json으로 보내주셔야 합니다!")
-//            @RequestPart AuctionCreateRequest request,
-//            @RequestParam List<MultipartFile> images
-            @RequestPart AuctionCreateRequest request
-    ) {
+            @RequestPart AuctionCreateRequest request,
+            @RequestPart List<MultipartFile> images
+    ) throws IOException {
 
-        Auction newAuction = Auction.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .itemCondition(ItemCondition.valueOf(request.getItemCondition()))
-                .startPrice(request.getStartPrice())
-                .instantPrice(request.getInstantPrice())
-                .currentPrice(request.getStartPrice())
-                .auctionStatus(AuctionStatus.AUCTION_PROGRESS)
-                .duration(Duration.DAY)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .user(loginUser.getUser())
-                .build();
-
-        newAuction.calcEndAuctionTime(Duration.valueOf(request.getDuration()).getTime());
-
-        auctionRepository.save(newAuction);
-
-        AuctionImage.builder()
-                .imageUrl("")
-                .auction(newAuction)
-                .build();
-
-//        auctionImageRepository.save(null);
+        auctionService.create(loginUser, request, images);
 
         return Response.success("게시글 생성 성공", null);
     }

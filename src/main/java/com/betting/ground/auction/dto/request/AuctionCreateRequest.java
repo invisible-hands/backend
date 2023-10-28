@@ -21,7 +21,7 @@ public class AuctionCreateRequest {
     private Long startPrice;
     @Schema(description = "즉시 판매가", example = "25000")
     private Long instantPrice;
-    @Schema(description = "경매 시간", example = "DAY")
+    @Schema(description = "경매 시간", example = "DAY", allowableValues = {"QUARTER", "HALF", "DAY"})
     private String duration;
     @Schema(description = "태그", example = "")
     private List<String> tags;

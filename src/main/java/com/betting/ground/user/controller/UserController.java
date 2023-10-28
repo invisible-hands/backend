@@ -27,8 +27,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // todo code 받아오는 api 짜기
-
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인")
     public Response<LoginResponseDto> kakaoLogin(
@@ -51,6 +49,12 @@ public class UserController {
         String nickname = loginUser.getUser().getNickname();
 
         return Response.success(nickname + " 로그아웃 성공", null);
+    }
+
+    @Hidden
+    @GetMapping("/code")
+    public String code(String code) {
+        return code;
     }
 
     @Hidden

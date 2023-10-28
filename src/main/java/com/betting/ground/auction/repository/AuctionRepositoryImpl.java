@@ -23,8 +23,8 @@ import static com.betting.ground.auction.domain.QTag.tag;
 
 @RequiredArgsConstructor
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
-    private final JPAQueryFactory jpaQueryFactory;
 
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
