@@ -140,4 +140,10 @@ public class AuctionService {
             tagRepository.save(auctionTag);
         }
     }
+
+    public void delete(Long auctionId) {
+        auctionRepository.deleteById(auctionId);
+        auctionImageRepository.deleteByAuctionId(auctionId);
+        tagRepository.deleteByAcutionId(auctionId);
+    }
 }
