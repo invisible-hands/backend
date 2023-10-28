@@ -1,8 +1,10 @@
 package com.betting.ground.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,7 +21,6 @@ public class UserDTO {
     @Schema(description = "닉네임", example = "김경매123")
     private String nickname;
 
-    @NotBlank
     @Schema(description = "프로필 사진", example = "이미지")
     private String profileImage;
 
@@ -39,7 +40,7 @@ public class UserDTO {
     @Schema(description = "지번주소", example = "서울특별시 양천구 123-4")
     private String addressName;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "우편번호", example = "19524")
     private Integer zipcode;
 
@@ -47,7 +48,7 @@ public class UserDTO {
     @Schema(description = "상세주소", example = "1011호")
     private String detailAddress;
 
-    @NotBlank
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "가입일", example = "2023-10-20")
     private LocalDateTime registerDate;
 

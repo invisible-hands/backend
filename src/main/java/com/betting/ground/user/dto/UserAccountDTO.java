@@ -14,11 +14,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class UserAccountDTO {
     //계좌번호 등록,수정
-    @Email(message = "이메일 형식이 아닙니다.")
-    @NotBlank(message = "이메일을 입력해 주세요.")
-    @Schema(description = "이메일", example = "test@naver.com")
-    private String email;
-
     @NotBlank(message = "은행명을 입력해 주세요.")
     @Schema(description = "은행명", example = "국민은행")
     private String bankName;

@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @Embeddable
+@NoArgsConstructor
 public class Address {
     private String roadName;
     private String addressName;

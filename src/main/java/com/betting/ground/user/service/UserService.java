@@ -1,6 +1,5 @@
 package com.betting.ground.user.service;
 
-import com.betting.ground.user.domain.QUser;
 import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.UserAccountDTO;
@@ -8,7 +7,6 @@ import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
 import com.betting.ground.user.repository.UserRepository;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.betting.ground.RefreshToken.domain.RefreshToken;
 import com.betting.ground.RefreshToken.repository.RefreshTokenRepository;
 import com.betting.ground.common.exception.ErrorCode;
@@ -19,12 +17,9 @@ import com.betting.ground.user.dto.ReissueRequestDto;
 import com.betting.ground.user.dto.login.KakaoProfile;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.dto.login.OAuthToken;
-import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -57,15 +52,10 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper;
 
-    @Autowired
-    private JPAQueryFactory jpaQueryFactory;
-
-    /**
-     * user정보 조회(email)
-     */
+    //유저 프로필 조회
     @Transactional(readOnly = true)
-    public UserDTO selectUserProfileByEmail(String email) {
-        Optional<User> userProfile = Optional.ofNullable(userRepository.findByEmail(email)
+    public UserDTO selectUserProfileById(Long userId) {
+        Optional<User> userProfile = Optional.ofNullable(userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST)));
 
         return userProfile.map(user ->
@@ -80,39 +70,14 @@ public class UserService {
                         .detailAddress(user.getAddress() != null ? user.getAddress().getDetailAddress() : null)
                         .money(user.getMoney())
                         .email(user.getEmail())
+                        .registerDate(user.getCreatedAt())
                         .role(String.valueOf(user.getRole()))
                         .build()
         ).orElse(null);
     }
 
-    /**
-     * 해당 nickName 갯수 조회
-     */
-    @Transactional(readOnly = true)
-    public int selectUserNickNameCount(String nickName) {
-        return userRepository.countByNickname(nickName);
-    }
-
-    /**
-     * 닉네임 수정
-     */
-//    @Modifying
-//    @Transactional
-//    public boolean updateUserNickName(UserNicknameDTO userNicknameDTO) {
-//        //닉네임 중복 확인
-//        if(selectUserNickNameCount(userNicknameDTO.getNickname()) > 0) {
-//            return false;
-//        }
-//
-//        //닉네임 수정후 update
-//        jpaQueryFactory.update(QUser.user)
-//                .set(QUser.user.nickname, userNicknameDTO.getNickname())
-//                .where(QUser.user.email.eq(userNicknameDTO.getEmail()))
-//                .execute();
-//        return true;
-//    }
-
-    public boolean updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
+    //닉네임 변경
+    public UserNicknameDTO updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
         //닉네임 중복 확인
         userRepository.findByNickname(userNicknameDTO.getNickname()).ifPresent(
                 a -> new GlobalException(ErrorCode.DUPLICATED_NICKNAME)
@@ -123,36 +88,20 @@ public class UserService {
         );
 
         user.updateNickname(userNicknameDTO.getNickname());
+        return userNicknameDTO;
     }
 
-    /**
-     * 계좌 번호 등록 및 수정
-     */
-    @Modifying
-    @Transactional
-    public void updateUserAccount(UserAccountDTO userAccountDTO) {
-        jpaQueryFactory.update(QUser.user)
-                .set(QUser.user.bankInfo.bankAccount, userAccountDTO.getBankAccount())
-                .set(QUser.user.bankInfo.bankName, userAccountDTO.getBankName())
-                .where(QUser.user.email.eq(userAccountDTO.getEmail()))
-                .execute();
+    //계좌 번호 등록 및 수정
+    public UserAccountDTO updateUserAccount(Long userId, UserAccountDTO userAccountDTO) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.updateBank(userAccountDTO);
+        return userAccountDTO;
     }
 
-    /**
-     * 주소 등록 및 수정
-     */
-//    @Modifying
-//    @Transactional
-//    public void updateUserAddress(UserAddressDTO userAddressDTO) {
-//        jpaQueryFactory.update(QUser.user)
-//                .set(QUser.user.address.addressName, userAddressDTO.getAddressName())
-//                .set(QUser.user.address.detailAddress, userAddressDTO.getDetailAddress())
-//                .set(QUser.user.address.roadName, userAddressDTO.getRoadName())
-//                .set(QUser.user.address.zipcode, userAddressDTO.getZipcode())
-//                .where(QUser.user.email.eq(userAddressDTO.getEmail()))
-//                .execute();
-//    }
-
+    //주소 등록 및 수정
     public UserAddressDTO updateUserAddress(Long userId, UserAddressDTO userAddressDTO) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
@@ -163,16 +112,29 @@ public class UserService {
         return userAddressDTO;
     }
 
-    /**
-     * 권한 변경
-     */
-    @Modifying
-    @Transactional
-    public void updateUserRole(UserDTO userDTO) {
-        jpaQueryFactory.update(QUser.user)
-                .set(QUser.user.role, Role.USER)
-                .where(QUser.user.email.eq(userDTO.getEmail()))
-                .execute();
+    //권한 변경
+    public UserDTO updateUserRole(Long userId) {
+        Optional<User> userData = Optional.ofNullable(userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        ));
+
+        userData.ifPresent(User::updateRole);
+
+        return userData.map(user ->
+                UserDTO.builder()
+                        .nickname(user.getNickname())
+                        .profileImage(user.getProfileImage())
+                        .bankName(user.getBankInfo() != null ? user.getBankInfo().getBankName() : null)
+                        .bankAccount(user.getBankInfo() != null ? user.getBankInfo().getBankAccount() : null)
+                        .roadName(user.getAddress() != null ? user.getAddress().getRoadName() : null)
+                        .addressName(user.getAddress() != null ? user.getAddress().getAddressName() : null)
+                        .zipcode(user.getAddress() != null ? user.getAddress().getZipcode() : null)
+                        .detailAddress(user.getAddress() != null ? user.getAddress().getDetailAddress() : null)
+                        .money(user.getMoney())
+                        .email(user.getEmail())
+                        .role(String.valueOf(user.getRole()))
+                        .build()
+        ).orElse(null);
     }
 
     public LoginResponseDto login(String code) throws JsonProcessingException {

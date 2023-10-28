@@ -1,7 +1,6 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
@@ -17,16 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Tag(name = "유저", description = "유저 관련 api")
@@ -80,11 +71,10 @@ public class UserController {
     }
 
     //프로필 관련 API
-
-    @GetMapping //
+    @GetMapping
     @Operation(summary = "유저 프로필 조회")
     public Response<UserDTO> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
-        return Response.success("유저 프로필 조회 완료.", userService.selectUserProfileByEmail(loginUser.getUser().getEmail()));
+        return Response.success("유저 프로필 조회 완료.", userService.selectUserProfileById(loginUser.getUser().getId()));
     }
 
     @PutMapping("/nickname")
@@ -94,35 +84,18 @@ public class UserController {
             @AuthenticationPrincipal LoginUser loginUser
     ) {
         log.info("입력값 : {}", userNicknameDTO);
-        String message = "닉네임 수정 완료되었습니다.";
-
-        //db에서 유저 이름을 찾아서 업데이트
-        if (!userService.updateUserNickName(userNicknameDTO)) message = "이미 사용중인 닉네임입니다.";
-        return Response.success(message, userNicknameDTO);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDTO));
     }
-
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 등록,수정")
     public Response<UserAccountDTO> editAccountNumber(
-            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDTO userAccountDTO) {
+            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDTO userAccountDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userAccountDTO);
-
-        //db에서 유저 이름을 찾아서 업데이트
-        userService.updateUserAccount(userAccountDTO);
-        return Response.success("처리 완료 되었습니다.", userAccountDTO);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDTO));
     }
-
-
-//    @PutMapping("/address")
-//    @Operation(summary = "주소 등록,수정")
-//    public Response<UserAddressDTO> editAddress(
-//            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDTO userAddressDTO) {
-//        log.info("입력값 : {}", userAddressDTO);
-//        //db에서 유저 이름을 찾아서 업데이트
-//        userService.updateUserAddress(userAddressDTO);
-//        return Response.success("처리 완료 되었습니다.", userAddressDTO);
-//    }
 
     @PutMapping("/address")
     @Operation(summary = "주소 등록,수정")
@@ -131,19 +104,16 @@ public class UserController {
             @AuthenticationPrincipal LoginUser loginUser
     ) {
         log.info("입력값 : {}", userAddressDTO);
-        //db에서 유저 이름을 찾아서 업데이트
-
         return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDTO));
     }
 
     @PutMapping("/role")
     @Operation(summary = "활성 유저 전환")
     public Response<UserDTO> editRole(
-            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO) {
+            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userDTO);
-
-        //db에서 유저 이름을 찾아서 업데이트
-        userService.updateUserRole(userDTO);
-        return Response.success("활성 유저 전환 완료", userDTO);
+        return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
 }
