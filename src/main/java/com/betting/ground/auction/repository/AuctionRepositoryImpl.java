@@ -2,9 +2,11 @@ package com.betting.ground.auction.repository;
 
 import com.betting.ground.auction.dto.AuctionDetailInfo;
 import com.betting.ground.auction.dto.AuctionImageDto;
+import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
+import com.betting.ground.user.domain.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -20,6 +22,7 @@ import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
 import static com.betting.ground.auction.domain.QTag.tag;
+import static com.betting.ground.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
@@ -187,6 +190,16 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         boolean authorCheck = auctionDetailInfo.getSellerId().equals(userId);
 
         return new ItemDetailDto(auctionDetailInfo, images, tags, authorCheck);
+    }
+
+    @Override
+    public void findSellerByid(Long auctionId) {
+//        jpaQueryFactory.select(Projections.constructor(SellerInfo.class)
+//                        ,se )
+//                .from(auction)
+//                .join(auction.user, user).fetchJoin()
+//                .where(auction.id.eq(auctionId))
+//                .fetchOne();
     }
 
     private static JPQLQuery<String> getAuctionImage() {

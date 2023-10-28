@@ -1,11 +1,14 @@
 package com.betting.ground.auction.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@Builder
 public class SellerInfo {
 
     @Schema(description = "판매자 아이디", example="6")
@@ -19,4 +22,12 @@ public class SellerInfo {
     @Schema(description = "판매자 경매글 목록 3개만 보여줌")
     private List<biddingItemDto> auctionList;
 
+    @QueryProjection
+    public SellerInfo(Long sellerId, String nickname, String profileImage, int auctionCnt, List<biddingItemDto> auctionList) {
+        this.sellerId = sellerId;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.auctionCnt = auctionCnt;
+        this.auctionList = auctionList;
+    }
 }

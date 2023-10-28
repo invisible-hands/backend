@@ -3,6 +3,7 @@ package com.betting.ground.auction.service;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
+import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -139,5 +141,19 @@ public class AuctionService {
 
             tagRepository.save(auctionTag);
         }
+    }
+
+    public SellerInfo getSeller(Long auctionId) {
+
+        auctionRepository.findSellerByid(auctionId);
+
+//        return SellerInfo.builder()
+//                .sellerId()
+//                .nickname()
+//                .profileImage()
+//                .auctionCnt()
+//                .auctionList()
+//                .build();
+        return null;
     }
 }

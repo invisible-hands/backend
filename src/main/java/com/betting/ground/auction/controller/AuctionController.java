@@ -73,7 +73,8 @@ public class AuctionController {
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
             @PathVariable Long auctionId
     ) {
-        return Response.success("해당 경매글의 판매자 정보 보기 성공", new SellerInfo());
+
+        return Response.success("해당 경매글의 판매자 정보 보기 성공", auctionService.getSeller(auctionId));
     }
 
     @PostMapping("/{auctionId}/instant")
