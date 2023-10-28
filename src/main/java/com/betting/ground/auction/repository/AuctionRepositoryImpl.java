@@ -1,13 +1,15 @@
 package com.betting.ground.auction.repository;
 
-import com.betting.ground.auction.dto.AuctionDetailInfo;
-import com.betting.ground.auction.dto.AuctionImageDto;
-import com.betting.ground.auction.dto.SellerInfo;
-import com.betting.ground.auction.dto.TagDto;
+import com.betting.ground.auction.domain.AuctionStatus;
+import com.betting.ground.auction.domain.QAuctionImage;
+import com.betting.ground.auction.dto.*;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.user.domain.QUser;
+import com.betting.ground.user.domain.User;
+import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -193,13 +195,40 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public void findSellerByid(Long auctionId) {
-//        jpaQueryFactory.select(Projections.constructor(SellerInfo.class)
-//                        ,se )
-//                .from(auction)
-//                .join(auction.user, user).fetchJoin()
-//                .where(auction.id.eq(auctionId))
-//                .fetchOne();
+    public User findSellerById(Long auctionId) {
+        User seller = jpaQueryFactory.select(user)
+                .from(auction)
+                .leftJoin(auction.user, user)
+                .where(auction.id.eq(auctionId))
+                .fetchOne();
+
+        return seller;
+    }
+
+    @Override
+    public PageImpl<BiddingItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
+
+        List<BiddingItemDto> findBiddingItem =
+                jpaQueryFactory.select(Projections.constructor(BiddingItemDto.class,
+                                auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration))
+                        .distinct()
+                        .from(auction)
+                        .leftJoin(auction.user, user)
+                        .where(user.id.eq(sellerId),
+                                auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
+
+        Long count = jpaQueryFactory.select(Wildcard.count)
+                .from(auction)
+                .leftJoin(auction.user, user)
+                .where(user.id.eq(sellerId),
+                        auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
+                .fetchOne();
+
+
+        return new PageImpl<>(findBiddingItem, pageable, count);
     }
 
     private static JPQLQuery<String> getAuctionImage() {

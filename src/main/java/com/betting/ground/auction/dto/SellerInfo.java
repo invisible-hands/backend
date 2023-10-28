@@ -8,7 +8,6 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-@Builder
 public class SellerInfo {
 
     @Schema(description = "판매자 아이디", example="6")
@@ -18,16 +17,22 @@ public class SellerInfo {
     @Schema(description = "판매자 프로필 이미지", example="profileImage-s3-url")
     private String profileImage;
     @Schema(description = "판매자 경매글 수", example="5")
-    private int auctionCnt;
+    private Long auctionCnt;
     @Schema(description = "판매자 경매글 목록 3개만 보여줌")
-    private List<biddingItemDto> auctionList;
+    private List<BiddingItemDto> auctionList;
+    @Schema(description = "현재 페이지", example="0")
+    private int currentPage;
+    @Schema(description = "전체 페이지", example="3")
+    private int totalPage;
 
-    @QueryProjection
-    public SellerInfo(Long sellerId, String nickname, String profileImage, int auctionCnt, List<biddingItemDto> auctionList) {
+    @Builder
+    public SellerInfo(Long sellerId, String nickname, String profileImage, Long auctionCnt, List<BiddingItemDto> auctionList, int currentPage, int totalPage) {
         this.sellerId = sellerId;
         this.nickname = nickname;
         this.profileImage = profileImage;
         this.auctionCnt = auctionCnt;
         this.auctionList = auctionList;
+        this.currentPage = currentPage;
+        this.totalPage = totalPage;
     }
 }

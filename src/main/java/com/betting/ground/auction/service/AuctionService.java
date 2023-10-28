@@ -3,6 +3,7 @@ package com.betting.ground.auction.service;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
+import com.betting.ground.auction.dto.BiddingItemDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
@@ -30,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -143,17 +143,21 @@ public class AuctionService {
         }
     }
 
-    public SellerInfo getSeller(Long auctionId) {
+    public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
-        auctionRepository.findSellerByid(auctionId);
+        User findSeller = auctionRepository.findSellerById(auctionId);
+        PageImpl<BiddingItemDto> findBiddingItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
 
-//        return SellerInfo.builder()
-//                .sellerId()
-//                .nickname()
-//                .profileImage()
-//                .auctionCnt()
-//                .auctionList()
-//                .build();
-        return null;
+        SellerInfo sellerInfo = SellerInfo.builder()
+                .sellerId(findSeller.getId())
+                .nickname(findSeller.getNickname())
+                .profileImage(findSeller.getProfileImage())
+                .auctionCnt(findBiddingItem.getTotalElements())
+                .auctionList(findBiddingItem.getContent())
+                .currentPage(findBiddingItem.getNumber())
+                .totalPage(findBiddingItem.getTotalPages())
+                .build();
+
+        return sellerInfo;
     }
 }
