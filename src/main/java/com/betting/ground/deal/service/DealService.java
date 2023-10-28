@@ -2,11 +2,8 @@ package com.betting.ground.deal.service;
 
 import com.betting.ground.admin.domain.Settlement;
 import com.betting.ground.admin.repository.SettlementRepository;
-import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.domain.AuctionStatus;
-import com.betting.ground.auction.domain.BidHistory;
 import com.betting.ground.auction.repository.AuctionRepository;
-import com.betting.ground.auction.repository.BidHistoryRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.deal.domain.Deal;
@@ -103,7 +100,7 @@ public class DealService {
 
         List<Deal> list = dealRepository.findAllByBuyerId(userId);
         for (Deal deal : list) {
-            if(deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE) || deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE))
+            if(deal.getDealStatus().equals(DealStatus.PURCHASE_COMPLETE) || deal.getDealStatus().equals(DealStatus.PURCHASE_CANCEL))
                 complete++;
             else
                 progress++;

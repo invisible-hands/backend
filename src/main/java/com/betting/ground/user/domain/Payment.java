@@ -1,5 +1,6 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.kakaopay.dto.response.KakaoApproveResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,4 +23,11 @@ public class Payment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    public Payment(KakaoApproveResponse response, User user) {
+        this.money = response.getAmount().getTotal();
+        this.paymentType = PaymentType.IN;
+        this.createdAt = LocalDateTime.now();
+        this.user = user;
+    }
 }

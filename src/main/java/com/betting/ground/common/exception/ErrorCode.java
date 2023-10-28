@@ -19,7 +19,9 @@ public enum ErrorCode {
     USERNAME_NOT_FOUND(HttpStatus.UNAUTHORIZED,"계정이 존재하지 않습니다."),
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치 합니다."),
 
-    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰시간이 만료되었습니다. 다시 로그인 해주세요.")
+    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰시간이 만료되었습니다. 다시 로그인 해주세요."),
+    PAY_CANCEL(HttpStatus.BAD_REQUEST, "사용자가 결제를 취소하였습니다."),
+    PAY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패")
     ;
 
     private final HttpStatus status;

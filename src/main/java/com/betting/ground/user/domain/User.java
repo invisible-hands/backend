@@ -48,4 +48,8 @@ public class User {
                 ", role=" + role +
                 '}';
     }
+
+    public void increaseMoney(Long money){
+        this.money += money;
+    }
 }

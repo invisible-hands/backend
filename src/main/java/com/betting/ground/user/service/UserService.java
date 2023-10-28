@@ -2,7 +2,6 @@ package com.betting.ground.user.service;
 
 import com.betting.ground.RefreshToken.domain.RefreshToken;
 import com.betting.ground.RefreshToken.repository.RefreshTokenRepository;
-import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.config.jwt.JwtUtils;
 import com.betting.ground.user.domain.Role;
@@ -89,6 +88,7 @@ public class UserService {
                     .password(passwordEncoder.encode("password"))
                     .role(Role.GUEST)
                     .username(kakaoProfile.getKakao_account().getName())
+                    .money(0L)
                     .nickname(kakaoProfile.getKakao_account().getProfile().getNickname() + "(" + kakaoProfile.getId() + ")")
                     .profileImage(kakaoProfile.getKakao_account().getProfile().getProfile_image_url())
                     .phoneNumber(kakaoProfile.getKakao_account().getPhone_number())
