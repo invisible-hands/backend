@@ -51,6 +51,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     private JPAQueryFactory jpaQueryFactory;
@@ -59,9 +64,25 @@ public class UserService {
      * user정보 조회(email)
      */
     @Transactional(readOnly = true)
-    public User selectUserProfileByEmail(String email) {
-        Optional<User> userProfile = userRepository.findByEmail(email);
-        return userProfile.orElse(null);
+    public UserDTO selectUserProfileByEmail(String email) {
+        Optional<User> userProfile = Optional.ofNullable(userRepository.findByEmail(email)
+                .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST)));
+
+        return userProfile.map(user ->
+                UserDTO.builder()
+                        .nickname(user.getNickname())
+                        .profileImage(user.getProfileImage())
+                        .bankName(user.getBankInfo() != null ? user.getBankInfo().getBankName() : null)
+                        .bankAccount(user.getBankInfo() != null ? user.getBankInfo().getBankAccount() : null)
+                        .roadName(user.getAddress() != null ? user.getAddress().getRoadName() : null)
+                        .addressName(user.getAddress() != null ? user.getAddress().getAddressName() : null)
+                        .zipcode(user.getAddress() != null ? user.getAddress().getZipcode() : null)
+                        .detailAddress(user.getAddress() != null ? user.getAddress().getDetailAddress() : null)
+                        .money(user.getMoney())
+                        .email(user.getEmail())
+                        .role(String.valueOf(user.getRole()))
+                        .build()
+        ).orElse(null);
     }
 
     /**
@@ -75,20 +96,33 @@ public class UserService {
     /**
      * 닉네임 수정
      */
-    @Modifying
-    @Transactional
-    public boolean updateUserNickName(UserNicknameDTO userNicknameDTO) {
-        //닉네임 중복 확인
-        if(selectUserNickNameCount(userNicknameDTO.getNickname()) > 0) {
-            return false;
-        }
+//    @Modifying
+//    @Transactional
+//    public boolean updateUserNickName(UserNicknameDTO userNicknameDTO) {
+//        //닉네임 중복 확인
+//        if(selectUserNickNameCount(userNicknameDTO.getNickname()) > 0) {
+//            return false;
+//        }
+//
+//        //닉네임 수정후 update
+//        jpaQueryFactory.update(QUser.user)
+//                .set(QUser.user.nickname, userNicknameDTO.getNickname())
+//                .where(QUser.user.email.eq(userNicknameDTO.getEmail()))
+//                .execute();
+//        return true;
+//    }
 
-        //닉네임 수정후 update
-        jpaQueryFactory.update(QUser.user)
-                .set(QUser.user.nickname, userNicknameDTO.getNickname())
-                .where(QUser.user.email.eq(userNicknameDTO.getEmail()))
-                .execute();
-        return true;
+    public boolean updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
+        //닉네임 중복 확인
+        userRepository.findByNickname(userNicknameDTO.getNickname()).ifPresent(
+                a -> new GlobalException(ErrorCode.DUPLICATED_NICKNAME)
+        );
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.BAD_REQUEST)
+        );
+
+        user.updateNickname(userNicknameDTO.getNickname());
     }
 
     /**
@@ -107,16 +141,26 @@ public class UserService {
     /**
      * 주소 등록 및 수정
      */
-    @Modifying
-    @Transactional
-    public void updateUserAddress(UserAddressDTO userAddressDTO) {
-        jpaQueryFactory.update(QUser.user)
-                .set(QUser.user.address.addressName, userAddressDTO.getAddressName())
-                .set(QUser.user.address.detailAddress, userAddressDTO.getDetailAddress())
-                .set(QUser.user.address.roadName, userAddressDTO.getRoadName())
-                .set(QUser.user.address.zipcode, userAddressDTO.getZipcode())
-                .where(QUser.user.email.eq(userAddressDTO.getEmail()))
-                .execute();
+//    @Modifying
+//    @Transactional
+//    public void updateUserAddress(UserAddressDTO userAddressDTO) {
+//        jpaQueryFactory.update(QUser.user)
+//                .set(QUser.user.address.addressName, userAddressDTO.getAddressName())
+//                .set(QUser.user.address.detailAddress, userAddressDTO.getDetailAddress())
+//                .set(QUser.user.address.roadName, userAddressDTO.getRoadName())
+//                .set(QUser.user.address.zipcode, userAddressDTO.getZipcode())
+//                .where(QUser.user.email.eq(userAddressDTO.getEmail()))
+//                .execute();
+//    }
+
+    public UserAddressDTO updateUserAddress(Long userId, UserAddressDTO userAddressDTO) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.updateAddress(userAddressDTO);
+
+        return userAddressDTO;
     }
 
     /**
@@ -130,13 +174,6 @@ public class UserService {
                 .where(QUser.user.email.eq(userDTO.getEmail()))
                 .execute();
     }
-
-    private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
-    private final ObjectMapper objectMapper;
 
     public LoginResponseDto login(String code) throws JsonProcessingException {
         // 토큰 받아오기

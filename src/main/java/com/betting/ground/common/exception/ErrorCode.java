@@ -16,8 +16,9 @@ public enum ErrorCode {
     USERNAME_NOT_FOUND(HttpStatus.UNAUTHORIZED,"계정이 존재하지 않습니다."),
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치 합니다."),
 
-    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰시간이 만료되었습니다. 다시 로그인 해주세요.")
-    ;
+    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰시간이 만료되었습니다. 다시 로그인 해주세요."),
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 유저입니다."),
+    DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다.");
 
     private final HttpStatus status;
     private final String message;

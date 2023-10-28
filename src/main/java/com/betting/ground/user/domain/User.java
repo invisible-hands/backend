@@ -1,5 +1,6 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.user.dto.UserAddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -47,5 +48,13 @@ public class User {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", role=" + role +
                 '}';
+    }
+
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    public void updateAddress(UserAddressDTO dto){
+        this.address = new Address(dto);
     }
 }
