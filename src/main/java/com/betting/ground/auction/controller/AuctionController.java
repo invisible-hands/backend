@@ -52,16 +52,19 @@ public class AuctionController {
             @PathVariable Long auctionId,
             @Parameter(description = "page 와 size 보내주세요")
             Pageable pageable) {
-        return Response.success("해당 경매글의 입찰 내역 보기 성공", new BidHistoryDto());
+
+        return Response.success("해당 경매글의 입찰 내역 보기 성공", auctionService.getBidHistory(auctionId, pageable));
     }
 
-    @GetMapping("/{auctionId}/seller")
+    @GetMapping("/{auctionId}/seller") // todo
     @Operation(summary = "판매자 정보", description = "")
     public Response<SellerInfo> getSeller(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-            @PathVariable Long auctionId
-    ) {
-        return Response.success("해당 경매글의 판매자 정보 보기 성공", new SellerInfo());
+            @PathVariable Long auctionId,
+            @Parameter(description = "page 와 size 보내주세요")
+            Pageable pageable) {
+
+        return Response.success("해당 경매글의 판매자 정보 보기 성공", auctionService.getSeller(auctionId, pageable));
     }
 
     @PostMapping("/{auctionId}/instant")

@@ -3,12 +3,17 @@ package com.betting.ground.auction.service;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
+import com.betting.ground.auction.dto.BidHistoryDto;
+import com.betting.ground.auction.dto.BidInfo;
+import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.repository.AuctionImageRepository;
 import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.auction.repository.BidHistoryRepository;
 import com.betting.ground.auction.repository.TagRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
@@ -40,6 +45,7 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final S3Config s3Config;
+    private final BidHistoryRepository bidHistoryRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -145,5 +151,34 @@ public class AuctionService {
         auctionRepository.deleteById(auctionId);
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
+    }
+}
+
+    public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
+        PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
+
+        return BidHistoryDto.builder()
+                .bids(auctionInfo.getContent())
+                .currentPage(auctionInfo.getNumber())
+                .totalPage(auctionInfo.getTotalPages())
+                .build();
+
+    public SellerInfo getSeller(Long auctionId, Pageable pageable) {
+
+        User findSeller = auctionRepository.findSellerById(auctionId);
+        PageImpl<BiddingItemDto> findBiddingItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+
+        SellerInfo sellerInfo = SellerInfo.builder()
+                .sellerId(findSeller.getId())
+                .nickname(findSeller.getNickname())
+                .profileImage(findSeller.getProfileImage())
+                .auctionCnt(findBiddingItem.getTotalElements())
+                .auctionList(findBiddingItem.getContent())
+                .currentPage(findBiddingItem.getNumber())
+                .totalPage(findBiddingItem.getTotalPages())
+                .build();
+
+        return sellerInfo;
+
     }
 }

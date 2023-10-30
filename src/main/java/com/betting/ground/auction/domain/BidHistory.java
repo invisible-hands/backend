@@ -15,10 +15,10 @@ public class BidHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long bidderId;
+    private String nickname;
     private LocalDateTime createdAt;
     private Long price;
-    private String nickname;
-    private Long bidderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
