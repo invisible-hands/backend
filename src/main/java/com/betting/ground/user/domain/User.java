@@ -1,5 +1,7 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.user.dto.UserAccountDTO;
+import com.betting.ground.user.dto.UserAddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -49,7 +51,19 @@ public class User {
                 '}';
     }
 
-    public void increaseMoney(Long money){
-        this.money += money;
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    public void updateBank(UserAccountDTO userAccountDTO) {
+        this.bankInfo = new Bank(userAccountDTO);
+    }
+
+    public void updateAddress(UserAddressDTO dto){
+        this.address = new Address(dto);
+    }
+
+    public void updateRole() {
+        this.role = Role.USER;
     }
 }
