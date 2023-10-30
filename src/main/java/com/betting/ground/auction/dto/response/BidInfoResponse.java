@@ -1,8 +1,11 @@
 package com.betting.ground.auction.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -16,7 +19,16 @@ public class BidInfoResponse {
     @Schema(description = "현재 가격", example="20000")
     private Long currentPrice;
     @Schema(description = "경매 종료 시각", example="2023-10-14 19:49:00")
-    private String endAuctionTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime endAuctionTime;
     @Schema(description = "보유 포인트", example="10000")
     private Long money;
+
+    public BidInfoResponse(String image, String title, Long currentPrice, LocalDateTime endAuctionTime, Long money) {
+        this.image = image;
+        this.title = title;
+        this.currentPrice = currentPrice;
+        this.endAuctionTime = endAuctionTime;
+        this.money = money;
+    }
 }

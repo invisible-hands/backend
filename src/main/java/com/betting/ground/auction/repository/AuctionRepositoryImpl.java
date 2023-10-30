@@ -6,6 +6,7 @@ import com.betting.ground.auction.dto.AuctionImageDto;
 import com.betting.ground.auction.dto.BiddingItemDto;
 import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
+import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.login.LoginUser;
@@ -32,8 +33,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
+
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
@@ -100,7 +103,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.createdAt,
                         auction.endAuctionTime,
+                        auction.duration,
                         auction.viewCnt,
                         auctionImage
                 ))
@@ -243,5 +248,36 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                                 .from(auctionImage)
                                 .where(auctionImage.auction.eq(auction))
                 ));
+    }
+
+    @Override
+    public BidInfoResponse getBidInfo(Long auctionId, Long userId){
+        return jpaQueryFactory.select(Projections.constructor(BidInfoResponse.class,
+                        getAuctionImage(),
+                        auction.title,
+                        auction.currentPrice,
+                        auction.endAuctionTime,
+                        user.money
+                ))
+                .from(auction)
+                .leftJoin(user).on(auction.user.id.eq(userId))
+                .where(auction.id.eq(auctionId))
+                .fetchOne();
+    }
+
+    public List<AuctionStatus> getAuctionByBidderId(Long userId) {
+        return jpaQueryFactory.select(
+                        auction.auctionStatus
+                )
+                .from(auction)
+                .where(auction.id.in(
+                        JPAExpressions.select(
+                                        bidHistory.auction.id
+                                )
+                                .from(bidHistory)
+                                .where(bidHistory.bidderId.eq(userId))
+                                .distinct()
+                ))
+                .fetch();
     }
 }

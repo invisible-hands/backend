@@ -22,9 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
@@ -34,7 +34,7 @@ import com.betting.ground.auction.service.AuctionService;
 public class AuctionController {
 
     private final AuctionService auctionService;
-
+  
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 정보", description = "")
     public Response<ItemDetailDto> getItemDetail(
@@ -56,7 +56,7 @@ public class AuctionController {
         return Response.success("해당 경매글의 입찰 내역 보기 성공", auctionService.getBidHistory(auctionId, pageable));
     }
 
-    @GetMapping("/{auctionId}/seller") // todo
+    @GetMapping("/{auctionId}/seller")
     @Operation(summary = "판매자 정보", description = "")
     public Response<SellerInfo> getSeller(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
@@ -99,8 +99,6 @@ public class AuctionController {
 
         return Response.success("게시글 생성 성공", null);
     }
-
-
 
     @Operation(summary = "경매 삭제")
     @DeleteMapping("/{auctionId}")
@@ -145,7 +143,7 @@ public class AuctionController {
 
     @GetMapping("/{auctionId}/bid")
     @Operation(summary = "상품 입찰하기 페이지 조회")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId) {
-        return Response.success("입찰 조회 완료", new BidInfoResponse());
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal LoginUser loginUser){
+        return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, loginUser.getUser().getId()));
     }
 }

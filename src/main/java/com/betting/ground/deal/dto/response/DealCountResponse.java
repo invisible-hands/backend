@@ -13,7 +13,7 @@ public class DealCountResponse {
     @Schema(description = "배송 전", example = "0")
     private int before;
     @Schema(description = "진행중", example = "8")
-    private int process;
+    private int progress;
     @Schema(description = "완료", example = "4")
     private int complete;
 
@@ -29,10 +29,10 @@ public class DealCountResponse {
         return new DealCountResponse(all, before, process, complete);
     }
 
-    private DealCountResponse(int all, int before, int process, int complete) {
+    private DealCountResponse(int all, int before, int progress, int complete) {
         this.all = all;
         this.before = before;
-        this.process = process;
+        this.progress = progress;
         this.complete = complete;
     }
 }

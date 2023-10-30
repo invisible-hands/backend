@@ -26,6 +26,10 @@ public class Deal {
     @OneToOne(fetch = FetchType.LAZY)
     private Auction auction;
 
+    public void updateStatus(DealStatus status){
+        this.dealStatus = status;
+    }
+
     public Deal(Auction auction) {
         this.sellerId = auction.getUser().getId();
         this.buyerId = auction.getBidderId();
