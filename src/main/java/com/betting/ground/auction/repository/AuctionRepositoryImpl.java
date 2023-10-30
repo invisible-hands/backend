@@ -36,6 +36,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
+
         JPQLQuery<String> auctionImage = getAuctionImage();
 
         List<AuctionInfo> auctions = jpaQueryFactory.select(Projections.constructor(AuctionInfo.class,
