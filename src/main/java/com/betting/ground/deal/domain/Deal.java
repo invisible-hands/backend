@@ -25,4 +25,18 @@ public class Deal {
 
     @OneToOne(fetch = FetchType.LAZY)
     private Auction auction;
+
+    public void updateStatus(DealStatus status){
+        this.dealStatus = status;
+    }
+
+    public Deal(Auction auction) {
+        this.sellerId = auction.getUser().getId();
+        this.buyerId = auction.getBidderId();
+        this.dealPrice = auction.getCurrentPrice();
+        this.dealTime = auction.getEndAuctionTime();
+        this.dealStatus = DealStatus.DELIVERY_WAITING;
+        this.dealDeadLine = auction.getBidderId() == null ? null : auction.getEndAuctionTime().plusHours(48L);
+        this.auction = auction;
+    }
 }

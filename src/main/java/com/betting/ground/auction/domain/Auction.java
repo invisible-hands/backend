@@ -24,6 +24,7 @@ public class Auction {
     private ItemCondition itemCondition;
     private Long startPrice;
     private Long instantPrice;
+    private Long bidderId;
     private Long currentPrice;
     @Enumerated(EnumType.STRING)
     private AuctionStatus auctionStatus;
@@ -37,4 +38,49 @@ public class Auction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @Builder
+    public Auction(String title, String content, ItemCondition itemCondition, Long startPrice, Long instantPrice, Long currentPrice, AuctionStatus auctionStatus, Duration duration, LocalDateTime endAuctionTime, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
+        this.title = title;
+        this.content = content;
+        this.itemCondition = itemCondition;
+        this.startPrice = startPrice;
+        this.instantPrice = instantPrice;
+        this.currentPrice = currentPrice;
+        this.auctionStatus = auctionStatus;
+        this.duration = duration;
+        this.endAuctionTime = endAuctionTime;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.user = user;
+    }
+
+    public void calcEndAuctionTime(int duration) {
+        this.endAuctionTime = this.createdAt.plusHours(duration);
+    }
+
+    @Override
+    public String toString() {
+        return "Auction{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", itemCondition=" + itemCondition +
+                ", startPrice=" + startPrice +
+                ", instantPrice=" + instantPrice +
+                ", currentPrice=" + currentPrice +
+                ", auctionStatus=" + auctionStatus +
+                ", duration=" + duration +
+                ", endAuctionTime=" + endAuctionTime +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
+    public void updateViewCnt() {
+        this.viewCnt++;
+    }
+
+    public void updateAuctionStatus(AuctionStatus auctionStatus) {
+        this.auctionStatus = auctionStatus;
+    }
 }

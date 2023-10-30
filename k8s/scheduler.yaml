@@ -1,0 +1,17 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-job
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: container
+              image: kubetm/init
+              command: ["sh", "-c", "curl 'http://my-app-svc/api/schedule'"]
+          terminationGracePeriodSeconds: 0

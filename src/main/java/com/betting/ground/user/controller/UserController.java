@@ -5,15 +5,18 @@ import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.UserDTO;
 import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.*;
+import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.ObjectUtils;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -25,114 +28,98 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping //토큰값으로 유저 정보를 가져올수있음, UserID로 유저 정보를 뿌림.
+    @GetMapping("/login/kakao")
+    @Operation(summary = "카카오 로그인")
+    public Response<LoginResponseDto> kakaoLogin(
+            @Parameter(description = "카카오에서 받은 code", example = "")
+            @RequestParam String code) throws JsonProcessingException {
+
+        return Response.success("카카오 로그인 성공", userService.login(code));
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급")
+    public Response<LoginResponseDto> reissue(
+            @Valid @RequestBody ReissueRequestDto request) {
+        return Response.success("토큰 재발행을 성공했습니다.", userService.reissue(request));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
+    public Response<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
+        String nickname = loginUser.getUser().getNickname();
+
+        return Response.success(nickname + " 로그아웃 성공", null);
+    }
+
+    @Hidden
+    @GetMapping("/code")
+    public String code(String code) {
+        return code;
+    }
+
+    @Hidden
+    @GetMapping("test1")
+    public String test1() {
+        return "test1";
+    }
+
+    @Hidden
+    @GetMapping("/auth/test2")
+    public String test2(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
+
+    @Hidden
+    @GetMapping("test3")
+    public String test3(@AuthenticationPrincipal LoginUser loginUser) {
+        return loginUser.getUser().toString();
+    }
+
+    //프로필 관련 API
+    @GetMapping
     @Operation(summary = "유저 프로필 조회")
-    public Response<?> getProfile(@PathVariable String email) {
-        log.info("입력값 : {}", email);
-        //조회한 정보를 반환([예시] - 추후 db에서 반환)
-        UserDTO userDTO = UserDTO.builder()
-                .email(email)
-                .build();
-        //결과 리턴
-        if(email != null)
-            return Response.success("유저 프로필 조회 완료", userDTO);
-        else
-            return Response.error("401", "해당 유저는 없는 유저입니다.");
+    public Response<UserDTO> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
+        return Response.success("유저 프로필 조회 완료.", userService.selectUserProfileById(loginUser.getUser().getId()));
     }
 
-    @PutMapping ("/nickname")
-    @Operation(summary = "닉네임 수정")
-    public Response<?> editNickname(@RequestBody @Valid UserNicknameDTO userNicknameDTO, BindingResult bindingResult) {
+    @PutMapping("/nickname")
+    @Operation(summary = "닉네임 등록,수정")
+    public Response<UserNicknameDTO> editNickname(
+            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDTO userNicknameDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userNicknameDTO);
-
-        //1. email검증
-        if(ObjectUtils.isEmpty(userNicknameDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserNicknameDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-        }
-
-        //2. 닉네임 유효성 검증
-        String nicknameRegex = "^[a-zA-Z0-9가-힣]*$"; // 닉네임에는 영어,숫자,한글만 사용가능
-        if(!userNicknameDTO.getNickname().matches(nicknameRegex)) {
-            bindingResult.addError(new FieldError("UserNicknameDTO"
-                    , "nickname"
-                    , "닉네임은 영어, 숫자, 한글만 포함할 수 있습니다."));
-        }
-
-        //3. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500", bindingResult.getFieldError().getDefaultMessage());
-
-        //결과 리턴
-        return Response.success("닉네임 수정 완료", userNicknameDTO);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDTO));
     }
-
 
     @PutMapping("/account")
-    @Operation(summary = "계좌 번호 수정")
-    public Response<?> editAccountNumber(@RequestBody @Valid UserAccountDTO userAccountDTO, BindingResult bindingResult) {
+    @Operation(summary = "계좌 번호 등록,수정")
+    public Response<UserAccountDTO> editAccountNumber(
+            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDTO userAccountDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userAccountDTO);
-
-        //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userAccountDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserAccountDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
-        }
-
-        //2. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러");
-
-        //결과리턴
-        return Response.success("계좌 번호 수정 완료", userAccountDTO);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDTO));
     }
-
 
     @PutMapping("/address")
-    @Operation(summary = "주소 수정")
-    public Response<?> editAddress(@RequestBody @Valid UserAddressDTO userAddressDTO, BindingResult bindingResult) {
+    @Operation(summary = "주소 등록,수정")
+    public Response<UserAddressDTO> editAddress(
+            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDTO userAddressDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userAddressDTO);
-        //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userAddressDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserAddressDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
-        }
-
-        //2. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러(db 연결 불가)");
-
-        //결과 리턴
-        return Response.success("주소 수정 완료", userAddressDTO);
+        return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDTO));
     }
 
-    @PostMapping("/role")
+    @PutMapping("/role")
     @Operation(summary = "활성 유저 전환")
-    public Response<?> userRoleUpdate(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+    public Response<UserDTO> editRole(
+            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
         log.info("입력값 : {}", userDTO);
-        //1. 이메일 검증
-        if(ObjectUtils.isEmpty(userDTO.getEmail())) {
-            //유효성 검증 에러 추가
-            bindingResult.addError(new FieldError("UserDTO"
-                    , "email"
-                    , "이메일을 입력하셔야 됩니다."));
-            return Response.error("401", bindingResult.getFieldError("email").getDefaultMessage());
-        }
-
-        //2. 에러가 존재하면 error리턴
-        if(bindingResult.hasErrors()) return Response.error("500","시스템 에러(db 연결 불가)");
-
-        //3. user의 role이 guest일 경우엔 전환
-        if(userDTO.getRole().equals("guest")) return Response.success("활성 유저 전환 완료", userDTO);
-
-        //결과 리턴
-        return Response.error("402","이미 전환된 유저입니다.");
+        return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
-
 }
-

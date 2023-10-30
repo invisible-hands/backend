@@ -1,5 +1,6 @@
 package com.betting.ground.admin.domain;
 
+import com.betting.ground.deal.domain.Deal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,4 +22,10 @@ public class Settlement {
     private Long price;
     private Long sellerId;
     private LocalDateTime createdAt;
+
+    public Settlement(Deal deal) {
+        this.price = deal.getDealPrice();
+        this.sellerId = deal.getSellerId();
+        this.createdAt = LocalDateTime.now();
+    }
 }
