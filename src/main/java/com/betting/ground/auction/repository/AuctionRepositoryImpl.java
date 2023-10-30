@@ -16,10 +16,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
