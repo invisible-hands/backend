@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.BidInfo;
+import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
@@ -153,5 +155,23 @@ public class AuctionService {
                 .currentPage(auctionInfo.getNumber())
                 .totalPage(auctionInfo.getTotalPages())
                 .build();
+
+    public SellerInfo getSeller(Long auctionId, Pageable pageable) {
+
+        User findSeller = auctionRepository.findSellerById(auctionId);
+        PageImpl<BiddingItemDto> findBiddingItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+
+        SellerInfo sellerInfo = SellerInfo.builder()
+                .sellerId(findSeller.getId())
+                .nickname(findSeller.getNickname())
+                .profileImage(findSeller.getProfileImage())
+                .auctionCnt(findBiddingItem.getTotalElements())
+                .auctionList(findBiddingItem.getContent())
+                .currentPage(findBiddingItem.getNumber())
+                .totalPage(findBiddingItem.getTotalPages())
+                .build();
+
+        return sellerInfo;
+
     }
 }
