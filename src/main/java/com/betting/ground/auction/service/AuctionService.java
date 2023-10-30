@@ -80,13 +80,13 @@ public class AuctionService {
         return new ItemResponse(auctionInfo);
     }
 
-    public ItemDetailDto getItemDetail(Long userId, Long auctionId) {
+    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.BAD_REQUEST)
         );
         auction.updateViewCnt();
         auctionRepository.save(auction);
-        return auctionRepository.findDetailAuctionById(userId, auctionId);
+        return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
 
     public void create(LoginUser loginUser, AuctionCreateRequest request, List<MultipartFile> images) throws IOException {
@@ -152,7 +152,7 @@ public class AuctionService {
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
     }
-}
+
 
     public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
         PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
@@ -162,6 +162,7 @@ public class AuctionService {
                 .currentPage(auctionInfo.getNumber())
                 .totalPage(auctionInfo.getTotalPages())
                 .build();
+    }
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 

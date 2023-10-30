@@ -5,6 +5,7 @@ resources:
   - ingress.yaml
   - mysql.yaml
   - redis.yaml
+  - scheduler.yaml
 configMapGenerator:
   - name: init-db
     files:
