@@ -1,8 +1,5 @@
 package com.betting.ground.auction.controller;
 
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
@@ -13,27 +10,18 @@ import com.betting.ground.auction.repository.AuctionImageRepository;
 import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.auction.repository.TagRepository;
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.config.s3.S3Config;
-import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.login.LoginUser;
-import com.betting.ground.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import com.betting.ground.auction.domain.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
@@ -112,9 +100,13 @@ public class AuctionController {
         return Response.success("게시글 생성 성공", null);
     }
 
+
+
     @Operation(summary = "경매 삭제")
     @DeleteMapping("/{auctionId}")
     public Response<Void> delete(@PathVariable Long auctionId) {
+        auctionService.delete(auctionId);
+
         return Response.success("게시글 삭제 성공", null);
     }
 

@@ -147,6 +147,13 @@ public class AuctionService {
         }
     }
 
+    public void delete(Long auctionId) {
+        auctionRepository.deleteById(auctionId);
+        auctionImageRepository.deleteByAuctionId(auctionId);
+        tagRepository.deleteByAcutionId(auctionId);
+    }
+}
+
     public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
         PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
 
