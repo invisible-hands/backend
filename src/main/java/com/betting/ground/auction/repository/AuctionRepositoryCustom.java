@@ -1,5 +1,6 @@
 package com.betting.ground.auction.repository;
 
+import com.betting.ground.auction.dto.BiddingItemDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;

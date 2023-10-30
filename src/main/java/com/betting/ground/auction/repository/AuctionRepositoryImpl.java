@@ -1,16 +1,14 @@
 package com.betting.ground.auction.repository;
 
-import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.dto.AuctionDetailInfo;
 import com.betting.ground.auction.dto.AuctionImageDto;
+import com.betting.ground.auction.dto.BiddingItemDto;
 import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
-import com.betting.ground.user.domain.QUser;
 import com.betting.ground.user.domain.User;
-import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.JPAExpressions;

@@ -189,7 +189,6 @@ public class AuctionService {
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
     }
-}
 
     public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
         PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
@@ -199,6 +198,7 @@ public class AuctionService {
                 .currentPage(auctionInfo.getNumber())
                 .totalPage(auctionInfo.getTotalPages())
                 .build();
+    }
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
@@ -216,6 +216,5 @@ public class AuctionService {
                 .build();
 
         return sellerInfo;
-
     }
 }
