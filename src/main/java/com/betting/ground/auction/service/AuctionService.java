@@ -117,13 +117,13 @@ public class AuctionService {
         return auctionRepository.getBidInfo(auctionId, userId);
     }
 
-    public ItemDetailDto getItemDetail(Long userId, Long auctionId) {
+    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.BAD_REQUEST)
         );
         auction.updateViewCnt();
         auctionRepository.save(auction);
-        return auctionRepository.findDetailAuctionById(userId, auctionId);
+        return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
 
     public void create(LoginUser loginUser, AuctionCreateRequest request, List<MultipartFile> images) throws IOException {

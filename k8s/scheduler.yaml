@@ -13,5 +13,5 @@ spec:
           containers:
             - name: container
               image: kubetm/init
-              command: ["sh", "-c", "curl 'https://k231608ed5352a.user-app.krampoline.com/api/schedule'"]
+              command: ["sh", "-c", "curl 'http://my-app-svc/api/schedule'"]
           terminationGracePeriodSeconds: 0

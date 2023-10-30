@@ -39,10 +39,10 @@ public class AuctionController {
     @Operation(summary = "경매 상세 정보", description = "")
     public Response<ItemDetailDto> getItemDetail(
             @Parameter(description = "경매글 아이디", example = "1")
-            @PathVariable Long auctionId
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal LoginUser loginUser
     ) {
-        Long userId = 1L;
-        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(userId, auctionId));
+        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId));
     }
 
     @GetMapping("/{auctionId}/bidHistory")

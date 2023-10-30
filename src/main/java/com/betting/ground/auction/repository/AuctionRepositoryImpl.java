@@ -9,6 +9,7 @@ import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.user.domain.User;
+import com.betting.ground.user.dto.login.LoginUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.JPAExpressions;
@@ -17,8 +18,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
@@ -155,7 +158,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public ItemDetailDto findDetailAuctionById(Long userId, Long auctionId) {
+    public ItemDetailDto findDetailAuctionById(LoginUser loginUser, Long auctionId) {
         AuctionDetailInfo auctionDetailInfo = jpaQueryFactory.select(Projections.constructor(AuctionDetailInfo.class,
                         auction.id,
                         auction.user.id,
@@ -191,7 +194,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .where(tag.auction.id.eq(auctionId))
                 .fetch();
 
-        boolean authorCheck = auctionDetailInfo.getSellerId().equals(userId);
+        boolean authorCheck = loginUser != null && auctionDetailInfo.getSellerId().equals(loginUser.getUser().getId());
 
         return new ItemDetailDto(auctionDetailInfo, images, tags, authorCheck);
     }
