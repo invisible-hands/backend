@@ -1,5 +1,6 @@
 package com.betting.ground.user.service;
 
+import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.UserAccountDTO;
