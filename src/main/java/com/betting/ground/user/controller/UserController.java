@@ -53,7 +53,13 @@ public class UserController {
     }
 
     @Hidden
-    @GetMapping("/test1")
+    @GetMapping("/code")
+    public String code(String code) {
+        return code;
+    }
+
+    @Hidden
+    @GetMapping("test1")
     public String test1() {
         return "test1";
     }

@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SecurityScheme(type = SecuritySchemeType.APIKEY, name = "Authorization", in = SecuritySchemeIn.HEADER)
 @OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 @SpringBootApplication
+@SecurityScheme(type = SecuritySchemeType.APIKEY, name = "Authorization", in = SecuritySchemeIn.HEADER)
 public class GroundApplication {
 
 	public static void main(String[] args) {

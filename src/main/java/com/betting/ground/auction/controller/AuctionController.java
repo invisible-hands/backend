@@ -1,33 +1,52 @@
 package com.betting.ground.auction.controller;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.BidRequest;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
+import com.betting.ground.auction.repository.AuctionImageRepository;
+import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.auction.repository.TagRepository;
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.config.s3.S3Config;
+import com.betting.ground.user.domain.User;
+import com.betting.ground.user.dto.login.LoginUser;
+import com.betting.ground.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import com.betting.ground.auction.domain.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auction")
-@Tag(name = "경매", description = "경매 관련 api")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "경매", description = "경매 관련 api")
 public class AuctionController {
 
     private final AuctionService auctionService;
-  
+
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 정보", description = "")
     public Response<ItemDetailDto> getItemDetail(
@@ -48,13 +67,15 @@ public class AuctionController {
         return Response.success("해당 경매글의 입찰 내역 보기 성공", new BidHistoryDto());
     }
 
-    @GetMapping("/{auctionId}/seller")
+    @GetMapping("/{auctionId}/seller") // todo
     @Operation(summary = "판매자 정보", description = "")
     public Response<SellerInfo> getSeller(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-            @PathVariable Long auctionId
-    ) {
-        return Response.success("해당 경매글의 판매자 정보 보기 성공", new SellerInfo());
+            @PathVariable Long auctionId,
+            @Parameter(description = "page 와 size 보내주세요")
+            Pageable pageable) {
+
+        return Response.success("해당 경매글의 판매자 정보 보기 성공", auctionService.getSeller(auctionId, pageable));
     }
 
     @PostMapping("/{auctionId}/instant")
@@ -79,24 +100,26 @@ public class AuctionController {
     @Operation(summary = "경매 생성", description = "request는 json으로 보내주셔야 합니다!")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Response<Void> create(
+            @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "request는 json으로 보내주셔야 합니다!")
             @RequestPart AuctionCreateRequest request,
-            @RequestParam List<MultipartFile> images
-    ) {
+            @RequestPart List<MultipartFile> images
+    ) throws IOException {
 
+        auctionService.create(loginUser, request, images);
 
         return Response.success("게시글 생성 성공", null);
     }
 
     @Operation(summary = "경매 삭제")
     @DeleteMapping("/{auctionId}")
-    public Response<Void> delete(@PathVariable Long auctionId){
+    public Response<Void> delete(@PathVariable Long auctionId) {
         return Response.success("게시글 삭제 성공", null);
     }
 
     @Operation(summary = "입찰 요청")
     @PostMapping("/{auctionId}/bid")
-    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody BidRequest request){
+    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody BidRequest request) {
         return Response.success("경매 참여 완료", null);
     }
 
@@ -129,7 +152,7 @@ public class AuctionController {
 
     @GetMapping("/{auctionId}/bid")
     @Operation(summary = "상품 입찰하기 페이지 조회")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId){
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId) {
         return Response.success("입찰 조회 완료", new BidInfoResponse());
     }
 }
