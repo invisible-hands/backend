@@ -1,8 +1,10 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.kakaopay.dto.response.KakaoApproveResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long auctionId;
     private Long money;
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
@@ -26,7 +29,15 @@ public class Payment {
 
     public Payment(KakaoApproveResponse response, User user) {
         this.money = response.getAmount().getTotal();
-        this.paymentType = PaymentType.IN;
+        this.paymentType = PaymentType.IN_CHARGE;
+        this.createdAt = LocalDateTime.now();
+        this.user = user;
+    }
+
+    public Payment(Deal deal, PaymentType inSettlement, User user) {
+        this.auctionId = deal.getAuction().getId();
+        this.money = deal.getDealPrice();
+        this.paymentType = inSettlement;
         this.createdAt = LocalDateTime.now();
         this.user = user;
     }

@@ -1,7 +1,5 @@
 package com.betting.ground.deal.service;
 
-import com.betting.ground.admin.domain.Settlement;
-import com.betting.ground.admin.repository.SettlementRepository;
 import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.common.exception.ErrorCode;
@@ -15,6 +13,11 @@ import com.betting.ground.deal.dto.response.PurchaseInfoResponse;
 import com.betting.ground.deal.dto.response.SalesInfoResponse;
 import com.betting.ground.deal.repository.DealEventRepository;
 import com.betting.ground.deal.repository.DealRepository;
+import com.betting.ground.user.domain.Payment;
+import com.betting.ground.user.domain.PaymentType;
+import com.betting.ground.user.domain.User;
+import com.betting.ground.user.repository.PaymentRepository;
+import com.betting.ground.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,7 +34,8 @@ public class DealService {
     private final DealRepository dealRepository;
     private final AuctionRepository auctionRepository;
     private final DealEventRepository dealEventRepository;
-    private final SettlementRepository settlementRepository;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public PurchaseInfoResponse getAllPurchases(Long userId, Pageable pageable, LocalDate startDate, LocalDate endDate){
@@ -49,8 +53,13 @@ public class DealService {
         );
 
         deal.updateStatus(DealStatus.PURCHASE_COMPLETE);
+
+        User user = userRepository.findById(deal.getSellerId()).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+        Payment payment = new Payment(deal, PaymentType.IN_SETTLEMENT, user);
+        paymentRepository.save(payment);
         dealEventRepository.save(new DealEvent(deal));
-        settlementRepository.save(new Settlement(deal));
     }
 
     @Transactional(readOnly = true)
