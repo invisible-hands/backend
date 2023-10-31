@@ -41,4 +41,12 @@ public class Payment {
         this.createdAt = LocalDateTime.now();
         this.user = user;
     }
+
+    public Payment(Long auctionId, Long price, PaymentType outBid, LocalDateTime now, User user) {
+        this.auctionId = auctionId;
+        this.money = price;
+        this.paymentType = outBid;
+        this.createdAt = now;
+        this.user = user;
+    }
 }

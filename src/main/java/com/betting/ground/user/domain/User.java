@@ -1,5 +1,7 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.common.exception.ErrorCode;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import jakarta.persistence.*;
@@ -37,19 +39,6 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", profileImage='" + profileImage + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", role=" + role +
-                '}';
-    }
 
     public void updateNickname(String nickname){
         this.nickname = nickname;
@@ -69,5 +58,16 @@ public class User {
 
     public void increaseMoney(Long money) {
         this.money += money;
+    }
+
+    public void pay(Long price) {
+        if (this.money < price) {
+            throw new GlobalException(ErrorCode.NOT_ENOUGH_MONEY);
+        }
+        this.money -= price;
+    }
+
+    public void bidCancel(Long price) {
+        this.money += price;
     }
 }

@@ -83,4 +83,10 @@ public class Auction {
     public void updateAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
     }
+
+    public void udpateBid(Long bidderId, Long price, AuctionStatus auctionStatus) {
+        this.bidderId = bidderId;
+        this.currentPrice = price;
+        this.auctionStatus = auctionStatus;
+    }
 }

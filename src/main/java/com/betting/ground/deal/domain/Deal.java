@@ -39,4 +39,14 @@ public class Deal {
         this.dealDeadLine = auction.getBidderId() == null ? null : auction.getEndAuctionTime().plusHours(48L);
         this.auction = auction;
     }
+
+    public Deal(Auction auction, LocalDateTime now) {
+        this.sellerId = auction.getUser().getId();
+        this.buyerId = auction.getBidderId();
+        this.dealPrice = auction.getCurrentPrice();
+        this.dealTime = now;
+        this.dealStatus = DealStatus.DELIVERY_WAITING;
+        this.dealDeadLine = auction.getBidderId() == null ? null : auction.getEndAuctionTime().plusHours(48L);
+        this.auction = auction;
+    }
 }

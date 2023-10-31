@@ -23,8 +23,10 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 유저입니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     PAY_CANCEL(HttpStatus.BAD_REQUEST, "유저 결제 취소"),
-    PAY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패")
-    ;
+    PAY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"),
+    NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
+    AUCTION_SOLD_OUT(HttpStatus.BAD_REQUEST,"이미 상품이 판매되었습니다."),
+    CAN_NOT_PURCHASE(HttpStatus.BAD_REQUEST, "본인이 올린 경매글은 구매할 수 없습니다.");
 
 
     private final HttpStatus status;
