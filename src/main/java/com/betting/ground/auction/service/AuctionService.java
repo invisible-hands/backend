@@ -185,14 +185,17 @@ public class AuctionService {
     }
 
     public void delete(Long auctionId) {
-        // 5분 이내 삭제 가능
+        // 해당 경매글 찾기
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
+        
+        // 경매글 생성 5분 후 삭제 불가
         if(auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
             new GlobalException(ErrorCode.ALREADY_AUCTION_START);
         }
 
+        // 경매글 soft delete, 사진과 태그는 삭제
         auctionRepository.deleteById(auctionId);
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
