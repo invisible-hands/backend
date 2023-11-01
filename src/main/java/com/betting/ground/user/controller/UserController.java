@@ -27,6 +27,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    @Hidden
+    @GetMapping("/code")
+    public String code(String code) {
+        return code;
+    }
 
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인")
@@ -52,29 +57,6 @@ public class UserController {
         return Response.success(nickname + " 로그아웃 성공", null);
     }
 
-    @Hidden
-    @GetMapping("/code")
-    public String code(String code) {
-        return code;
-    }
-
-    @Hidden
-    @GetMapping("test1")
-    public String test1() {
-        return "test1";
-    }
-
-    @Hidden
-    @GetMapping("/auth/test2")
-    public String test2(@AuthenticationPrincipal LoginUser loginUser) {
-        return loginUser.getUser().toString();
-    }
-
-    @Hidden
-    @GetMapping("test3")
-    public String test3(@AuthenticationPrincipal LoginUser loginUser) {
-        return loginUser.getUser().toString();
-    }
 
     //프로필 관련 API
     @GetMapping
