@@ -185,6 +185,14 @@ public class AuctionService {
     }
 
     public void delete(Long auctionId) {
+        // 5분 이내 삭제 가능
+        Auction auction = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
+        );
+        if(auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
+            new GlobalException(ErrorCode.ALREADY_AUCTION_START);
+        }
+
         auctionRepository.deleteById(auctionId);
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
