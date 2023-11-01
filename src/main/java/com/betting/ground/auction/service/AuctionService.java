@@ -191,13 +191,9 @@ public class AuctionService {
     }
 
     public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
-        PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
+        PageImpl<BidInfo> bidInfos = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
 
-        return BidHistoryDto.builder()
-                .bids(auctionInfo.getContent())
-                .currentPage(auctionInfo.getNumber())
-                .totalPage(auctionInfo.getTotalPages())
-                .build();
+        return new BidHistoryDto(bidInfos);
     }
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
