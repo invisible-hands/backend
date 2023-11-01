@@ -99,7 +99,9 @@ public class AuctionController {
     @Operation(summary = "입찰 요청")
 
     @PostMapping("/{auctionId}/bid")
-    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody BidRequest request) {
+    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody PayRequest request) {
+
+
         return Response.success("경매 참여 완료", null);
     }
 

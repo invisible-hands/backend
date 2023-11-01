@@ -6,6 +6,7 @@ import com.betting.ground.auction.domain.Duration;
 import com.betting.ground.auction.domain.ItemCondition;
 import com.betting.ground.auction.dto.request.PayRequest;
 import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.repository.UserRepository;
@@ -21,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
-@Disabled
+//@Disabled
 class AuctionServiceTest {
 
     @Autowired
@@ -75,7 +76,7 @@ class AuctionServiceTest {
                 .itemCondition(ItemCondition.NEW)
                 .startPrice(1000L)
                 .instantPrice(30000L)
-                .currentPrice(null)
+                .currentPrice(0L)
                 .auctionStatus(AuctionStatus.AUCTION_PROGRESS)
                 .duration(Duration.HALF)
                 .createdAt(LocalDateTime.now())
@@ -101,7 +102,7 @@ class AuctionServiceTest {
                     System.out.println("random = " + random);
                     auctionService.instantBuy(1L, new PayRequest(30000L), random);
                     success.getAndIncrement();
-                } catch (IllegalArgumentException e) {
+                } catch (GlobalException e) {
                     fail.getAndIncrement();
                 } finally {
                     latch.countDown();
@@ -115,6 +116,93 @@ class AuctionServiceTest {
         // when
 
         // then
+
+    }
+
+    @Test
+    public void bidTest() throws Exception {
+        //given
+        User seller = User.builder()
+                .username("판매자")
+                .nickname("ㅁㅁㅁ")
+                .email("aaa")
+                .password("dsdf")
+                .profileImage("이미지")
+                .bankInfo(null)
+                .address(null)
+                .phoneNumber("전화번호")
+                .money(10000L)
+                .role(Role.USER)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(seller);
+
+        Auction auction = Auction.builder()
+                .title("aaa")
+                .content("내용")
+                .itemCondition(ItemCondition.NEW)
+                .startPrice(1000L)
+                .instantPrice(30000L)
+                .currentPrice(0L)
+                .auctionStatus(AuctionStatus.AUCTION_PROGRESS)
+                .duration(Duration.HALF)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .user(seller)
+                .build();
+        auction.calcEndAuctionTime(Duration.HALF.getTime());
+        auctionRepository.save(auction);
+
+        for (int i = 0; i < 10; i++) {
+            User buyer = User.builder()
+                    .username("구매자" + i)
+                    .nickname("11111111")
+                    .email("aaaaaaaa")
+                    .password("dsdf")
+                    .profileImage("이미지")
+                    .bankInfo(null)
+                    .address(null)
+                    .phoneNumber("전화번호")
+                    .money(1000000L)
+                    .role(Role.USER)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            userRepository.save(buyer);
+        }
+
+        auctionService.bid(1L, new PayRequest(2000L), 2L);
+        auctionService.bid(1L, new PayRequest(3000L), 3L);
+
+        //when
+
+//        int threadCount = 100;
+//        ExecutorService executorService = Executors.newFixedThreadPool(30);
+//        CountDownLatch latch = new CountDownLatch(threadCount);
+//
+//        AtomicInteger success = new AtomicInteger();
+//        AtomicInteger fail = new AtomicInteger();
+//        for (int i = 0; i < threadCount; i++) {
+//            int finalI = i;
+//            executorService.submit(() -> {
+//                try {
+//                    long random = (int) (Math.random() * 10) + 2L;
+//                    System.out.println("random = " + random);
+//                    auctionService.bid(1L, new PayRequest(2500L), random);
+//                    success.getAndIncrement();
+//                } catch (GlobalException e) {
+//                    fail.getAndIncrement();
+//                } finally {
+//                    System.out.println("success : " + success);
+//                    System.out.println("fail : " + fail);
+//                    latch.countDown();
+//                }
+//            });
+//        }
+//        latch.await();
+
+        //then
 
     }
 }

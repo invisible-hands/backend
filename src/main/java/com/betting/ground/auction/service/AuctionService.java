@@ -226,7 +226,7 @@ public class AuctionService {
 
         // 비관적 락 select for update
         Auction auction = auctionRepository.findByLockId(auctionId).orElseThrow(
-                () -> new GlobalException(ErrorCode.BAD_REQUEST)
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
 
         // 내가 올린 경매는 구매 불가
@@ -272,10 +272,81 @@ public class AuctionService {
         }
 
         // 경매 즉시거래가로 업데이트
-        auction.udpateBid(user.getId(), request.getPrice(), AuctionStatus.AUCTION_SUCCESS);
+        auction.updateBid(user.getId(), request.getPrice(), AuctionStatus.AUCTION_SUCCESS);
         auctionRepository.save(auction);
 
         Deal deal = new Deal(auction,now);
         dealRepository.save(deal);
+    }
+
+    public void bid(Long auctionId, PayRequest request, Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+
+        // 비관적 락 select for update
+        Auction auction = auctionRepository.findByLockId(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
+        );
+
+        // 내가 올린 경매는 구매 불가
+        if (auction.getUser().getId() == userId) {
+            throw new GlobalException(ErrorCode.CAN_NOT_PURCHASE);
+        }
+
+        // 경매 시간 만료시 예외
+        if (auction.getEndAuctionTime().isBefore(now)) {
+            throw new GlobalException(ErrorCode.AUCTION_TIME_OUT);
+        }
+
+        // 경매가 종료된 이후 요청이 들어올 경우 예외
+        if (!auction.getAuctionStatus().equals(AuctionStatus.AUCTION_PROGRESS)) {
+            throw new GlobalException(ErrorCode.AUCTION_SOLD_OUT);
+        }
+
+        // 즉시 구매가격 이상 입찰 요청시 예외
+        if(auction.getInstantPrice() <= request.getPrice()) {
+            throw new GlobalException(ErrorCode.EXCEED_INSTANT_PRICE);
+        }
+
+        // 이미 최고가로 입찰한 입찰자가 재입찰한 경우 예외
+        if(auction.getBidderId() == userId) {
+            throw new GlobalException(ErrorCode.ALREADY_TOP_PRICE_BIDDER);
+        }
+
+        // 현재 입찰가보다 낮은 가격으로 요청시 예외
+        if(auction.getCurrentPrice() >= request.getPrice()) {
+            throw new GlobalException(ErrorCode.LESS_THEN_CURRENT_PRICE);
+        }
+
+        // 내 가상머니 차감
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+        user.pay(request.getPrice());
+        userRepository.save(user);
+
+        // 입찰한 사람의 입출금내역
+        Payment payment = new Payment(auctionId, request.getPrice(), PaymentType.OUT_BID, now, user);
+        paymentRepository.save(payment);
+
+        // 구매자 입찰내역
+        BidHistory buyerBidHistory = new BidHistory(user.getId(), user.getNickname(), now, request.getPrice(), auction);
+        bidHistoryRepository.save(buyerBidHistory);
+
+        // 최근 입찰한 사람 찾아서 취소
+        Optional<BidHistory> bidHistory = bidHistoryRepository.findByAuctionAndPrice(auction, auction.getCurrentPrice());
+        if (bidHistory.isPresent()) {
+            User bidder = userRepository.findById(bidHistory.get().getBidderId()).orElseThrow(
+                    () -> new GlobalException(ErrorCode.BAD_REQUEST)
+            );
+            bidder.bidCancel(bidHistory.get().getPrice());
+            userRepository.save(bidder);
+            Payment bidderPayment = new Payment(auctionId, bidHistory.get().getPrice(), PaymentType.IN_CANCEL, now, bidder);
+            paymentRepository.save(bidderPayment);
+        }
+
+        // 경매 현재 거래가로 업데이트
+        auction.updateBid(user.getId(), request.getPrice(), AuctionStatus.AUCTION_PROGRESS);
+        auctionRepository.save(auction);
+
     }
 }
