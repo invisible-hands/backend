@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor @Builder
 @SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class User {
