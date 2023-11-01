@@ -116,39 +116,20 @@ public class AuctionService {
         );
 
         // 경매 저장
-        Auction auction = Auction.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .itemCondition(ItemCondition.valueOf(request.getItemCondition()))
-                .startPrice(request.getStartPrice())
-                .instantPrice(request.getInstantPrice())
-                .currentPrice(request.getStartPrice())
-                .auctionStatus(AuctionStatus.AUCTION_PROGRESS)
-                .duration(Duration.DAY)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .user(user)
-                .build();
+        Auction auction = new Auction(user, request);
         auction.calcEndAuctionTime(Duration.valueOf(request.getDuration()).getTime());
         auctionRepository.save(auction);
 
         //경매 사진 저장
         for (MultipartFile image : images ) {
             String s3Url = s3Utils.upload(image);
-            AuctionImage auctionImage = AuctionImage.builder()
-                    .imageUrl(s3Url)
-                    .auction(auction)
-                    .build();
-            auctionImageRepository.save(auctionImage);
+            auctionImageRepository.save(new AuctionImage(s3Url, auction));
         }
 
         // 태그 저장
         List<String> tags = request.getTags();
-        for (String tag : tags) {
-            Tag auctionTag = Tag.builder()
-                    .tagName(tag)
-                    .auction(auction)
-                    .build();
+        for (String tagName : tags) {
+            Tag auctionTag = new Tag(tagName, auction);
             tagRepository.save(auctionTag);
         }
     }
