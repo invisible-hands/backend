@@ -33,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,11 +42,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +57,7 @@ public class AuctionService {
     private final BidHistoryRepository bidHistoryRepository;
     private final DealRepository dealRepository;
     private final DealEventRepository dealEventRepository;
+    private final RedisTemplate redisTemplate;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -100,7 +100,7 @@ public class AuctionService {
 
         if(auction.getEndAuctionTime().isBefore(LocalDateTime.now()) && auction.getAuctionStatus().equals(AuctionStatus.AUCTION_PROGRESS)){
             // 시간 지나고 status 업데이트 안 된 상태에서 get요청 들어오면 status 업데이트
-            if(auction.getCurrentPrice() != null)
+            if(auction.hasBidder())
                 auction.updateAuctionStatus(AuctionStatus.AUCTION_SUCCESS);
             else
                 auction.updateAuctionStatus(AuctionStatus.AUCTION_FAIL);
@@ -121,10 +121,15 @@ public class AuctionService {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.BAD_REQUEST)
         );
-        auction.updateViewCnt();
+//        auction.updateViewCnt();
+
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        hashOperations.increment("Auction", auctionId.toString(), 1);
+
         auctionRepository.save(auction);
         return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
+
 
     public void create(LoginUser loginUser, AuctionCreateRequest request, List<MultipartFile> images) throws IOException {
         User user = userRepository.findById(loginUser.getUser().getId()).get();
@@ -182,6 +187,9 @@ public class AuctionService {
 
             tagRepository.save(auctionTag);
         }
+
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        hashOperations.put("Auction", auction.getId().toString(), "0");
     }
 
     public void delete(Long auctionId) {

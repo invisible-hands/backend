@@ -33,7 +33,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
 

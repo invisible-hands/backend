@@ -9,6 +9,7 @@ import com.betting.ground.user.domain.Payment;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.repository.PaymentRepository;
 import com.betting.ground.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +35,9 @@ public class KakaoPayService {
     private static final String cid = "TC0ONETIME";
     private KakaoReadyResponse kakaoReady;
 
-    public KakaoReadyResponse kakaoPayReady(KakaoReadyRequest request, Long userId) {
+    public KakaoReadyResponse kakaoPayReady(HttpServletRequest http, KakaoReadyRequest request, Long userId) {
+        String path=http.getScheme()+"://"+http.getServerName()+":"+http.getServerPort();
+
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         parameters.add("partner_order_id", "partner_order_id");
@@ -44,9 +47,9 @@ public class KakaoPayService {
         parameters.add("total_amount", request.getPrice().toString());
         parameters.add("vat_amount", "0");
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", "http://localhost:8080/api/payment/success"); // 성공 시 redirect url
-        parameters.add("cancel_url", "http://localhost:8080/api/payment/cancel"); // 취소 시 redirect url
-        parameters.add("fail_url", "http://localhost:8080/api/payment/fail"); // 실패 시 redirect url
+        parameters.add("approval_url", path + "/api/payment/success"); // 성공 시 redirect url
+        parameters.add("cancel_url", path + "/api/payment/cancel"); // 취소 시 redirect url
+        parameters.add("fail_url", path + "/api/payment/fail"); // 실패 시 redirect url
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
 

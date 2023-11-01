@@ -31,7 +31,7 @@ public class SchedulerController {
         List<DealEvent> dealEvents = auctions.stream()
                 .filter(auction -> auction.getEndAuctionTime().isBefore(LocalDateTime.now()))
                 .map(auction -> {
-                    if (auction.getCurrentPrice() == null) {
+                    if (!auction.hasBidder()) {
                         auction.updateAuctionStatus(AuctionStatus.AUCTION_FAIL);
                     } else {
                         auction.updateAuctionStatus(AuctionStatus.AUCTION_SUCCESS);

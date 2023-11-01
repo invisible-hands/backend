@@ -83,4 +83,8 @@ public class Auction {
     public void updateAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
     }
+
+    public boolean hasBidder(){
+        return !(bidderId == null && (this.currentPrice == this.startPrice));
+    }
 }

@@ -10,6 +10,7 @@ import com.betting.ground.kakaopay.service.KakaoPayService;
 import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,10 @@ public class KakaoPayController {
     @PostMapping("/ready")
     public KakaoReadyResponse payReady(
             @RequestBody KakaoReadyRequest request,
-            @AuthenticationPrincipal LoginUser loginUser
+            @AuthenticationPrincipal LoginUser loginUser,
+            HttpServletRequest http
     ){
-        return kakaoPayService.kakaoPayReady(request, loginUser.getUser().getId());
+        return kakaoPayService.kakaoPayReady(http, request, loginUser.getUser().getId());
     }
 
     @GetMapping("/success")
