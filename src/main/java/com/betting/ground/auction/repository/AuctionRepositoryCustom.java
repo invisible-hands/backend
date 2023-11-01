@@ -1,7 +1,7 @@
 package com.betting.ground.auction.repository;
 
 import com.betting.ground.auction.domain.AuctionStatus;
-import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerItemDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AuctionRepositoryCustom {
 
@@ -26,9 +27,9 @@ public interface AuctionRepositoryCustom {
   
     ItemDetailDto findDetailAuctionById(LoginUser loginUser, Long auctionId);
 
-    PageImpl<BiddingItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);
+    PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);
 
-    User findSellerById(Long auctionId);
+    Optional<User> findSellerById(Long auctionId);
 
     List<AuctionStatus> getAuctionByBidderId(Long userId);
 }

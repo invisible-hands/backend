@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.BidInfo;
-import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerItemDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
@@ -42,9 +42,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -202,19 +199,14 @@ public class AuctionService {
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
-        User findSeller = auctionRepository.findSellerById(auctionId);
-        PageImpl<BiddingItemDto> findBiddingItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+        // 해당 경매글의 판매자 찾기
+        User findSeller = auctionRepository.findSellerById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
 
-        SellerInfo sellerInfo = SellerInfo.builder()
-                .sellerId(findSeller.getId())
-                .nickname(findSeller.getNickname())
-                .profileImage(findSeller.getProfileImage())
-                .auctionCnt(findBiddingItem.getTotalElements())
-                .auctionList(findBiddingItem.getContent())
-                .currentPage(findBiddingItem.getNumber())
-                .totalPage(findBiddingItem.getTotalPages())
-                .build();
+        // 판매자가 판매중인 물건 찾기
+        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
 
-        return sellerInfo;
+        return new SellerInfo(findSeller, findSellerItem);
     }
 }
