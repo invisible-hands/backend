@@ -44,6 +44,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -72,6 +73,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -103,6 +105,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -131,6 +134,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
