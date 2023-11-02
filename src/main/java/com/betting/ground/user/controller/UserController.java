@@ -37,6 +37,12 @@ public class UserController {
         return Response.success("카카오 로그인 성공", userService.login(code));
     }
 
+    @Hidden
+    @GetMapping("/code")
+    public String code(String code) {
+        return code;
+    }
+
     @PostMapping("/reissue")
     @Operation(summary = "토큰 재발급")
     public Response<LoginResponseDto> reissue(
@@ -50,30 +56,6 @@ public class UserController {
         String nickname = loginUser.getUser().getNickname();
 
         return Response.success(nickname + " 로그아웃 성공", null);
-    }
-
-    @Hidden
-    @GetMapping("/code")
-    public String code(String code) {
-        return code;
-    }
-
-    @Hidden
-    @GetMapping("test1")
-    public String test1() {
-        return "test1";
-    }
-
-    @Hidden
-    @GetMapping("/auth/test2")
-    public String test2(@AuthenticationPrincipal LoginUser loginUser) {
-        return loginUser.getUser().toString();
-    }
-
-    @Hidden
-    @GetMapping("test3")
-    public String test3(@AuthenticationPrincipal LoginUser loginUser) {
-        return loginUser.getUser().toString();
     }
 
     //프로필 관련 API
