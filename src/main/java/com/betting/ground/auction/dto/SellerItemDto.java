@@ -3,16 +3,13 @@ package com.betting.ground.auction.dto;
 import com.betting.ground.auction.domain.Duration;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
-public class BiddingItemDto {
+public class SellerItemDto {
     @Schema(description = "경매글 아이디", example = "15")
     private Long auctionId;
     @Schema(description = "경매글 제목", example = "초이가 말아주는 버블티")
@@ -31,7 +28,7 @@ public class BiddingItemDto {
     private int duration;
 
     @Builder
-    public BiddingItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration) {
+    public SellerItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration) {
         this.auctionId = auctionId;
         this.title = title;
         this.currentPrice = currentPrice;

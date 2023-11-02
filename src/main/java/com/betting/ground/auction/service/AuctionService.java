@@ -1,9 +1,12 @@
 package com.betting.ground.auction.service;
 
+
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.BidInfo;
-import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerItemDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
@@ -36,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -102,7 +106,7 @@ public class AuctionService {
 
     public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
-                () -> new GlobalException(ErrorCode.BAD_REQUEST)
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
         auction.updateViewCnt();
         auctionRepository.save(auction);
@@ -135,36 +139,38 @@ public class AuctionService {
     }
 
     public void delete(Long auctionId) {
+        // 해당 경매글 찾기
+        Auction auction = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
+        );
+        
+        // 경매글 생성 5분 후 삭제 불가
+        if(auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
+            new GlobalException(ErrorCode.ALREADY_AUCTION_START);
+        }
+
+        // 경매글 soft delete, 사진과 태그는 삭제
         auctionRepository.deleteById(auctionId);
         auctionImageRepository.deleteByAuctionId(auctionId);
         tagRepository.deleteByAcutionId(auctionId);
     }
 
     public BidHistoryDto getBidHistory(Long auctionId, Pageable pageable) {
-        PageImpl<BidInfo> auctionInfo = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
+        PageImpl<BidInfo> bidInfos = bidHistoryRepository.findBidInfoByAuctionId(auctionId, pageable);
 
-        return BidHistoryDto.builder()
-                .bids(auctionInfo.getContent())
-                .currentPage(auctionInfo.getNumber())
-                .totalPage(auctionInfo.getTotalPages())
-                .build();
+        return new BidHistoryDto(bidInfos);
     }
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
-        User findSeller = auctionRepository.findSellerById(auctionId);
-        PageImpl<BiddingItemDto> findBiddingItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+        // 해당 경매글의 판매자 찾기
+        User findSeller = auctionRepository.findSellerById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
 
-        SellerInfo sellerInfo = SellerInfo.builder()
-                .sellerId(findSeller.getId())
-                .nickname(findSeller.getNickname())
-                .profileImage(findSeller.getProfileImage())
-                .auctionCnt(findBiddingItem.getTotalElements())
-                .auctionList(findBiddingItem.getContent())
-                .currentPage(findBiddingItem.getNumber())
-                .totalPage(findBiddingItem.getTotalPages())
-                .build();
+        // 판매자가 판매중인 물건 찾기
+        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
 
-        return sellerInfo;
+        return new SellerInfo(findSeller, findSellerItem);
     }
 }
