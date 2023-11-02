@@ -22,7 +22,6 @@ public class RefreshToken {
     @Indexed
     private String refreshToken;
 
-    @Builder
     public RefreshToken(LoginUser loginUser, String refreshToken) {
         this.loginUser = loginUser;
         this.refreshToken = refreshToken;
