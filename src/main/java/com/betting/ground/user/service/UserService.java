@@ -59,25 +59,10 @@ public class UserService {
     //유저 프로필 조회
     @Transactional(readOnly = true)
     public UserDTO selectUserProfileById(Long userId) {
-        Optional<User> userProfile = Optional.ofNullable(userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
 
-        return userProfile.map(user ->
-                UserDTO.builder()
-                        .nickname(user.getNickname())
-                        .profileImage(user.getProfileImage())
-                        .bankName(user.getBankInfo() != null ? user.getBankInfo().getBankName() : null)
-                        .bankAccount(user.getBankInfo() != null ? user.getBankInfo().getBankAccount() : null)
-                        .roadName(user.getAddress() != null ? user.getAddress().getRoadName() : null)
-                        .addressName(user.getAddress() != null ? user.getAddress().getAddressName() : null)
-                        .zipcode(user.getAddress() != null ? user.getAddress().getZipcode() : null)
-                        .detailAddress(user.getAddress() != null ? user.getAddress().getDetailAddress() : null)
-                        .money(user.getMoney())
-                        .email(user.getEmail())
-                        .registerDate(user.getCreatedAt())
-                        .role(String.valueOf(user.getRole()))
-                        .build()
-        ).orElse(null);
+        return new UserDTO(user);
     }
 
     //닉네임 변경
@@ -90,10 +75,10 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.BAD_REQUEST)
         );
-
         user.updateNickname(userNicknameDTO.getNickname());
         return userNicknameDTO;
     }
+
 
     //계좌 번호 등록 및 수정
     public UserAccountDTO updateUserAccount(Long userId, UserAccountDTO userAccountDTO) {
@@ -118,27 +103,12 @@ public class UserService {
 
     //권한 변경
     public UserDTO updateUserRole(Long userId) {
-        Optional<User> userData = Optional.ofNullable(userRepository.findById(userId).orElseThrow(
-                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
-        ));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
-        userData.ifPresent(User::updateRole);
+        user.updateRole();
 
-        return userData.map(user ->
-                UserDTO.builder()
-                        .nickname(user.getNickname())
-                        .profileImage(user.getProfileImage())
-                        .bankName(user.getBankInfo() != null ? user.getBankInfo().getBankName() : null)
-                        .bankAccount(user.getBankInfo() != null ? user.getBankInfo().getBankAccount() : null)
-                        .roadName(user.getAddress() != null ? user.getAddress().getRoadName() : null)
-                        .addressName(user.getAddress() != null ? user.getAddress().getAddressName() : null)
-                        .zipcode(user.getAddress() != null ? user.getAddress().getZipcode() : null)
-                        .detailAddress(user.getAddress() != null ? user.getAddress().getDetailAddress() : null)
-                        .money(user.getMoney())
-                        .email(user.getEmail())
-                        .role(String.valueOf(user.getRole()))
-                        .build()
-        ).orElse(null);
+        return new UserDTO(user);
     }
 
     public LoginResponseDto login(String code) throws JsonProcessingException {

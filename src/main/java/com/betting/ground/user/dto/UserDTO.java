@@ -1,12 +1,12 @@
 package com.betting.ground.user.dto;
 
+import com.betting.ground.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -64,4 +64,19 @@ public class UserDTO {
     @Schema(description = "권한", example = "role")
     private String role;
 
+    public UserDTO(User user) {
+        this.nickname = user.getNickname();
+        this.profileImage = user.getProfileImage();
+        this.bankName = user.getBankInfo() != null ? user.getBankInfo().getBankName() : null;
+        this.bankAccount = user.getBankInfo() != null ? user.getBankInfo().getBankAccount() : null;
+        this.roadName = user.getAddress() != null ? user.getAddress().getRoadName() : null;
+        this.addressName = user.getAddress() != null ? user.getAddress().getAddressName() : null;
+        this.zipcode = user.getAddress() != null ? user.getAddress().getZipcode() : null;
+        this.detailAddress = user.getAddress() != null ? user.getAddress().getDetailAddress() : null;
+        this.money = user.getMoney();
+        this.email = user.getEmail();
+        this.registerDate = user.getCreatedAt();
+        this.role = String.valueOf(user.getRole());
+    }
 }
+
