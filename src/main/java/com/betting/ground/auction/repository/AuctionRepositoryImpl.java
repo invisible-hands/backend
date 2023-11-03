@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
@@ -145,8 +146,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .groupBy(auction)
                 .orderBy(auction.createdAt.desc())
-                .distinct()
                 .fetch();
 
 
