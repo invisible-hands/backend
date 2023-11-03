@@ -27,11 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    @Hidden
-    @GetMapping("/code")
-    public String code(String code) {
-        return code;
-    }
 
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인")

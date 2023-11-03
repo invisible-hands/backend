@@ -1,13 +1,12 @@
 package com.betting.ground.auction.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
-@Getter @Builder
+@Getter
 public class BidHistoryDto {
     @Schema(description = "입찰 내역", example="")
     private List<BidInfo> bids;
