@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -83,7 +84,7 @@ class AuctionServiceTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    auctionService.getItemDetail(loginUser, 1L);
+                    auctionService.getItemDetail(loginUser, 1L, UUID.randomUUID().toString());
                     success.getAndIncrement();
                 } catch (GlobalException e) {
                     fail.getAndIncrement();

@@ -22,12 +22,12 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
 import static com.betting.ground.auction.domain.QTag.tag;
+import static com.betting.ground.auction.domain.QView.view;
 import static com.betting.ground.user.domain.QUser.user;
 
 @RequiredArgsConstructor
@@ -47,10 +47,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.instantPrice,
                         auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(auction.createdAt.desc())
@@ -76,10 +77,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.instantPrice,
                         auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -108,13 +110,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.instantPrice,
                         auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(auction.viewCnt.desc())
+                .orderBy(view.cnt.desc())
                 .fetch();
 
         Long count = jpaQueryFactory.select(
@@ -137,10 +140,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.instantPrice,
                         auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .leftJoin(tag).on(tag.auction.eq(auction))
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
@@ -175,9 +179,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.endAuctionTime,
                         auction.duration,
                         bidHistory.count(),
-                        auction.viewCnt
+                        view.cnt
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .leftJoin(bidHistory).on(bidHistory.auction.eq(auction))
                 .where(auction.id.eq(auctionId))
                 .fetchOne();

@@ -13,6 +13,9 @@ import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -21,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -37,9 +42,19 @@ public class AuctionController {
     public Response<ItemDetailDto> getItemDetail(
             @Parameter(description = "경매글 아이디", example = "1")
             @PathVariable Long auctionId,
-            @AuthenticationPrincipal LoginUser loginUser
+            @AuthenticationPrincipal LoginUser loginUser,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId));
+
+        Cookie cookie = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("UserUUID"))
+                .findFirst().orElse(
+                        new Cookie("UserUUID", UUID.randomUUID().toString())
+                );
+        response.addCookie(cookie);
+
+        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));
     }
 
     @GetMapping("/{auctionId}/bidHistory")

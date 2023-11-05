@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
+@Builder
+@AllArgsConstructor
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +34,6 @@ public class Auction {
     @Enumerated(EnumType.STRING)
     private Duration duration;
     private LocalDateTime endAuctionTime;
-    private int viewCnt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;
@@ -56,10 +57,6 @@ public class Auction {
 
     public void calcEndAuctionTime(int duration) {
         this.endAuctionTime = this.createdAt.plusHours(duration);
-    }
-
-    public void updateViewCnt() {
-        this.viewCnt++;
     }
 
     public void updateAuctionStatus(AuctionStatus auctionStatus) {

@@ -2,7 +2,10 @@ package com.betting.ground.common.scheduler;
 
 import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.domain.AuctionStatus;
+import com.betting.ground.auction.domain.View;
 import com.betting.ground.auction.repository.AuctionRepository;
+import com.betting.ground.auction.repository.ViewCacheRepository;
+import com.betting.ground.auction.repository.ViewRepository;
 import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.deal.domain.DealEvent;
 import com.betting.ground.deal.repository.DealEventRepository;
@@ -23,6 +26,8 @@ public class SchedulerController {
     private final AuctionRepository auctionRepository;
     private final DealRepository dealRepository;
     private final DealEventRepository dealEventRepository;
+    private final ViewRepository viewRepository;
+    private final ViewCacheRepository viewCacheRepository;
 
     @GetMapping
     @Transactional
@@ -42,6 +47,22 @@ public class SchedulerController {
                 .toList();
         dealEventRepository.saveAll(dealEvents);
         auctionRepository.saveAll(auctions);
+    }
 
+    @GetMapping("/migration")
+    @Transactional
+    public void migration(){
+        List<String> allAuctions = viewCacheRepository.getAllAuctions();
+        if(allAuctions.isEmpty()){
+            return;
+        }
+
+        List<Long> auctionIds = allAuctions.stream().map(Long::valueOf).toList();
+        List<View> views = viewRepository.findAllByAuctionIdIn(auctionIds);
+        for (View view : views) {
+            view.updateCount(viewCacheRepository.getViewCount(view.getAuctionId().toString()));
+        }
+        viewCacheRepository.removeAllUUID();
+        viewCacheRepository.removeAllAuctions();
     }
 }

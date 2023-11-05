@@ -1,8 +1,6 @@
 package com.betting.ground.auction.service;
 
 
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.betting.ground.auction.domain.*;
 import com.betting.ground.auction.dto.BidHistoryDto;
 import com.betting.ground.auction.dto.BidInfo;
@@ -13,14 +11,10 @@ import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.response.ItemResponse;
-import com.betting.ground.auction.repository.AuctionImageRepository;
-import com.betting.ground.auction.repository.AuctionRepository;
-import com.betting.ground.auction.repository.BidHistoryRepository;
-import com.betting.ground.auction.repository.TagRepository;
+import com.betting.ground.auction.repository.*;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.common.s3.S3Utils;
-import com.betting.ground.config.s3.S3Config;
 import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.deal.domain.DealEvent;
 import com.betting.ground.deal.repository.DealEventRepository;
@@ -29,7 +23,6 @@ import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +41,8 @@ public class AuctionService {
     private final AuctionImageRepository auctionImageRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final ViewCacheRepository viewCacheRepository;
+    private final ViewRepository viewRepository;
 
     private final BidHistoryRepository bidHistoryRepository;
     private final DealRepository dealRepository;
@@ -104,11 +98,16 @@ public class AuctionService {
         return auctionRepository.getBidInfo(auctionId, userId);
     }
 
-    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId) {
+    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId, String uuid) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
-        auction.updateViewCnt();
+
+        if(viewCacheRepository.addUniqueUUID(auctionId.toString(), uuid)){
+            viewCacheRepository.setAuction(auctionId.toString());
+            viewCacheRepository.setUUID(auctionId.toString(), uuid);
+        }
+
         auctionRepository.save(auction);
         return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
@@ -136,6 +135,9 @@ public class AuctionService {
             Tag auctionTag = new Tag(tagName, auction);
             tagRepository.save(auctionTag);
         }
+
+        // 조회수 저장
+        viewRepository.save(new View(auction.getId()));
     }
 
     public void delete(Long auctionId) {
