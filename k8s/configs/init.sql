@@ -1,12 +1,6 @@
 
 ALTER DATABASE bettingGround CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-drop table if exists test;
-create table test (
-                      id bigint not null auto_increment,
-                      primary key (id)
-) engine=InnoDB;
-
 drop table if exists auction;
 drop table if exists auction_image;
 drop table if exists bid_history;
@@ -14,9 +8,9 @@ drop table if exists deal;
 drop table if exists deal_event;
 drop table if exists delivery;
 drop table if exists payment;
-drop table if exists settlement;
 drop table if exists tag;
 drop table if exists user;
+drop table if exists view;
 
 create table auction (
                          id bigint not null auto_increment,
@@ -33,7 +27,6 @@ create table auction (
                          start_price bigint,
                          title varchar(255),
                          updated_at datetime(6),
-                         view_cnt integer not null,
                          user_id bigint,
                          primary key (id)
 ) engine=InnoDB;
@@ -80,18 +73,12 @@ create table delivery (
 ) engine=InnoDB;
 create table payment (
                          id bigint not null auto_increment,
+                         auction_id bigint,
                          created_at datetime(6),
                          money bigint,
                          payment_type varchar(255),
                          user_id bigint,
                          primary key (id)
-) engine=InnoDB;
-create table settlement (
-                            id bigint not null auto_increment,
-                            created_at datetime(6),
-                            price bigint,
-                            seller_id bigint,
-                            primary key (id)
 ) engine=InnoDB;
 create table tag (
                      id bigint not null auto_increment,
@@ -112,10 +99,17 @@ create table user (
                       is_deleted bit not null,
                       money bigint,
                       nickname varchar(255),
+                      password varchar(255),
                       phone_number varchar(255),
                       profile_image varchar(255),
                       role varchar(255),
                       updated_at datetime(6),
                       username varchar(255),
+                      primary key (id)
+) engine=InnoDB;
+create table view (
+                      id bigint not null auto_increment,
+                      auction_id bigint,
+                      cnt integer not null,
                       primary key (id)
 ) engine=InnoDB;

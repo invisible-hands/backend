@@ -1,36 +1,39 @@
 package com.betting.ground.auction.controller;
 
 import com.betting.ground.auction.dto.BidHistoryDto;
-import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
-import com.betting.ground.auction.dto.request.BidRequest;
+import com.betting.ground.auction.dto.request.PayRequest;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
-import com.betting.ground.auction.repository.AuctionImageRepository;
-import com.betting.ground.auction.repository.AuctionRepository;
-import com.betting.ground.auction.repository.TagRepository;
+import com.betting.ground.auction.dto.response.ItemDetailDto;
+import com.betting.ground.auction.dto.response.ItemResponse;
+import com.betting.ground.auction.service.AuctionService;
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import com.betting.ground.auction.dto.response.ItemResponse;
-import com.betting.ground.auction.service.AuctionService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
+
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auction")
-@io.swagger.v3.oas.annotations.tags.Tag(name = "경매", description = "경매 관련 api")
+@Tag(name = "경매", description = "경매 관련 api")
 public class AuctionController {
 
     private final AuctionService auctionService;
@@ -40,9 +43,19 @@ public class AuctionController {
     public Response<ItemDetailDto> getItemDetail(
             @Parameter(description = "경매글 아이디", example = "1")
             @PathVariable Long auctionId,
-            @AuthenticationPrincipal LoginUser loginUser
+            @AuthenticationPrincipal LoginUser loginUser,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId));
+        Cookie cookie = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("UserUUID"))
+                .findFirst().orElse(
+                        new Cookie("UserUUID", UUID.randomUUID().toString())
+                );
+        cookie.setMaxAge(24 * 60 * 60);
+        response.addCookie(cookie);
+
+        return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));
     }
 
     @GetMapping("/{auctionId}/bidHistory")
@@ -65,15 +78,6 @@ public class AuctionController {
             Pageable pageable) {
 
         return Response.success("해당 경매글의 판매자 정보 보기 성공", auctionService.getSeller(auctionId, pageable));
-    }
-
-    @PostMapping("/{auctionId}/instant")
-    @Operation(summary = "즉시 결제", description = "")
-    public Response<Void> instantBuy(
-            @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
-            @PathVariable Long auctionId
-    ) {
-        return Response.success("해당 경매글의 즉시 결제 성공", null);
     }
 
     @Operation(summary = "게시글 검색")
@@ -110,12 +114,27 @@ public class AuctionController {
 
     @Operation(summary = "입찰 요청")
     @PostMapping("/{auctionId}/bid")
-    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody BidRequest request) {
+    public Response<Void> bid(@PathVariable Long auctionId,
+                              @RequestBody PayRequest request,
+                              @AuthenticationPrincipal LoginUser loginUser) {
+        auctionService.bid(auctionId,request, loginUser.getUser().getId());
         return Response.success("경매 참여 완료", null);
     }
 
-    @GetMapping("/new")
+    @PostMapping("/{auctionId}/instant")
+    @Operation(summary = "즉시 결제", description = "")
+    public Response<Void> instantBuy(
+            @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
+            @PathVariable Long auctionId,
+            @RequestBody PayRequest request,
+            @AuthenticationPrincipal LoginUser loginUser
+    ) {
+        auctionService.instantBuy(auctionId,request, loginUser.getUser().getId());
+        return Response.success("해당 경매글의 즉시 결제 성공", null);
+    }
+
     @Operation(summary = "새로 들어온 제품 (최신순)")
+    @GetMapping("/new")
     public Response<ItemResponse> getNewItem(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
@@ -123,8 +142,8 @@ public class AuctionController {
         return Response.success("새로 들어온 제품", auctionService.getNewItem(pageable));
     }
 
-    @GetMapping("/deadline")
     @Operation(summary = "마감 임박한 상품")
+    @GetMapping("/deadline")
     public Response<ItemResponse> getDeadline(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"
@@ -132,8 +151,8 @@ public class AuctionController {
         return Response.success("마감 임박한 상품", auctionService.getDeadline(pageable));
     }
 
-    @GetMapping("/view")
     @Operation(summary = "조회수 많은 상품")
+    @GetMapping("/view")
     public Response<ItemResponse> getMostView(
             @Parameter(
                     description = "page, size만 주시면 됩니다!! ex) ?page=1&size=10"

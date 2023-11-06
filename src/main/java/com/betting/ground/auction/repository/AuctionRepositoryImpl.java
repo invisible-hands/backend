@@ -3,7 +3,7 @@ package com.betting.ground.auction.repository;
 import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.dto.AuctionDetailInfo;
 import com.betting.ground.auction.dto.AuctionImageDto;
-import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerItemDto;
 import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
@@ -21,18 +21,19 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
 import static com.betting.ground.auction.domain.QBidHistory.bidHistory;
 import static com.betting.ground.auction.domain.QTag.tag;
+import static com.betting.ground.auction.domain.QView.view;
 import static com.betting.ground.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-
 
     @Override
     public PageImpl<AuctionInfo> findItemByOrderByCreatedAtDesc(Pageable pageable) {
@@ -44,11 +45,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(auction.createdAt.desc())
@@ -72,11 +75,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .where(auction.endAuctionTime.gt(LocalDateTime.now()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -103,14 +108,16 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(auction.viewCnt.desc())
+                .orderBy(view.cnt.desc())
                 .fetch();
 
         Long count = jpaQueryFactory.select(
@@ -131,17 +138,19 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
-                        auction.viewCnt,
+                        view.cnt,
                         auctionImage
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .leftJoin(tag).on(tag.auction.eq(auction))
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .groupBy(auction)
                 .orderBy(auction.createdAt.desc())
-                .distinct()
                 .fetch();
 
 
@@ -170,11 +179,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.endAuctionTime,
                         auction.duration,
                         bidHistory.count(),
-                        auction.viewCnt
+                        view.cnt
                 ))
                 .from(auction)
+                .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .leftJoin(bidHistory).on(bidHistory.auction.eq(auction))
                 .where(auction.id.eq(auctionId))
+                .groupBy(auction, view)
                 .fetchOne();
 
         List<AuctionImageDto> images = jpaQueryFactory.select(Projections.constructor(AuctionImageDto.class,
@@ -199,21 +210,21 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public User findSellerById(Long auctionId) {
+    public Optional<User> findSellerById(Long auctionId) {
         User seller = jpaQueryFactory.select(user)
                 .from(auction)
                 .leftJoin(auction.user, user)
                 .where(auction.id.eq(auctionId))
                 .fetchOne();
 
-        return seller;
+        return Optional.ofNullable(seller);
     }
 
     @Override
-    public PageImpl<BiddingItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
+    public PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
 
-        List<BiddingItemDto> findBiddingItem =
-                jpaQueryFactory.select(Projections.constructor(BiddingItemDto.class,
+        List<SellerItemDto> findBiddingItem =
+                jpaQueryFactory.select(Projections.constructor(SellerItemDto.class,
                                 auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration))
                         .distinct()
                         .from(auction)

@@ -2,7 +2,6 @@ package com.betting.ground.auction.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +17,6 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
 
-    @Builder
     public Tag(String tagName, Auction auction) {
         this.tagName = tagName;
         this.auction = auction;

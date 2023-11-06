@@ -1,5 +1,6 @@
 package com.betting.ground.auction.domain;
 
+import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,6 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
+@Builder
+@AllArgsConstructor
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +34,6 @@ public class Auction {
     @Enumerated(EnumType.STRING)
     private Duration duration;
     private LocalDateTime endAuctionTime;
-    private int viewCnt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;
@@ -39,19 +41,17 @@ public class Auction {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @Builder
-    public Auction(String title, String content, ItemCondition itemCondition, Long startPrice, Long instantPrice, Long currentPrice, AuctionStatus auctionStatus, Duration duration, LocalDateTime endAuctionTime, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
-        this.title = title;
-        this.content = content;
-        this.itemCondition = itemCondition;
-        this.startPrice = startPrice;
-        this.instantPrice = instantPrice;
-        this.currentPrice = currentPrice;
-        this.auctionStatus = auctionStatus;
-        this.duration = duration;
-        this.endAuctionTime = endAuctionTime;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public Auction(User user, AuctionCreateRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.itemCondition = ItemCondition.valueOf(request.getItemCondition());
+        this.startPrice = request.getStartPrice();
+        this.instantPrice = request.getInstantPrice();
+        this.currentPrice = request.getStartPrice();
+        this.auctionStatus = AuctionStatus.AUCTION_PROGRESS;
+        this.duration = Duration.valueOf(request.getDuration());
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
         this.user = user;
     }
 
@@ -59,28 +59,19 @@ public class Auction {
         this.endAuctionTime = this.createdAt.plusHours(duration);
     }
 
-    @Override
-    public String toString() {
-        return "Auction{" +
-                "title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", itemCondition=" + itemCondition +
-                ", startPrice=" + startPrice +
-                ", instantPrice=" + instantPrice +
-                ", currentPrice=" + currentPrice +
-                ", auctionStatus=" + auctionStatus +
-                ", duration=" + duration +
-                ", endAuctionTime=" + endAuctionTime +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
-    public void updateViewCnt() {
-        this.viewCnt++;
-    }
-
     public void updateAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
     }
+
+
+    public boolean hasBidder(){
+        return !(bidderId == null && (this.currentPrice == this.startPrice));
+    }
+
+    public void updateBid(Long bidderId, Long price, AuctionStatus auctionStatus) {
+        this.bidderId = bidderId;
+        this.currentPrice = price;
+        this.auctionStatus = auctionStatus;
+    }
+
 }
