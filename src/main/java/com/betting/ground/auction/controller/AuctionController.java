@@ -126,10 +126,9 @@ public class AuctionController {
     public Response<Void> instantBuy(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
             @PathVariable Long auctionId,
-            @RequestBody PayRequest request,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        auctionService.instantBuy(auctionId,request, loginUser.getUser().getId());
+        auctionService.instantBuy(auctionId, loginUser.getUser().getId());
         return Response.success("해당 경매글의 즉시 결제 성공", null);
     }
 

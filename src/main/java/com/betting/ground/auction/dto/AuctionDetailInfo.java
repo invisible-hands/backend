@@ -27,6 +27,9 @@ public class AuctionDetailInfo {
     @Schema(description = "경매 등록 시간", example = "2023-10-20 13:35:10")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
+    @Schema(description = "경매 시작 시간", example = "2023-10-20 13:35:10")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime startAuctionTime;
     @Schema(description = "경매 종료 시간", example = "2023-10-20 13:40:10") // 2023-10-20 13:40:10
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime endAuctionTime;
@@ -46,6 +49,7 @@ public class AuctionDetailInfo {
         this.currentPrice = currentPrice;
         this.instantPrice = instantPrice;
         this.createdAt = createdAt;
+        this.startAuctionTime = createdAt.plusMinutes(5L);
         this.endAuctionTime = endAuctionTime;
         this.duration = duration.getTime();
         this.bidderCnt = bidderCnt;

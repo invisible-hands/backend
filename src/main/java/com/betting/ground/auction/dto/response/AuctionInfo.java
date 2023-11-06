@@ -25,6 +25,12 @@ public class AuctionInfo {
     private Long instantPrice;
     @Schema(description = "경매 기간", example = "12")
     private int duration;
+    @Schema(description = "경매 등록 시각", example = "2023-10-24 09:00:01")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt;
+    @Schema(description = "경매 시작 시각", example = "2023-10-24 09:00:01")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime startAuctionTime;
     @Schema(description = "경매 종료 시각", example = "2023-10-24 09:00:01")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime endAuctionTime;
@@ -35,16 +41,18 @@ public class AuctionInfo {
     @Schema(description = "이미지 url", example = "aws-s3-url-14")
     private String imageUrl;
 
-    public AuctionInfo(Long auctionId, String title, Long currentPrice, Long instantPrice,Duration duration, LocalDateTime endAuctionTime, int viewCnt, String imageUrl) {
+    public AuctionInfo(Long auctionId, String title, Long currentPrice, Long instantPrice,Duration duration,LocalDateTime createdAt, LocalDateTime endAuctionTime, int viewCnt, String imageUrl) {
         this.auctionId = auctionId;
         this.title = title;
         this.currentPrice = currentPrice;
         this.instantPrice = instantPrice;
         this.duration = duration.getTime();
+        this.createdAt = createdAt;
+        this.startAuctionTime = createdAt.plusMinutes(5L);
         this.endAuctionTime = endAuctionTime;
         this.viewCnt = viewCnt;
         this.auctionStatus = endAuctionTime.isBefore(LocalDateTime.now()) ?
-                "경매 종료" : AuctionStatus.AUCTION_PROGRESS.getStatus();
+                "AUCTION_FINISH" : AuctionStatus.AUCTION_PROGRESS.name();
         this.imageUrl = imageUrl;
     }
 }

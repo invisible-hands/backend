@@ -1,6 +1,7 @@
 package com.betting.ground.deal.repository;
 
 import com.betting.ground.deal.domain.Deal;
+import com.betting.ground.deal.domain.DealStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface DealRepository extends JpaRepository<Deal, Long>, DealRepositor
     List<Deal> findAllByBuyerId(Long userId);
 
     List<Deal> findAllBySellerId(Long userId);
+
+    List<Deal> findAllByDealStatus(DealStatus deliveryWaiting);
 }

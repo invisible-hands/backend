@@ -182,7 +182,7 @@ public class AuctionService {
         return new SellerInfo(findSeller, findSellerItem);
     }
 
-    public void instantBuy(Long auctionId, PayRequest request, Long userId) {
+    public void instantBuy(Long auctionId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
 
         // 비관적 락 select for update
@@ -214,19 +214,19 @@ public class AuctionService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
-        user.pay(request.getPrice());
+        user.pay(auction.getInstantPrice());
         userRepository.save(user);
 
         // 즉시구매한 사람의 입출금내역
-        Payment payment = new Payment(auctionId, request.getPrice(), PaymentType.OUT_BID, now, user);
+        Payment payment = new Payment(auctionId, auction.getInstantPrice(), PaymentType.OUT_BID, now, user);
         paymentRepository.save(payment);
 
         // 구매자 입찰내역
-        BidHistory buyerBidHistory = new BidHistory(user.getId(), user.getNickname(), now, request.getPrice(), auction);
+        BidHistory buyerBidHistory = new BidHistory(user.getId(), user.getNickname(), now, auction.getInstantPrice(), auction);
         bidHistoryRepository.save(buyerBidHistory);
 
         // 최근 입찰한 사람 찾아서 취소
-        Optional<BidHistory> bidHistory = bidHistoryRepository.findByAuctionAndPrice(auction, auction.getCurrentPrice());
+        Optional<BidHistory> bidHistory = bidHistoryRepository.findByAuctionAndPrice(auction, auction.getInstantPrice());
         if (bidHistory.isPresent()) {
             User bidder = userRepository.findById(bidHistory.get().getBidderId()).orElseThrow(
                     () -> new GlobalException(ErrorCode.BAD_REQUEST)
@@ -238,7 +238,7 @@ public class AuctionService {
         }
 
         // 경매 즉시거래가로 업데이트
-        auction.updateBid(user.getId(), request.getPrice(), AuctionStatus.AUCTION_SUCCESS);
+        auction.updateBid(user.getId(), auction.getInstantPrice(), AuctionStatus.AUCTION_SUCCESS);
         auctionRepository.save(auction);
 
         Deal deal = new Deal(auction, now);

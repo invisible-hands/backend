@@ -46,6 +46,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
                         view.cnt,
                         auctionImage
@@ -76,6 +77,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
                         view.cnt,
                         auctionImage
@@ -109,6 +111,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
                         view.cnt,
                         auctionImage
@@ -139,6 +142,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
                         view.cnt,
                         auctionImage
@@ -149,7 +153,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .groupBy(auction)
+                .groupBy(auction, view)
                 .orderBy(auction.createdAt.desc())
                 .fetch();
 
