@@ -12,10 +12,7 @@ import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.response.ItemResponse;
-import com.betting.ground.auction.repository.AuctionImageRepository;
-import com.betting.ground.auction.repository.AuctionRepository;
-import com.betting.ground.auction.repository.BidHistoryRepository;
-import com.betting.ground.auction.repository.TagRepository;
+import com.betting.ground.auction.repository.*;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.common.s3.S3Utils;
@@ -39,7 +36,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +48,8 @@ public class AuctionService {
     private final AuctionImageRepository auctionImageRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final ViewCacheRepository viewCacheRepository;
+    private final ViewRepository viewRepository;
     private final BidHistoryRepository bidHistoryRepository;
     private final DealRepository dealRepository;
     private final DealEventRepository dealEventRepository;
@@ -104,11 +105,16 @@ public class AuctionService {
         return auctionRepository.getBidInfo(auctionId, userId);
     }
 
-    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId) {
+    public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId, String uuid) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
-        auction.updateViewCnt();
+
+        if(viewCacheRepository.addUniqueUUID(auctionId.toString(), uuid)){
+            viewCacheRepository.setAuction(auctionId.toString());
+            viewCacheRepository.setUUID(auctionId.toString(), uuid);
+        }
+
         auctionRepository.save(auction);
         return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
@@ -136,6 +142,9 @@ public class AuctionService {
             Tag auctionTag = new Tag(tagName, auction);
             tagRepository.save(auctionTag);
         }
+
+        // 조회수 저장
+        viewRepository.save(new View(auction.getId()));
     }
 
     public void delete(Long auctionId) {

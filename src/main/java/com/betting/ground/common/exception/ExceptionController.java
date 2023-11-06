@@ -23,15 +23,15 @@ public class ExceptionController {
 
     @ExceptionHandler(value = GlobalException.class)
     public ResponseEntity<Response<Void>> handleGlobalExceptionHandler(GlobalException e) {
-        log.error("error occur {}", e);
+        log.error("error occur {}", e.getMessage());
 
         return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(Response.error(e.getErrorCode().getStatus().toString(), e.getErrorCode().getMessage()));
+                .body(Response.error(e.getErrorCode().name(), e.getErrorCode().getMessage()));
     }
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Response<Void>> unhandledException(Exception e, HttpServletRequest request) {
-        log.error("error occur {}",e);
+        log.error("error occur {}",e.getMessage());
 
         slackAlarmGenerator.sendSlackAlertErrorLog(e, request);
 

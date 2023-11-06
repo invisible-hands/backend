@@ -9,6 +9,17 @@ import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.domain.User;
+import com.betting.ground.user.dto.login.LoginUser;
+import com.betting.ground.user.repository.UserRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
 import com.betting.ground.user.repository.UserRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 //@Disabled
 class AuctionServiceTest {
@@ -28,13 +41,15 @@ class AuctionServiceTest {
     @Autowired
     private AuctionService auctionService;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private AuctionRepository auctionRepository;
     @Autowired
-    private UserRepository userRepository;
+    private RedisTemplate redisTemplate;
 
     @Test
-    void test() throws InterruptedException {
-        // given
+    void 레디스_조회수() throws Exception{
+        //given
         User seller = User.builder()
                 .username("판매자")
                 .nickname("ㅁㅁㅁ")
@@ -86,21 +101,32 @@ class AuctionServiceTest {
         auction.calcEndAuctionTime(Duration.HALF.getTime());
         auctionRepository.save(auction);
 
+
+        LoginUser loginUser = new LoginUser(seller);
+
+
 //        auctionService.instantBuy(1L, new PayRequest(30000L), 2L);
 
         int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(30);
+
         CountDownLatch latch = new CountDownLatch(threadCount);
 
         AtomicInteger success = new AtomicInteger();
         AtomicInteger fail = new AtomicInteger();
         for (int i = 0; i < threadCount; i++) {
+
+            executorService.submit(() -> {
+                try {
+                    auctionService.getItemDetail(loginUser, 1L, UUID.randomUUID().toString());
+
             int finalI = i;
             executorService.submit(() -> {
                 try {
                     long random = (int) (Math.random() * 10) + 2L;
                     System.out.println("random = " + random);
                     auctionService.instantBuy(1L, new PayRequest(30000L), random);
+
                     success.getAndIncrement();
                 } catch (GlobalException e) {
                     fail.getAndIncrement();
@@ -112,6 +138,19 @@ class AuctionServiceTest {
             });
         }
         latch.await();
+
+        HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
+        System.out.println(hashOperations.get("Auction", "1"));
+        Set keys = hashOperations.keys("Auction");
+        for (Object key : keys) {
+            System.out.println(Long.valueOf((String)key));
+        }
+        //when
+
+        //then
+    }
+}
+
 
         // when
 
@@ -206,3 +245,4 @@ class AuctionServiceTest {
 
     }
 }
+
