@@ -8,15 +8,13 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
 public class ViewCacheRepository {
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private SetOperations<String, String> setAuction;
     private ValueOperations<String, String> valueOperations;
     private static final String AUCTION = "Auction";
@@ -34,8 +32,8 @@ public class ViewCacheRepository {
         setAuction.add(AUCTION, auctionId);
     }
 
-    public List<String> getAllAuctions(){
-        return setAuction.members(AUCTION).stream().toList();
+    public Set<String> getAllAuctions(){
+        return setAuction.members(AUCTION);
     }
 
     public void removeAllAuctions(){
@@ -43,13 +41,13 @@ public class ViewCacheRepository {
     }
 
     public void setUUID(String auctionId, String uuid) {
-        setAuction.add(getUniqueKey(auctionId), uuid.toString());
+        setAuction.add(getUniqueKey(auctionId), uuid);
     }
 
     public void removeAllUUID(){
-        List<String> allAuctions = getAllAuctions();
+        Set<String> allAuctions = getAllAuctions();
         for (String auctionId : allAuctions) {
-            List<String> members = getMembers(auctionId).stream().toList();
+            Set<String> members = getMembers(auctionId);
             for (String uuid : members) {
                 setAuction.remove(getUniqueKey(auctionId), uuid);
             }
@@ -61,11 +59,11 @@ public class ViewCacheRepository {
     }
 
     public boolean addUniqueUUID(String auctionId, String uuid){
-        return valueOperations.setIfAbsent(
+        return Boolean.TRUE.equals(valueOperations.setIfAbsent(
                 getUniqueUUIDKey(auctionId),
                 uuid,
                 Duration.ofMinutes(5)
-        );
+        ));
     }
 
     private String getUniqueKey(String auctionId){

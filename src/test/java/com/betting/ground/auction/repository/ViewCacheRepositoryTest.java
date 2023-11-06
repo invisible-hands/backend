@@ -31,7 +31,7 @@ class ViewCacheRepositoryTest {
     private AuctionService auctionService;
 
     @Test
-    public void 레디스_테스트() throws Exception{
+    void 레디스_테스트() throws Exception{
         User seller = User.builder()
                 .username("판매자")
                 .nickname("ㅁㅁㅁ")
@@ -90,7 +90,7 @@ class ViewCacheRepositoryTest {
     }
 
     @Test
-    public void 삭제() throws Exception{
+    void 삭제() throws Exception{
         //given
 //        viewCacheRepository.removeAllUUID();
 //        viewCacheRepository.removeAllAuctions();

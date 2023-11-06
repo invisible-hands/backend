@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class SchedulerController {
     private final ViewRepository viewRepository;
     private final ViewCacheRepository viewCacheRepository;
 
-    @GetMapping
+    @GetMapping("/status")
     @Transactional
     public void update() {
         List<Auction> auctions = auctionRepository.findAllByAuctionStatus(AuctionStatus.AUCTION_PROGRESS);
@@ -52,7 +53,7 @@ public class SchedulerController {
     @GetMapping("/migration")
     @Transactional
     public void migration(){
-        List<String> allAuctions = viewCacheRepository.getAllAuctions();
+        Set<String> allAuctions = viewCacheRepository.getAllAuctions();
         if(allAuctions.isEmpty()){
             return;
         }

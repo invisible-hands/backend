@@ -185,6 +185,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .leftJoin(view).on(auction.id.eq(view.auctionId))
                 .leftJoin(bidHistory).on(bidHistory.auction.eq(auction))
                 .where(auction.id.eq(auctionId))
+                .groupBy(auction, view)
                 .fetchOne();
 
         List<AuctionImageDto> images = jpaQueryFactory.select(Projections.constructor(AuctionImageDto.class,

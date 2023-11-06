@@ -51,7 +51,7 @@ public class AuctionController {
                 .findFirst().orElse(
                         new Cookie("UserUUID", UUID.randomUUID().toString())
                 );
-        cookie.setMaxAge(60 * 5);
+        cookie.setMaxAge(24 * 60 * 60);
         response.addCookie(cookie);
 
         return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));

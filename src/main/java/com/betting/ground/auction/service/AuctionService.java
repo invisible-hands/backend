@@ -148,7 +148,7 @@ public class AuctionService {
 
         // 경매글 생성 5분 후 삭제 불가
         if(auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
-            new GlobalException(ErrorCode.ALREADY_AUCTION_START);
+            throw new GlobalException(ErrorCode.ALREADY_AUCTION_START);
         }
 
         // 경매글 soft delete, 사진과 태그는 삭제
