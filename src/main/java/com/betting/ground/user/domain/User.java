@@ -1,7 +1,10 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.common.exception.ErrorCode;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
+import com.betting.ground.user.dto.login.KakaoProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

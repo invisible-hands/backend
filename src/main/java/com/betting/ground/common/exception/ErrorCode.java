@@ -31,6 +31,7 @@ public enum ErrorCode {
     EXCEED_INSTANT_PRICE(HttpStatus.BAD_REQUEST, "즉시 구매가를 초과하였습니다."),
     LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
     ALREADY_AUCTION_START(HttpStatus.BAD_REQUEST, "시작된 경매 입니다."),
+    AUCTION_NOT_START(HttpStatus.BAD_REQUEST, "경매가 시작되지 않았습니다."),
     ;
 
 

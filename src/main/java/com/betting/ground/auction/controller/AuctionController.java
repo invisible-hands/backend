@@ -1,6 +1,7 @@
 package com.betting.ground.auction.controller;
 
 import com.betting.ground.auction.dto.BidHistoryDto;
+import com.betting.ground.auction.dto.request.PayRequest;
 import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
@@ -101,7 +102,10 @@ public class AuctionController {
 
     @Operation(summary = "입찰 요청")
     @PostMapping("/{auctionId}/bid")
-    public Response<Void> bid(@PathVariable Long auctionId, @RequestBody PayRequest request) {
+    public Response<Void> bid(@PathVariable Long auctionId,
+                              @RequestBody PayRequest request,
+                              @AuthenticationPrincipal LoginUser loginUser) {
+        auctionService.bid(auctionId,request, loginUser.getUser().getId());
         return Response.success("경매 참여 완료", null);
     }
 
@@ -110,17 +114,11 @@ public class AuctionController {
     public Response<Void> instantBuy(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
             @PathVariable Long auctionId,
-            @RequestBody PayRequest request
-//            @AuthenticationPrincipal LoginUser loginUser
+            @RequestBody PayRequest request,
+            @AuthenticationPrincipal LoginUser loginUser
     ) {
-        auctionService.instantBuy(auctionId,request, (int)(Math.random() * 10) + 2L);
+        auctionService.instantBuy(auctionId,request, loginUser.getUser().getId());
         return Response.success("해당 경매글의 즉시 결제 성공", null);
-    }
-
-    @Operation(summary = "상품 입찰하기 페이지 조회")
-    @GetMapping("/{auctionId}/bid")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal LoginUser loginUser){
-        return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, loginUser.getUser().getId()));
     }
 
     @Operation(summary = "새로 들어온 제품 (최신순)")
