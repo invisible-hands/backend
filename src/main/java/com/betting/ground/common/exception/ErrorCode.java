@@ -24,8 +24,14 @@ public enum ErrorCode {
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     PAY_CANCEL(HttpStatus.BAD_REQUEST, "유저 결제 취소"),
     PAY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"),
-
+    NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
+    AUCTION_SOLD_OUT(HttpStatus.BAD_REQUEST,"이미 상품이 판매되었습니다."),
+    CAN_NOT_PURCHASE(HttpStatus.BAD_REQUEST, "본인이 올린 경매글은 구매할 수 없습니다."),
+    ALREADY_TOP_PRICE_BIDDER(HttpStatus.BAD_REQUEST, "이미 최고 입찰가로 참여하셨습니다."),
+    EXCEED_INSTANT_PRICE(HttpStatus.BAD_REQUEST, "즉시 구매가를 초과하였습니다."),
+    LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
     ALREADY_AUCTION_START(HttpStatus.BAD_REQUEST, "시작된 경매 입니다."),
+    AUCTION_NOT_START(HttpStatus.BAD_REQUEST, "경매가 시작되지 않았습니다."),
     ;
 
 

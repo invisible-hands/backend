@@ -22,4 +22,12 @@ public class BidHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
+
+    public BidHistory(Long bidderId, String nickname, LocalDateTime createdAt, Long price, Auction auction) {
+        this.bidderId = bidderId;
+        this.nickname = nickname;
+        this.createdAt = createdAt;
+        this.price = price;
+        this.auction = auction;
+    }
 }

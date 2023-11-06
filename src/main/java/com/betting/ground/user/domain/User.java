@@ -1,5 +1,7 @@
 package com.betting.ground.user.domain;
 
+import com.betting.ground.common.exception.ErrorCode;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
 import com.betting.ground.user.dto.login.KakaoProfile;
@@ -70,5 +72,16 @@ public class User {
         this.role = Role.GUEST;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void pay(Long price) {
+        if (this.money < price) {
+            throw new GlobalException(ErrorCode.NOT_ENOUGH_MONEY);
+        }
+        this.money -= price;
+    }
+
+    public void bidCancel(Long price) {
+        this.money += price;
     }
 }
