@@ -46,12 +46,12 @@ public class AuctionController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-
         Cookie cookie = Arrays.stream(request.getCookies())
                 .filter(c -> c.getName().equals("UserUUID"))
                 .findFirst().orElse(
                         new Cookie("UserUUID", UUID.randomUUID().toString())
                 );
+        cookie.setMaxAge(60 * 5);
         response.addCookie(cookie);
 
         return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));
