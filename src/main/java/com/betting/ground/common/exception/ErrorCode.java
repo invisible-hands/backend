@@ -30,6 +30,7 @@ public enum ErrorCode {
     ALREADY_TOP_PRICE_BIDDER(HttpStatus.BAD_REQUEST, "이미 최고 입찰가로 참여하셨습니다."),
     EXCEED_INSTANT_PRICE(HttpStatus.BAD_REQUEST, "즉시 구매가를 초과하였습니다."),
     LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
+    ALREADY_AUCTION_START(HttpStatus.BAD_REQUEST, "시작된 경매 입니다."),
     ;
 
 

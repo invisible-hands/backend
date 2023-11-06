@@ -3,7 +3,7 @@ package com.betting.ground.auction.repository;
 import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.dto.AuctionDetailInfo;
 import com.betting.ground.auction.dto.AuctionImageDto;
-import com.betting.ground.auction.dto.BiddingItemDto;
+import com.betting.ground.auction.dto.SellerItemDto;
 import com.betting.ground.auction.dto.TagDto;
 import com.betting.ground.auction.dto.response.AuctionInfo;
 import com.betting.ground.auction.dto.response.BidInfoResponse;
@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.betting.ground.auction.domain.QAuction.auction;
 import static com.betting.ground.auction.domain.QAuctionImage.auctionImage;
@@ -44,6 +46,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -72,6 +75,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -103,6 +107,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -131,6 +136,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.title,
                         auction.currentPrice,
                         auction.instantPrice,
+                        auction.duration,
                         auction.endAuctionTime,
                         auction.viewCnt,
                         auctionImage
@@ -140,8 +146,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .groupBy(auction)
                 .orderBy(auction.createdAt.desc())
-                .distinct()
                 .fetch();
 
 
@@ -199,21 +205,21 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public User findSellerById(Long auctionId) {
+    public Optional<User> findSellerById(Long auctionId) {
         User seller = jpaQueryFactory.select(user)
                 .from(auction)
                 .leftJoin(auction.user, user)
                 .where(auction.id.eq(auctionId))
                 .fetchOne();
 
-        return seller;
+        return Optional.ofNullable(seller);
     }
 
     @Override
-    public PageImpl<BiddingItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
+    public PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
 
-        List<BiddingItemDto> findBiddingItem =
-                jpaQueryFactory.select(Projections.constructor(BiddingItemDto.class,
+        List<SellerItemDto> findBiddingItem =
+                jpaQueryFactory.select(Projections.constructor(SellerItemDto.class,
                                 auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration))
                         .distinct()
                         .from(auction)

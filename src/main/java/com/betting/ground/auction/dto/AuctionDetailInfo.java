@@ -2,11 +2,11 @@ package com.betting.ground.auction.dto;
 
 import com.betting.ground.auction.domain.Duration;
 import com.betting.ground.auction.domain.ItemCondition;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 public class AuctionDetailInfo {
@@ -25,9 +25,11 @@ public class AuctionDetailInfo {
     @Schema(description = "즉시 구매 가격", example = "200000")
     private Long instantPrice;
     @Schema(description = "경매 등록 시간", example = "2023-10-20 13:35:10")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt;
     @Schema(description = "경매 종료 시간", example = "2023-10-20 13:40:10") // 2023-10-20 13:40:10
-    private String endAuctionTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime endAuctionTime;
     @Schema(description = "경매 기간", example = "24")
     private int duration;
     @Schema(description = "참여자 수", example = "8")
@@ -43,8 +45,8 @@ public class AuctionDetailInfo {
         this.itemCondition = itemCondition.name();
         this.currentPrice = currentPrice;
         this.instantPrice = instantPrice;
-        this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        this.endAuctionTime = endAuctionTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.createdAt = createdAt;
+        this.endAuctionTime = endAuctionTime;
         this.duration = duration.getTime();
         this.bidderCnt = bidderCnt;
         this.viewCnt = viewCnt;

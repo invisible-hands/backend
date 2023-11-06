@@ -19,7 +19,6 @@ public class AuctionImage {
     @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
 
-    @Builder
     public AuctionImage(String imageUrl, Auction auction) {
         this.imageUrl = imageUrl;
         this.auction = auction;
