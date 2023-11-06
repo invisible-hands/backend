@@ -26,7 +26,7 @@ public class PurchaseInfo {
     private LocalDateTime endAuctionTime;
     @Schema(description = "낙찰가격", example="500")
     private Long purchasePrice;
-    @Schema(description = "상태", example="배송중")
+    @Schema(description = "상태", example="DELIVERY_WAITING")
     private String status;
 
     @QueryProjection
@@ -37,7 +37,7 @@ public class PurchaseInfo {
         this.title = title;
         this.endAuctionTime = endAuctionTime;
         this.purchasePrice = purchasePrice;
-        this.status = status.getStatus();
+        this.status = status.name();
     }
 
 }

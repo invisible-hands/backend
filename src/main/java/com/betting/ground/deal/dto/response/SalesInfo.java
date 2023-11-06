@@ -28,7 +28,7 @@ public class SalesInfo {
     private LocalDateTime dealDeadline;
     @Schema(description = "판매 가격", example="500")
     private Long price;
-    @Schema(description = "상태", example="정산 완료")
+    @Schema(description = "상태", example="PURCHASE_COMPLETE")
     private String status;
 
     @QueryProjection
@@ -40,6 +40,6 @@ public class SalesInfo {
         this.closeAuctionTime = closeAuctionTime;
         this.dealDeadline = dealDeadline;
         this.price = price;
-        this.status = status.getStatus();
+        this.status = status.name();
     }
 }

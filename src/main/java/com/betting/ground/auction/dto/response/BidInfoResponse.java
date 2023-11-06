@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class BidInfoResponse {
 
@@ -24,11 +26,10 @@ public class BidInfoResponse {
     @Schema(description = "보유 포인트", example="10000")
     private Long money;
 
-    public BidInfoResponse(String image, String title, Long currentPrice, LocalDateTime endAuctionTime, Long money) {
+    public BidInfoResponse(String image, String title, Long currentPrice, LocalDateTime endAuctionTime) {
         this.image = image;
         this.title = title;
         this.currentPrice = currentPrice;
         this.endAuctionTime = endAuctionTime;
-        this.money = money;
     }
 }

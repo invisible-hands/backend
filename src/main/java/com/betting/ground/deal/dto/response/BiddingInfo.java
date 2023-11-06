@@ -29,7 +29,7 @@ public class BiddingInfo {
     private Long currentPrice;
     @Schema(description = "내 입찰 금액", example="500")
     private Long myBidPrice;
-    @Schema(description = "상태", example="경매 진행")
+    @Schema(description = "상태", example="AUCTION_PROGRESS")
     private String status;
 
     @QueryProjection
@@ -41,6 +41,6 @@ public class BiddingInfo {
         this.endAuctionTime = endAuctionTime;
         this.currentPrice = currentPrice;
         this.myBidPrice = myBidPrice;
-        this.status = status.getStatus();
+        this.status = status.name();
     }
 }
