@@ -11,6 +11,7 @@ import com.betting.ground.deal.domain.DealEvent;
 import com.betting.ground.deal.repository.DealEventRepository;
 import com.betting.ground.deal.repository.DealRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/schedule")
+@Slf4j
 public class SchedulerController {
     private final AuctionRepository auctionRepository;
     private final DealRepository dealRepository;
@@ -33,6 +35,7 @@ public class SchedulerController {
     @GetMapping("/status")
     @Transactional
     public void update() {
+        log.info("status update");
         List<Auction> auctions = auctionRepository.findAllByAuctionStatus(AuctionStatus.AUCTION_PROGRESS);
         List<DealEvent> dealEvents = auctions.stream()
                 .filter(auction -> auction.getEndAuctionTime().isBefore(LocalDateTime.now()))
@@ -53,6 +56,7 @@ public class SchedulerController {
     @GetMapping("/migration")
     @Transactional
     public void migration(){
+        log.info("migration");
         Set<String> allAuctions = viewCacheRepository.getAllAuctions();
         if(allAuctions.isEmpty()){
             return;

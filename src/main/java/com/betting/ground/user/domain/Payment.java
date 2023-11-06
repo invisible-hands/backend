@@ -4,7 +4,6 @@ import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.kakaopay.dto.response.KakaoApproveResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

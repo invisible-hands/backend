@@ -1,9 +1,7 @@
 package com.betting.ground.RefreshToken.domain;
 
-import com.betting.ground.config.jwt.JwtProperties;
 import com.betting.ground.user.dto.login.LoginUser;
 import jakarta.persistence.Id;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;

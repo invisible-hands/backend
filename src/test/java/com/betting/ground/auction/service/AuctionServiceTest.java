@@ -115,12 +115,6 @@ class AuctionServiceTest {
         AtomicInteger success = new AtomicInteger();
         AtomicInteger fail = new AtomicInteger();
         for (int i = 0; i < threadCount; i++) {
-
-            executorService.submit(() -> {
-                try {
-                    auctionService.getItemDetail(loginUser, 1L, UUID.randomUUID().toString());
-
-            int finalI = i;
             executorService.submit(() -> {
                 try {
                     long random = (int) (Math.random() * 10) + 2L;
@@ -149,14 +143,9 @@ class AuctionServiceTest {
 
         //then
     }
-}
 
 
-        // when
 
-        // then
-
-    }
 
     @Test
     public void bidTest() throws Exception {

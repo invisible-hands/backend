@@ -1,22 +1,16 @@
 package com.betting.ground.user.service;
 
-import com.betting.ground.common.exception.ErrorCode;
-import com.betting.ground.user.domain.Role;
-import com.betting.ground.user.domain.User;
-import com.betting.ground.user.dto.UserAccountDTO;
-import com.betting.ground.user.dto.UserAddressDTO;
-import com.betting.ground.user.dto.UserDTO;
-import com.betting.ground.user.dto.UserNicknameDTO;
-import com.betting.ground.user.repository.UserRepository;
 import com.betting.ground.RefreshToken.domain.RefreshToken;
 import com.betting.ground.RefreshToken.repository.RefreshTokenRepository;
+import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.config.jwt.JwtUtils;
-import com.betting.ground.user.dto.LoginResponseDto;
-import com.betting.ground.user.dto.ReissueRequestDto;
+import com.betting.ground.user.domain.User;
+import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.KakaoProfile;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.dto.login.OAuthToken;
+import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
 
-import java.util.Optional;
+import java.util.UUID;
+
+import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
 
 @Service
 @Transactional
@@ -157,8 +150,7 @@ public class UserService {
                 tokenRequest,
                 String.class
         );
-        OAuthToken oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
-        return oAuthToken;
+        return objectMapper.readValue(response.getBody(), OAuthToken.class);
     }
 
     private KakaoProfile getKakaoProfile(OAuthToken oAuthToken) throws JsonProcessingException {
@@ -172,8 +164,7 @@ public class UserService {
                 profileRequest,
                 String.class
         );
-        KakaoProfile kakaoProfile = objectMapper.readValue(infoResponse.getBody(), KakaoProfile.class);
-        return kakaoProfile;
+        return objectMapper.readValue(infoResponse.getBody(), KakaoProfile.class);
     }
 
 
