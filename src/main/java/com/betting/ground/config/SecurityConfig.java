@@ -2,10 +2,12 @@ package com.betting.ground.config;
 
 import com.betting.ground.config.filter.JwtTokenFilter;
 import com.betting.ground.config.jwt.JwtUtils;
+import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.dto.login.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,12 +67,35 @@ public class SecurityConfig {
                 .and()
                 .addFilter(corsFilter())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/user/auth/test2").authenticated()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/api/user/code").permitAll()
+                        .requestMatchers("/api/user/login/kakao").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,"/api/auction/{auctionId}").permitAll()
+                        .requestMatchers("/api/auction/{auctionId}/seller").permitAll()
+                        .requestMatchers("/api/auction/{auctionId}/bidHistory").permitAll()
+                        .requestMatchers("/api/auction/view").permitAll()
+                        .requestMatchers("/api/auction/search").permitAll()
+                        .requestMatchers("/api/auction/new").permitAll()
+                        .requestMatchers("/api/auction/deadline").permitAll()
+                        .requestMatchers("/api/schedule/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+
+                        .requestMatchers("/api/deal/{dealId}").hasRole("USER")
+                        .requestMatchers("/api/auction").hasRole("USER")
+                        .requestMatchers("/api/auction/{auctionId}/instant").hasRole("USER")
+                        .requestMatchers("/api/auction/{auctionId}/bid").hasRole("USER")
+                        .requestMatchers("/api/auction/{auctionId}").hasRole("USER")
+                        .requestMatchers("/api/delivery").hasRole("USER")
+                        .requestMatchers("/api/payment/ready").hasRole("USER")
+                        .requestMatchers("/api/payment/succes").hasRole("USER")
+
                         .anyRequest().authenticated()
                 ).build();
     }
-
 
     @Bean
     public CorsFilter corsFilter() {

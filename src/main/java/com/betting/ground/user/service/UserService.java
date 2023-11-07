@@ -13,6 +13,7 @@ import com.betting.ground.user.dto.login.OAuthToken;
 import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.slack.api.model.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,7 +50,7 @@ public class UserService {
 
     @Value("${kakao.login.password}")
     private String password;
-  
+
     //유저 프로필 조회
     @Transactional(readOnly = true)
     public UserDTO selectUserProfileById(Long userId) {
@@ -62,7 +64,9 @@ public class UserService {
     public UserNicknameDTO updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
         //닉네임 중복 확인
         userRepository.findByNickname(userNicknameDTO.getNickname()).ifPresent(
-                a -> new GlobalException(ErrorCode.DUPLICATED_NICKNAME)
+                a -> {
+                    throw new GlobalException(ErrorCode.DUPLICATED_NICKNAME);
+                }
         );
 
         User user = userRepository.findById(userId).orElseThrow(
@@ -125,7 +129,7 @@ public class UserService {
 
         // 엑세스 토큰 생성
         String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
-        
+
         // 리프레시 토큰 생성
         RefreshToken refreshToken = new RefreshToken(loginUser, UUID.randomUUID().toString());
         refreshTokenRepository.save(refreshToken);
@@ -170,7 +174,7 @@ public class UserService {
 
     public LoginResponseDto reissue(ReissueRequestDto request) {
         String refreshToken = request.getRefreshToken();
-        
+
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new GlobalException(EXPIRED_REFRESH_TOKEN));
 
