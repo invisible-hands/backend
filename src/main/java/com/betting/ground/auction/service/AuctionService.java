@@ -170,7 +170,7 @@ public class AuctionService {
     }
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
-        
+
         Auction findAuction  = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );

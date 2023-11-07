@@ -1,5 +1,6 @@
 package com.betting.ground.auction.dto;
 
+import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.domain.Duration;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,18 +20,18 @@ public class SellerItemDto {
     @Schema(description = "경매글 사진 이메일 첫 장", example = "image-s3-url-15")
     private String imageUrl;
     @Schema(description = "경매 등록 시간", example="2023-10-20 13:35:10")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
     @Schema(description = "경매 시작 시간", example="2023-10-20 13:40:10") // 2023-10-20 13:40:10
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime auctionStartTime;
     @Schema(description = "경매 기간", example="24")
     private int duration;
     @Schema(description = "경매 종료 시간", example="2023-10-20 13:35:10")
     private LocalDateTime endAuctionTime;
+    @Schema(description = "경매 상태", example="2023-10-20 13:35:10")
+    private String auctionStatus;
 
     @Builder
-    public SellerItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration, LocalDateTime endAuctionTime) {
+    public SellerItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration, LocalDateTime endAuctionTime, AuctionStatus auctionStatus) {
         this.auctionId = auctionId;
         this.title = title;
         this.currentPrice = currentPrice;
@@ -39,5 +40,6 @@ public class SellerItemDto {
         this.auctionStartTime = createdAt.plusMinutes(5L);
         this.duration = duration.getTime();
         this.endAuctionTime = endAuctionTime;
+        this.auctionStatus = auctionStatus.name();
     }
 }
