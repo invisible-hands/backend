@@ -211,7 +211,7 @@ public class AuctionService {
         }
 
         // 경매 시작 후 5분 이내에 즉결 시도할 경우 예외
-        if (auction.getCreatedAt().plusMinutes(5L).isBefore(now)) {
+        if (auction.getCreatedAt().plusMinutes(5L).isAfter(now)) {
             throw new GlobalException(ErrorCode.AUCTION_NOT_START);
         }
 
@@ -274,7 +274,7 @@ public class AuctionService {
         }
 
         // 경매 시작 후 5분 이내에 즉결 시도할 경우 예외
-        if (auction.getCreatedAt().plusMinutes(5L).isBefore(now)) {
+        if (auction.getCreatedAt().plusMinutes(5L).isAfter(now)) {
             throw new GlobalException(ErrorCode.AUCTION_NOT_START);
         }
 
@@ -284,7 +284,7 @@ public class AuctionService {
         }
 
         // 이미 최고가로 입찰한 입찰자가 재입찰한 경우 예외
-        if (auction.getBidderId().equals(userId)) {
+        if (auction.getBidderId() != null && auction.getBidderId().equals(userId)) {
             throw new GlobalException(ErrorCode.ALREADY_TOP_PRICE_BIDDER);
         }
 
