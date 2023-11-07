@@ -32,6 +32,7 @@ public enum ErrorCode {
     LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
     ALREADY_AUCTION_START(HttpStatus.BAD_REQUEST, "시작된 경매 입니다."),
     AUCTION_NOT_START(HttpStatus.BAD_REQUEST, "경매가 시작되지 않았습니다."),
+    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다.")
     ;
 
 
