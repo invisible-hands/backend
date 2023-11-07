@@ -84,4 +84,8 @@ public class User {
     public void bidCancel(Long price) {
         this.money += price;
     }
+
+    public void settle(Long price) {
+        this.money += price;
+    }
 }
