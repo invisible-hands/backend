@@ -32,6 +32,10 @@ public class DeliveryService {
                 () -> new GlobalException(ErrorCode.DEAL_NOT_FOUND)
         );
 
+        if(deal.getDealStatus() != DealStatus.DELIVERY_WAITING){
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        }
+
         deal.updateStatus(DealStatus.PURCHASE_COMPLETE_WAITING);
 
         Delivery delivery = new Delivery(request.getInvoice(), request.getDeliveryCompany(), auction);
