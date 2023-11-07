@@ -101,7 +101,13 @@ public class AuctionService {
             throw new GlobalException(ErrorCode.AUCTION_TIME_OUT, "만료된 경매입니다.");
         }
 
-        return auctionRepository.getBidInfo(auctionId, userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        AuctionImage auctionImage = auctionImageRepository.findFirstByAuctionId(auctionId).orElseGet(() -> null);
+
+        return new BidInfoResponse(auctionImage, auction, user);
     }
 
     public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId, String uuid) {

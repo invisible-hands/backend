@@ -23,8 +23,6 @@ public interface AuctionRepositoryCustom {
 
     PageImpl<AuctionInfo> findItemByKeywordByOrderByCreatedAtDesc(String keyword, Pageable pageable);
 
-    BidInfoResponse getBidInfo(Long auctionId, Long userId);
-  
     ItemDetailDto findDetailAuctionById(LoginUser loginUser, Long auctionId);
 
     PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);

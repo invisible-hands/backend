@@ -259,21 +259,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 ));
     }
 
-    @Override
-    public BidInfoResponse getBidInfo(Long auctionId, Long userId){
-        return jpaQueryFactory.select(Projections.constructor(BidInfoResponse.class,
-                        getAuctionImage(),
-                        auction.title,
-                        auction.currentPrice,
-                        auction.endAuctionTime,
-                        user.money
-                ))
-                .from(auction)
-                .leftJoin(user).on(auction.user.id.eq(userId))
-                .where(auction.id.eq(auctionId))
-                .fetchOne();
-    }
-
     public List<AuctionStatus> getAuctionByBidderId(Long userId) {
         return jpaQueryFactory.select(
                         auction.auctionStatus
