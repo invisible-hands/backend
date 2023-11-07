@@ -34,7 +34,7 @@ public class AuctionInfo {
     @Schema(description = "경매 종료 시각", example = "2023-10-24 09:00:01")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime endAuctionTime;
-    @Schema(description = "경매 상태", example = "경매진행중")
+    @Schema(description = "경매 상태", example = "AUCTION_PROGRESS")
     private String auctionStatus;
     @Schema(description = "조회수", example = "30")
     private int viewCnt;

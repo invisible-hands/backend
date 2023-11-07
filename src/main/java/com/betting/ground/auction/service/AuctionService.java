@@ -226,7 +226,7 @@ public class AuctionService {
         bidHistoryRepository.save(buyerBidHistory);
 
         // 최근 입찰한 사람 찾아서 취소
-        Optional<BidHistory> bidHistory = bidHistoryRepository.findByAuctionAndPrice(auction, auction.getInstantPrice());
+        Optional<BidHistory> bidHistory = bidHistoryRepository.findByAuctionAndPrice(auction, auction.getCurrentPrice());
         if (bidHistory.isPresent()) {
             User bidder = userRepository.findById(bidHistory.get().getBidderId()).orElseThrow(
                     () -> new GlobalException(ErrorCode.BAD_REQUEST)
