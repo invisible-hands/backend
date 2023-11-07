@@ -8,6 +8,7 @@ import com.betting.ground.auction.repository.ViewCacheRepository;
 import com.betting.ground.auction.repository.ViewRepository;
 import com.betting.ground.deal.domain.Deal;
 import com.betting.ground.deal.domain.DealEvent;
+import com.betting.ground.deal.domain.DealStatus;
 import com.betting.ground.deal.repository.DealEventRepository;
 import com.betting.ground.deal.repository.DealRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class SchedulerController {
     private final ViewRepository viewRepository;
     private final ViewCacheRepository viewCacheRepository;
 
-    @GetMapping("/status")
+    @GetMapping("/auction")
     @Transactional
     public void update() {
         log.info("status update");
@@ -51,6 +52,16 @@ public class SchedulerController {
                 .toList();
         dealEventRepository.saveAll(dealEvents);
         auctionRepository.saveAll(auctions);
+    }
+
+    @GetMapping("/deal")
+    @Transactional
+    public void update2() {
+        List<Deal> deals = dealRepository.findAllByDealStatus(DealStatus.DELIVERY_WAITING);
+        deals.stream()
+                .filter(deal -> deal.getDealDeadLine().isBefore(LocalDateTime.now()))
+                .forEach(deal -> deal.updateStatus(DealStatus.PURCHASE_CANCEL));
+        dealRepository.saveAll(deals);
     }
 
     @GetMapping("/migration")

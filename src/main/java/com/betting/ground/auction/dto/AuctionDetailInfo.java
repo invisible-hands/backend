@@ -1,5 +1,6 @@
 package com.betting.ground.auction.dto;
 
+import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.domain.Duration;
 import com.betting.ground.auction.domain.ItemCondition;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,17 +28,22 @@ public class AuctionDetailInfo {
     @Schema(description = "경매 등록 시간", example = "2023-10-20 13:35:10")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
+    @Schema(description = "경매 시작 시간", example = "2023-10-20 13:35:10")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime startAuctionTime;
     @Schema(description = "경매 종료 시간", example = "2023-10-20 13:40:10") // 2023-10-20 13:40:10
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime endAuctionTime;
     @Schema(description = "경매 기간", example = "24")
     private int duration;
+    @Schema(description = "경매 상태", example = "AUCTION_PROGRESS")
+    private String auctionStatus;
     @Schema(description = "참여자 수", example = "8")
     private Long bidderCnt;
     @Schema(description = "조회수", example = "32")
     private int viewCnt;
 
-    public AuctionDetailInfo(Long auctionId, Long sellerId, String title, String content, ItemCondition itemCondition, Long currentPrice, Long instantPrice, LocalDateTime createdAt, LocalDateTime endAuctionTime, Duration duration, Long bidderCnt, int viewCnt) {
+    public AuctionDetailInfo(Long auctionId, Long sellerId, String title, String content, ItemCondition itemCondition, Long currentPrice, Long instantPrice, LocalDateTime createdAt, LocalDateTime endAuctionTime, Duration duration, AuctionStatus auctionStatus, Long bidderCnt, int viewCnt) {
         this.auctionId = auctionId;
         this.sellerId = sellerId;
         this.title = title;
@@ -46,8 +52,10 @@ public class AuctionDetailInfo {
         this.currentPrice = currentPrice;
         this.instantPrice = instantPrice;
         this.createdAt = createdAt;
+        this.startAuctionTime = createdAt.plusMinutes(5L);
         this.endAuctionTime = endAuctionTime;
         this.duration = duration.getTime();
+        this.auctionStatus = auctionStatus.name();
         this.bidderCnt = bidderCnt;
         this.viewCnt = viewCnt;
     }

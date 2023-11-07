@@ -119,7 +119,7 @@ class AuctionServiceTest {
                 try {
                     long random = (int) (Math.random() * 10) + 2L;
                     System.out.println("random = " + random);
-                    auctionService.instantBuy(1L, new PayRequest(30000L), random);
+                    auctionService.instantBuy(1L,  random);
 
                     success.getAndIncrement();
                 } catch (GlobalException e) {
