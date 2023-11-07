@@ -61,6 +61,8 @@ public class DealService {
         User user = userRepository.findById(deal.getSellerId()).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
+
+        user.settle(deal.getDealPrice());
         Payment payment = new Payment(deal, PaymentType.IN_SETTLEMENT, user);
         paymentRepository.save(payment);
         dealEventRepository.save(new DealEvent(deal));
