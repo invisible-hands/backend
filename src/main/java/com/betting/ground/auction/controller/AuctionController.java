@@ -109,8 +109,8 @@ public class AuctionController {
 
     @Operation(summary = "경매 삭제")
     @DeleteMapping("/{auctionId}")
-    public Response<Void> delete(@PathVariable Long auctionId) {
-        auctionService.delete(auctionId);
+    public Response<Void> delete(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long auctionId) {
+        auctionService.delete(loginUser.getUser().getId(), auctionId);
 
         return Response.success("게시글 삭제 성공", null);
     }

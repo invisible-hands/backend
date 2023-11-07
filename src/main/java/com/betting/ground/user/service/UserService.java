@@ -100,13 +100,25 @@ public class UserService {
     }
 
     //권한 변경
-    public UserDTO updateUserRole(Long userId) {
+    public LoginResponseDto updateUserRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
+        if (user.getBankInfo() == null || user.getAddress() == null) {
+            throw new GlobalException(ErrorCode.NOT_ENOUGH_INFO);
+        }
+
         user.updateRole();
 
-        return new UserDTO(user);
+        LoginUser loginUser = new LoginUser(user);
+        // 엑세스 토큰 생성
+        String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
+
+        // 리프레시 토큰 생성
+        RefreshToken refreshToken = new RefreshToken(loginUser, UUID.randomUUID().toString());
+        refreshTokenRepository.save(refreshToken);
+
+        return new LoginResponseDto(user, accessToken, refreshToken.getRefreshToken());
     }
 
     public LoginResponseDto login(String code) throws JsonProcessingException {
