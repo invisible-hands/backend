@@ -29,7 +29,7 @@ public class BidInfoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
     @Schema(description = "경매 지속 시간", example = "DAY")
-    private Duration duration;
+    private int duration;
     @Schema(description = "경매 시작 시각", example="2023-10-13 19:54:00")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime startAuctionTime;
@@ -46,7 +46,7 @@ public class BidInfoResponse {
         this.title = auction.getTitle();
         this.currentPrice = auction.getCurrentPrice();
         this.createdAt = auction.getCreatedAt();
-        this.duration = auction.getDuration();
+        this.duration = auction.getDuration().getTime();
         this.startAuctionTime = auction.getCreatedAt().plusMinutes(5L);
         this.endAuctionTime = auction.getEndAuctionTime();
         this.status = auction.getAuctionStatus();
