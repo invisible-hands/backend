@@ -171,15 +171,14 @@ public class AuctionService {
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
-        // 해당 경매글의 판매자 찾기
-        User findSeller = auctionRepository.findSellerById(auctionId).orElseThrow(
-                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        Auction findAuction  = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
 
         // 판매자가 판매중인 물건 찾기
-        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findAuction.getUser().getId(), pageable);
 
-        return new SellerInfo(findSeller, findSellerItem);
+        return new SellerInfo(findAuction.getUser(), findSellerItem);
     }
 
     public void instantBuy(Long auctionId, PayRequest request, Long userId) {

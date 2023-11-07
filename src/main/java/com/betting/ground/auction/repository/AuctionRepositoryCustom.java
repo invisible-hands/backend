@@ -29,7 +29,5 @@ public interface AuctionRepositoryCustom {
 
     PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);
 
-    Optional<User> findSellerById(Long auctionId);
-
     List<AuctionStatus> getAuctionByBidderId(Long userId);
 }
