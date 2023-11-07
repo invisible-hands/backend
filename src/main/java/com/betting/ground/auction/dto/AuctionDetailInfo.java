@@ -1,5 +1,6 @@
 package com.betting.ground.auction.dto;
 
+import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.domain.Duration;
 import com.betting.ground.auction.domain.ItemCondition;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,12 +36,14 @@ public class AuctionDetailInfo {
     private LocalDateTime endAuctionTime;
     @Schema(description = "경매 기간", example = "24")
     private int duration;
+    @Schema(description = "경매 상태", example = "AUCTION_PROGRESS")
+    private String auctionStatus;
     @Schema(description = "참여자 수", example = "8")
     private Long bidderCnt;
     @Schema(description = "조회수", example = "32")
     private int viewCnt;
 
-    public AuctionDetailInfo(Long auctionId, Long sellerId, String title, String content, ItemCondition itemCondition, Long currentPrice, Long instantPrice, LocalDateTime createdAt, LocalDateTime endAuctionTime, Duration duration, Long bidderCnt, int viewCnt) {
+    public AuctionDetailInfo(Long auctionId, Long sellerId, String title, String content, ItemCondition itemCondition, Long currentPrice, Long instantPrice, LocalDateTime createdAt, LocalDateTime endAuctionTime, Duration duration, AuctionStatus auctionStatus, Long bidderCnt, int viewCnt) {
         this.auctionId = auctionId;
         this.sellerId = sellerId;
         this.title = title;
@@ -52,6 +55,7 @@ public class AuctionDetailInfo {
         this.startAuctionTime = createdAt.plusMinutes(5L);
         this.endAuctionTime = endAuctionTime;
         this.duration = duration.getTime();
+        this.auctionStatus = auctionStatus.name();
         this.bidderCnt = bidderCnt;
         this.viewCnt = viewCnt;
     }

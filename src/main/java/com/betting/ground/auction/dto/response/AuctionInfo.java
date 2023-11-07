@@ -41,7 +41,7 @@ public class AuctionInfo {
     @Schema(description = "이미지 url", example = "aws-s3-url-14")
     private String imageUrl;
 
-    public AuctionInfo(Long auctionId, String title, Long currentPrice, Long instantPrice,Duration duration,LocalDateTime createdAt, LocalDateTime endAuctionTime, int viewCnt, String imageUrl) {
+    public AuctionInfo(Long auctionId, String title, Long currentPrice, Long instantPrice,Duration duration,LocalDateTime createdAt, LocalDateTime endAuctionTime,AuctionStatus auctionStatus, int viewCnt, String imageUrl) {
         this.auctionId = auctionId;
         this.title = title;
         this.currentPrice = currentPrice;
@@ -50,9 +50,8 @@ public class AuctionInfo {
         this.createdAt = createdAt;
         this.startAuctionTime = createdAt.plusMinutes(5L);
         this.endAuctionTime = endAuctionTime;
+        this.auctionStatus = auctionStatus.name();
         this.viewCnt = viewCnt;
-        this.auctionStatus = endAuctionTime.isBefore(LocalDateTime.now()) ?
-                "AUCTION_FINISH" : AuctionStatus.AUCTION_PROGRESS.name();
         this.imageUrl = imageUrl;
     }
 }

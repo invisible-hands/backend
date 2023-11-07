@@ -48,6 +48,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.duration,
                         auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -79,6 +80,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.duration,
                         auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -113,6 +115,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.duration,
                         auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -144,6 +147,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.duration,
                         auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -182,6 +186,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.createdAt,
                         auction.endAuctionTime,
                         auction.duration,
+                        auction.auctionStatus,
                         bidHistory.count(),
                         view.cnt
                 ))
