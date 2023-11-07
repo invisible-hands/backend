@@ -210,17 +210,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public Optional<User> findSellerById(Long auctionId) {
-        User seller = jpaQueryFactory.select(user)
-                .from(auction)
-                .leftJoin(auction.user, user)
-                .where(auction.id.eq(auctionId))
-                .fetchOne();
-
-        return Optional.ofNullable(seller);
-    }
-
-    @Override
     public PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
 
         List<SellerItemDto> findBiddingItem =

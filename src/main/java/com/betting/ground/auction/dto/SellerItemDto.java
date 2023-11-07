@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +22,8 @@ public class SellerItemDto {
     private String imageUrl;
     @Schema(description = "경매 등록 시간", example="2023-10-20 13:35:10")
     private LocalDateTime createdAt;
+    @Schema(description = "경매 시작 시간", example="2023-10-20 13:35:10")
+    private LocalDateTime startAuctionTime;
     @Schema(description = "경매 시작 시간", example="2023-10-20 13:40:10") // 2023-10-20 13:40:10
     private LocalDateTime auctionStartTime;
     @Schema(description = "경매 기간", example="24")
@@ -37,7 +40,7 @@ public class SellerItemDto {
         this.currentPrice = currentPrice;
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
-        this.auctionStartTime = createdAt.plusMinutes(5L);
+        this.startAuctionTime = this.createdAt.plusMinutes(5L);
         this.duration = duration.getTime();
         this.endAuctionTime = endAuctionTime;
         this.auctionStatus = auctionStatus.name();
