@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/index.html").permitAll()
                         .requestMatchers("/api/user/code").permitAll()
                         .requestMatchers("/api/user/login/kakao").permitAll()
+                        .requestMatchers("/api/user/reissue").permitAll()
 
                         .requestMatchers(HttpMethod.GET,"/api/auction/{auctionId}").permitAll()
                         .requestMatchers("/api/auction/{auctionId}/seller").permitAll()

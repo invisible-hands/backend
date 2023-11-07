@@ -152,11 +152,16 @@ public class AuctionService {
         viewRepository.save(new View(auction.getId()));
     }
 
-    public void delete(Long auctionId) {
+    public void delete(Long userId, Long auctionId) {
         // 해당 경매글 찾기
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
+
+        // 본인이 작성한 경매글이 아니면 삭제 불가
+        if(auction.getUser().getId().equals(userId)) {
+            throw new GlobalException(ErrorCode.CAN_NOT_DELETE);
+        }
 
         // 경매글 생성 5분 후 삭제 불가
         if (auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
