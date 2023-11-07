@@ -15,11 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +40,7 @@ public class KakaoPayService {
     private KakaoReadyResponse kakaoReady;
 
     public KakaoReadyResponse kakaoPayReady(HttpServletRequest http, KakaoReadyRequest request, Long userId) {
-        String path=http.getScheme()+"://"+http.getServerName()+":"+http.getServerPort();
-
+        String path=http.getScheme()+"://"+http.getServerName();
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         parameters.add("partner_order_id", "partner_order_id");
@@ -53,7 +56,11 @@ public class KakaoPayService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
 
+        // 프록시 설정 추가
         RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        restTemplate.setRequestFactory(factory);
 
         kakaoReady = restTemplate.postForObject(
                 "https://kapi.kakao.com/v1/payment/ready",
@@ -78,7 +85,9 @@ public class KakaoPayService {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
 
         RestTemplate restTemplate = new RestTemplate();
-
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        restTemplate.setRequestFactory(factory);
         KakaoApproveResponse approveResponse = restTemplate.postForObject(
                 "https://kapi.kakao.com/v1/payment/approve",
                 requestEntity,

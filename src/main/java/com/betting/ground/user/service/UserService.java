@@ -13,17 +13,16 @@ import com.betting.ground.user.dto.login.OAuthToken;
 import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.slack.api.model.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.UUID;
 
 import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
@@ -151,13 +152,18 @@ public class UserService {
 
     private OAuthToken getOAuthToken(String code) throws JsonProcessingException {
         RestTemplate tokenRt = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        tokenRt.setRequestFactory(factory);
+
         HttpHeaders tokenHeaders = new HttpHeaders();
         tokenHeaders.add("Content-Type", "application/x-www-form-urlencoded");
         MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
         tokenParams.add("grant_type", "authorization_code");
         tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
 //        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
-        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
+//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
+        tokenParams.add("redirect_uri", "http://k30e8e47032d4a.user-app.krampoline.com/api/user/code");
         tokenParams.add("code", code);
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
         ResponseEntity<String> response = tokenRt.exchange(
@@ -170,7 +176,12 @@ public class UserService {
     }
 
     private KakaoProfile getKakaoProfile(OAuthToken oAuthToken) throws JsonProcessingException {
+
         RestTemplate profileRt = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        profileRt.setRequestFactory(factory);
+
         MultiValueMap<String, String> profileParams = new LinkedMultiValueMap<>();
         profileParams.add("Authorization", "Bearer " + oAuthToken.getAccess_token());
         HttpEntity<MultiValueMap<String, String>> profileRequest = new HttpEntity<>(profileParams);
