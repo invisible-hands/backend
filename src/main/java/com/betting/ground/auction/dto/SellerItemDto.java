@@ -26,9 +26,11 @@ public class SellerItemDto {
     private LocalDateTime auctionStartTime;
     @Schema(description = "경매 기간", example="24")
     private int duration;
+    @Schema(description = "경매 종료 시간", example="2023-10-20 13:35:10")
+    private LocalDateTime endAuctionTime;
 
     @Builder
-    public SellerItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration) {
+    public SellerItemDto(Long auctionId, String title, Long currentPrice, String imageUrl, LocalDateTime createdAt, Duration duration, LocalDateTime endAuctionTime) {
         this.auctionId = auctionId;
         this.title = title;
         this.currentPrice = currentPrice;
@@ -36,5 +38,6 @@ public class SellerItemDto {
         this.createdAt = createdAt;
         this.auctionStartTime = createdAt.plusMinutes(5L);
         this.duration = duration.getTime();
+        this.endAuctionTime = endAuctionTime;
     }
 }

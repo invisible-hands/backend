@@ -225,12 +225,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
         List<SellerItemDto> findBiddingItem =
                 jpaQueryFactory.select(Projections.constructor(SellerItemDto.class,
-                                auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration))
+                                auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration, auction.endAuctionTime))
                         .distinct()
                         .from(auction)
                         .leftJoin(auction.user, user)
-                        .where(user.id.eq(sellerId),
-                                auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
+                        .where(user.id.eq(sellerId))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
                         .fetch();
