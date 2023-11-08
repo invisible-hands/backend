@@ -19,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.UUID;
 
 import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
@@ -48,7 +51,7 @@ public class UserService {
 
     @Value("${kakao.login.password}")
     private String password;
-  
+
     //유저 프로필 조회
     @Transactional(readOnly = true)
     public UserDTO selectUserProfileById(Long userId) {
@@ -62,7 +65,9 @@ public class UserService {
     public UserNicknameDTO updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
         //닉네임 중복 확인
         userRepository.findByNickname(userNicknameDTO.getNickname()).ifPresent(
-                a -> new GlobalException(ErrorCode.DUPLICATED_NICKNAME)
+                a -> {
+                    throw new GlobalException(ErrorCode.DUPLICATED_NICKNAME);
+                }
         );
 
         User user = userRepository.findById(userId).orElseThrow(
@@ -95,13 +100,25 @@ public class UserService {
     }
 
     //권한 변경
-    public UserDTO updateUserRole(Long userId) {
+    public LoginResponseDto updateUserRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
+        if (user.getBankInfo() == null || user.getAddress() == null) {
+            throw new GlobalException(ErrorCode.NOT_ENOUGH_INFO);
+        }
+
         user.updateRole();
 
-        return new UserDTO(user);
+        LoginUser loginUser = new LoginUser(user);
+        // 엑세스 토큰 생성
+        String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
+
+        // 리프레시 토큰 생성
+        RefreshToken refreshToken = new RefreshToken(loginUser, UUID.randomUUID().toString());
+        refreshTokenRepository.save(refreshToken);
+
+        return new LoginResponseDto(user, accessToken, refreshToken.getRefreshToken());
     }
 
     public LoginResponseDto login(String code) throws JsonProcessingException {
@@ -125,7 +142,7 @@ public class UserService {
 
         // 엑세스 토큰 생성
         String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
-        
+
         // 리프레시 토큰 생성
         RefreshToken refreshToken = new RefreshToken(loginUser, UUID.randomUUID().toString());
         refreshTokenRepository.save(refreshToken);
@@ -135,13 +152,19 @@ public class UserService {
 
     private OAuthToken getOAuthToken(String code) throws JsonProcessingException {
         RestTemplate tokenRt = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        tokenRt.setRequestFactory(factory);
+
         HttpHeaders tokenHeaders = new HttpHeaders();
         tokenHeaders.add("Content-Type", "application/x-www-form-urlencoded");
         MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
         tokenParams.add("grant_type", "authorization_code");
         tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
+        tokenParams.add("redirect_uri", "http://localhost:5173/redirection");
 //        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
-        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
+//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
+//        tokenParams.add("redirect_uri", "http://ka1425de5708ea.user-app.krampoline.com/api/user/code");
         tokenParams.add("code", code);
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
         ResponseEntity<String> response = tokenRt.exchange(
@@ -154,7 +177,12 @@ public class UserService {
     }
 
     private KakaoProfile getKakaoProfile(OAuthToken oAuthToken) throws JsonProcessingException {
+
         RestTemplate profileRt = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+        profileRt.setRequestFactory(factory);
+
         MultiValueMap<String, String> profileParams = new LinkedMultiValueMap<>();
         profileParams.add("Authorization", "Bearer " + oAuthToken.getAccess_token());
         HttpEntity<MultiValueMap<String, String>> profileRequest = new HttpEntity<>(profileParams);
@@ -170,7 +198,7 @@ public class UserService {
 
     public LoginResponseDto reissue(ReissueRequestDto request) {
         String refreshToken = request.getRefreshToken();
-        
+
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new GlobalException(EXPIRED_REFRESH_TOKEN));
 

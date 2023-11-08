@@ -97,11 +97,11 @@ public class UserController {
 
     @PutMapping("/role")
     @Operation(summary = "활성 유저 전환")
-    public Response<UserDTO> editRole(
-            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
+    public Response<LoginResponseDto> editRole(
+//            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userDTO);
+//        log.info("입력값 : {}", userDTO);
         return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
 }

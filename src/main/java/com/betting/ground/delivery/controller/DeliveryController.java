@@ -4,9 +4,11 @@ import com.betting.ground.common.dto.Response;
 import com.betting.ground.delivery.dto.request.DeliveryInfoRequest;
 import com.betting.ground.delivery.dto.response.DeliveryInfoResponse;
 import com.betting.ground.delivery.service.DeliveryService;
+import com.betting.ground.user.dto.login.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +21,7 @@ public class DeliveryController {
 
     @PostMapping
     @Operation(summary = "송장 번호 등록")
-    public Response<DeliveryInfoResponse> purchaseComplete(@RequestBody DeliveryInfoRequest request){
-        return Response.success("송장 번호 등록", deliveryService.create(request));
+    public Response<DeliveryInfoResponse> purchaseComplete(@AuthenticationPrincipal LoginUser loginUser, @RequestBody DeliveryInfoRequest request){
+        return Response.success("송장 번호 등록", deliveryService.create(loginUser.getUser().getId(), request));
     }
 }

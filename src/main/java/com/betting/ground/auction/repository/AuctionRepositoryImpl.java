@@ -46,7 +46,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -76,7 +78,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -109,7 +113,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -139,7 +145,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.currentPrice,
                         auction.instantPrice,
                         auction.duration,
+                        auction.createdAt,
                         auction.endAuctionTime,
+                        auction.auctionStatus,
                         view.cnt,
                         auctionImage
                 ))
@@ -149,7 +157,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .where(auction.title.contains(keyword).or(tag.tagName.contains(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .groupBy(auction)
+                .groupBy(auction, view)
                 .orderBy(auction.createdAt.desc())
                 .fetch();
 
@@ -178,6 +186,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.createdAt,
                         auction.endAuctionTime,
                         auction.duration,
+                        auction.auctionStatus,
                         bidHistory.count(),
                         view.cnt
                 ))
@@ -210,27 +219,15 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
     }
 
     @Override
-    public Optional<User> findSellerById(Long auctionId) {
-        User seller = jpaQueryFactory.select(user)
-                .from(auction)
-                .leftJoin(auction.user, user)
-                .where(auction.id.eq(auctionId))
-                .fetchOne();
-
-        return Optional.ofNullable(seller);
-    }
-
-    @Override
     public PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable) {
 
         List<SellerItemDto> findBiddingItem =
                 jpaQueryFactory.select(Projections.constructor(SellerItemDto.class,
-                                auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration))
+                                auction.id, auction.title, auction.currentPrice, getAuctionImage(), auction.createdAt, auction.duration, auction.endAuctionTime, auction.auctionStatus))
                         .distinct()
                         .from(auction)
                         .leftJoin(auction.user, user)
-                        .where(user.id.eq(sellerId),
-                                auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
+                        .where(user.id.eq(sellerId))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
                         .fetch();
@@ -257,21 +254,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                                 .from(auctionImage)
                                 .where(auctionImage.auction.eq(auction))
                 ));
-    }
-
-    @Override
-    public BidInfoResponse getBidInfo(Long auctionId, Long userId){
-        return jpaQueryFactory.select(Projections.constructor(BidInfoResponse.class,
-                        getAuctionImage(),
-                        auction.title,
-                        auction.currentPrice,
-                        auction.endAuctionTime,
-                        user.money
-                ))
-                .from(auction)
-                .leftJoin(user).on(auction.user.id.eq(userId))
-                .where(auction.id.eq(auctionId))
-                .fetchOne();
     }
 
     public List<AuctionStatus> getAuctionByBidderId(Long userId) {

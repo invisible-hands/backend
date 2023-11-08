@@ -101,7 +101,13 @@ public class AuctionService {
             throw new GlobalException(ErrorCode.AUCTION_TIME_OUT, "만료된 경매입니다.");
         }
 
-        return auctionRepository.getBidInfo(auctionId, userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        AuctionImage auctionImage = auctionImageRepository.findFirstByAuctionId(auctionId).orElseGet(() -> null);
+
+        return new BidInfoResponse(auctionImage, auction, user);
     }
 
     public ItemDetailDto getItemDetail(LoginUser loginUser, Long auctionId, String uuid) {
@@ -146,11 +152,16 @@ public class AuctionService {
         viewRepository.save(new View(auction.getId()));
     }
 
-    public void delete(Long auctionId) {
+    public void delete(Long userId, Long auctionId) {
         // 해당 경매글 찾기
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
+
+        // 본인이 작성한 경매글이 아니면 삭제 불가
+        if(auction.getUser().getId().equals(userId)) {
+            throw new GlobalException(ErrorCode.CAN_NOT_DELETE);
+        }
 
         // 경매글 생성 5분 후 삭제 불가
         if (auction.getCreatedAt().plusMinutes(5L).isBefore(LocalDateTime.now())) {
@@ -171,18 +182,17 @@ public class AuctionService {
 
     public SellerInfo getSeller(Long auctionId, Pageable pageable) {
 
-        // 해당 경매글의 판매자 찾기
-        User findSeller = auctionRepository.findSellerById(auctionId).orElseThrow(
-                () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
+        Auction findAuction  = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND)
         );
 
         // 판매자가 판매중인 물건 찾기
-        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findSeller.getId(), pageable);
+        PageImpl<SellerItemDto> findSellerItem = auctionRepository.findSellerItemBySellerId(findAuction.getUser().getId(), pageable);
 
-        return new SellerInfo(findSeller, findSellerItem);
+        return new SellerInfo(findAuction.getUser(), findSellerItem);
     }
 
-    public void instantBuy(Long auctionId, PayRequest request, Long userId) {
+    public void instantBuy(Long auctionId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
 
         // 비관적 락 select for update
@@ -206,7 +216,7 @@ public class AuctionService {
         }
 
         // 경매 시작 후 5분 이내에 즉결 시도할 경우 예외
-        if (auction.getCreatedAt().plusMinutes(5L).isBefore(now)) {
+        if (auction.getCreatedAt().plusMinutes(5L).isAfter(now)) {
             throw new GlobalException(ErrorCode.AUCTION_NOT_START);
         }
 
@@ -214,15 +224,15 @@ public class AuctionService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
-        user.pay(request.getPrice());
+        user.pay(auction.getInstantPrice());
         userRepository.save(user);
 
         // 즉시구매한 사람의 입출금내역
-        Payment payment = new Payment(auctionId, request.getPrice(), PaymentType.OUT_BID, now, user);
+        Payment payment = new Payment(auctionId, auction.getInstantPrice(), PaymentType.OUT_BID, now, user);
         paymentRepository.save(payment);
 
         // 구매자 입찰내역
-        BidHistory buyerBidHistory = new BidHistory(user.getId(), user.getNickname(), now, request.getPrice(), auction);
+        BidHistory buyerBidHistory = new BidHistory(user.getId(), user.getNickname(), now, auction.getInstantPrice(), auction);
         bidHistoryRepository.save(buyerBidHistory);
 
         // 최근 입찰한 사람 찾아서 취소
@@ -238,7 +248,7 @@ public class AuctionService {
         }
 
         // 경매 즉시거래가로 업데이트
-        auction.updateBid(user.getId(), request.getPrice(), AuctionStatus.AUCTION_SUCCESS);
+        auction.updateBid(user.getId(), auction.getInstantPrice(), AuctionStatus.AUCTION_SUCCESS);
         auctionRepository.save(auction);
 
         Deal deal = new Deal(auction, now);
@@ -269,7 +279,7 @@ public class AuctionService {
         }
 
         // 경매 시작 후 5분 이내에 즉결 시도할 경우 예외
-        if (auction.getCreatedAt().plusMinutes(5L).isBefore(now)) {
+        if (auction.getCreatedAt().plusMinutes(5L).isAfter(now)) {
             throw new GlobalException(ErrorCode.AUCTION_NOT_START);
         }
 
@@ -279,7 +289,7 @@ public class AuctionService {
         }
 
         // 이미 최고가로 입찰한 입찰자가 재입찰한 경우 예외
-        if (auction.getBidderId().equals(userId)) {
+        if (auction.getBidderId() != null && auction.getBidderId().equals(userId)) {
             throw new GlobalException(ErrorCode.ALREADY_TOP_PRICE_BIDDER);
         }
 

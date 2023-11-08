@@ -94,7 +94,7 @@ class AuctionServiceTest {
                 .currentPrice(0L)
                 .auctionStatus(AuctionStatus.AUCTION_PROGRESS)
                 .duration(Duration.HALF)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now().minusHours(1L))
                 .updatedAt(LocalDateTime.now())
                 .user(seller)
                 .build();
@@ -118,8 +118,7 @@ class AuctionServiceTest {
             executorService.submit(() -> {
                 try {
                     long random = (int) (Math.random() * 10) + 2L;
-                    System.out.println("random = " + random);
-                    auctionService.instantBuy(1L, new PayRequest(30000L), random);
+                    auctionService.instantBuy(1L,  random);
 
                     success.getAndIncrement();
                 } catch (GlobalException e) {
@@ -133,12 +132,12 @@ class AuctionServiceTest {
         }
         latch.await();
 
-        HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
-        System.out.println(hashOperations.get("Auction", "1"));
-        Set keys = hashOperations.keys("Auction");
-        for (Object key : keys) {
-            System.out.println(Long.valueOf((String)key));
-        }
+//        HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
+//        System.out.println(hashOperations.get("Auction", "1"));
+//        Set keys = hashOperations.keys("Auction");
+//        for (Object key : keys) {
+//            System.out.println(Long.valueOf((String)key));
+//        }
         //when
 
         //then

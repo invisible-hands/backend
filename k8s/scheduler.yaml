@@ -13,5 +13,7 @@ spec:
           containers:
             - name: container
               image: kubetm/init
-              command: ["sh", "-c", "curl 'http://my-app-svc/api/schedule/status'", "while true; do curl 'http://my-app-svc/api/schedule/migration'; sleep 10; done"]
+              command: ["sh", "-c", "curl 'http://my-app-svc/api/schedule/auction';
+              curl 'http://my-app-svc/api/schedule/deal'; 
+              while true; do curl 'http://my-app-svc/api/schedule/migration'; sleep 10; done"]
           terminationGracePeriodSeconds: 0

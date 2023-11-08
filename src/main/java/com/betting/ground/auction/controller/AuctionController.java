@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.UUID;
 
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auction")
@@ -37,7 +36,7 @@ import java.util.UUID;
 public class AuctionController {
 
     private final AuctionService auctionService;
-  
+
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 정보", description = "")
     public Response<ItemDetailDto> getItemDetail(
@@ -47,14 +46,18 @@ public class AuctionController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        Cookie cookie = Arrays.stream(request.getCookies())
-                .filter(c -> c.getName().equals("UserUUID"))
-                .findFirst().orElse(
-                        new Cookie("UserUUID", UUID.randomUUID().toString())
-                );
+        Cookie cookie;
+        if (request.getCookies() == null) {
+            cookie = new Cookie("UserUUID", UUID.randomUUID().toString());
+        } else {
+            cookie = Arrays.stream(request.getCookies())
+                    .filter(c -> c.getName().equals("UserUUID"))
+                    .findFirst().orElse(
+                            new Cookie("UserUUID", UUID.randomUUID().toString())
+                    );
+        }
         cookie.setMaxAge(24 * 60 * 60);
         response.addCookie(cookie);
-
         return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));
     }
 
@@ -106,8 +109,8 @@ public class AuctionController {
 
     @Operation(summary = "경매 삭제")
     @DeleteMapping("/{auctionId}")
-    public Response<Void> delete(@PathVariable Long auctionId) {
-        auctionService.delete(auctionId);
+    public Response<Void> delete(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long auctionId) {
+        auctionService.delete(loginUser.getUser().getId(), auctionId);
 
         return Response.success("게시글 삭제 성공", null);
     }
@@ -117,7 +120,7 @@ public class AuctionController {
     public Response<Void> bid(@PathVariable Long auctionId,
                               @RequestBody PayRequest request,
                               @AuthenticationPrincipal LoginUser loginUser) {
-        auctionService.bid(auctionId,request, loginUser.getUser().getId());
+        auctionService.bid(auctionId, request, loginUser.getUser().getId());
         return Response.success("경매 참여 완료", null);
     }
 
@@ -126,10 +129,9 @@ public class AuctionController {
     public Response<Void> instantBuy(
             @Parameter(name = "auctionId", description = "경매글 아이디", example = "4")
             @PathVariable Long auctionId,
-            @RequestBody PayRequest request,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        auctionService.instantBuy(auctionId,request, loginUser.getUser().getId());
+        auctionService.instantBuy(auctionId, loginUser.getUser().getId());
         return Response.success("해당 경매글의 즉시 결제 성공", null);
     }
 
@@ -162,7 +164,7 @@ public class AuctionController {
 
     @GetMapping("/{auctionId}/bid")
     @Operation(summary = "상품 입찰하기 페이지 조회")
-    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal LoginUser loginUser){
+    public Response<BidInfoResponse> getBidInfo(@PathVariable Long auctionId, @AuthenticationPrincipal LoginUser loginUser) {
         return Response.success("입찰 조회 완료", auctionService.getBidInfo(auctionId, loginUser.getUser().getId()));
     }
 }
