@@ -161,9 +161,10 @@ public class UserService {
         MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
         tokenParams.add("grant_type", "authorization_code");
         tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
+        tokenParams.add("redirect_uri", "http://localhost:5173/redirection");
 //        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
 //        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
-        tokenParams.add("redirect_uri", "http://k30e8e47032d4a.user-app.krampoline.com/api/user/code");
+//        tokenParams.add("redirect_uri", "http://ka1425de5708ea.user-app.krampoline.com/api/user/code");
         tokenParams.add("code", code);
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
         ResponseEntity<String> response = tokenRt.exchange(

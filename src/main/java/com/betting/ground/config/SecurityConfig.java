@@ -92,7 +92,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auction/{auctionId}").hasRole("USER")
                         .requestMatchers("/api/delivery").hasRole("USER")
                         .requestMatchers("/api/payment/ready").hasRole("USER")
-                        .requestMatchers("/api/payment/succes").hasRole("USER")
+                        .requestMatchers("/api/payment/success").hasRole("USER")
 
                         .anyRequest().authenticated()
                 ).build();
