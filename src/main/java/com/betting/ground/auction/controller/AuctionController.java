@@ -99,7 +99,7 @@ public class AuctionController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "request는 json으로 보내주셔야 합니다!")
             @RequestPart AuctionCreateRequest request,
-            @RequestPart List<MultipartFile> images
+            @RequestPart(required = false) List<MultipartFile> images
     ) throws IOException {
 
         auctionService.create(loginUser, request, images);

@@ -136,16 +136,20 @@ public class AuctionService {
         auctionRepository.save(auction);
 
         //경매 사진 저장
-        for (MultipartFile image : images) {
-            String s3Url = s3Utils.upload(image);
-            auctionImageRepository.save(new AuctionImage(s3Url, auction));
+        if(images != null) {
+            for (MultipartFile image : images) {
+                String s3Url = s3Utils.upload(image);
+                auctionImageRepository.save(new AuctionImage(s3Url, auction));
+            }
         }
 
         // 태그 저장
         List<String> tags = request.getTags();
-        for (String tagName : tags) {
-            Tag auctionTag = new Tag(tagName, auction);
-            tagRepository.save(auctionTag);
+        if(tags != null) {
+            for (String tagName : tags) {
+                Tag auctionTag = new Tag(tagName, auction);
+                tagRepository.save(auctionTag);
+            }
         }
 
         // 조회수 저장
