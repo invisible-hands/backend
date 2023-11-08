@@ -29,6 +29,7 @@ public class SecurityConfig {
     private final UserDetailServiceImpl userDetailService;
     private final JwtUtils jwtUtils;
     private final CustomAuthenticationEntryPoint entryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -64,6 +65,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(entryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
                 .and()
                 .addFilter(corsFilter())
                 .authorizeHttpRequests(request -> request
