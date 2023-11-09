@@ -1,5 +1,7 @@
 package com.betting.ground.user.controller;
 
+import com.betting.ground.admin.domain.Report;
+import com.betting.ground.admin.domain.ReportStatus;
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.user.dto.UserAccountDTO;
 import com.betting.ground.user.dto.UserAddressDTO;
@@ -104,4 +106,16 @@ public class UserController {
 //        log.info("입력값 : {}", userDTO);
         return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
+
+    @PutMapping("/report")
+    @Operation(summary = "회원신고 등록")
+    public Response<UserReportDTO> editReport(
+            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDTO userReportDTO
+    ) {
+        log.info("입력값 : {}", userReportDTO);
+        return Response.success("회원 신고 완료", userService.saveUserReport(userReportDTO));
+    }
+
 }
+
+

@@ -19,6 +19,8 @@ public enum ErrorCode {
     USERNAME_NOT_FOUND(HttpStatus.UNAUTHORIZED,"계정이 존재하지 않습니다."),
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치 합니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
+    USER_ALREADY_ACTIVE(HttpStatus.BAD_REQUEST, "이미 활성된 유저입니다."),
+    NOT_ADMIN_ROLE(HttpStatus.BAD_REQUEST, "유저 권한은 조회할 수 없습니다."),
 
     AUCTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재 하지 않는 게시글입니다."),
     AUCTION_SOLD_OUT(HttpStatus.BAD_REQUEST,"이미 상품이 판매되었습니다."),
@@ -40,7 +42,9 @@ public enum ErrorCode {
 
     NOT_ENOUGH_INFO(HttpStatus.BAD_REQUEST, "배송지 또는 은행 정보가 없습니다."),
 
-    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다.")
+    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
+
+    NOT_REPORT(HttpStatus.BAD_REQUEST, "신고내역이 없습니다.");
     ;
 
 

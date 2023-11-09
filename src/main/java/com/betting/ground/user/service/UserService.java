@@ -5,11 +5,13 @@ import com.betting.ground.RefreshToken.repository.RefreshTokenRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.config.jwt.JwtUtils;
+import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.KakaoProfile;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.dto.login.OAuthToken;
+import com.betting.ground.admin.repository.ReportRepository;
 import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +21,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,8 +32,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.UUID;
 
 import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
@@ -43,6 +42,7 @@ import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKE
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ReportRepository reportRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -104,6 +104,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
+        if(user.getRole().equals(Role.USER)) {
+            throw new GlobalException(ErrorCode.USER_ALREADY_ACTIVE);
+        }
+
         if (user.getBankInfo() == null || user.getAddress() == null) {
             throw new GlobalException(ErrorCode.NOT_ENOUGH_INFO);
         }
@@ -119,6 +123,12 @@ public class UserService {
         refreshTokenRepository.save(refreshToken);
 
         return new LoginResponseDto(user, accessToken, refreshToken.getRefreshToken());
+    }
+
+    //게시글 신고하기
+    public UserReportDTO saveUserReport(UserReportDTO userReportDTO) {
+        reportRepository.save(UserReportDTO.toReportEntity(userReportDTO));
+        return userReportDTO;
     }
 
     public LoginResponseDto login(String code) throws JsonProcessingException {
@@ -152,18 +162,18 @@ public class UserService {
 
     private OAuthToken getOAuthToken(String code) throws JsonProcessingException {
         RestTemplate tokenRt = new RestTemplate();
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
-        tokenRt.setRequestFactory(factory);
+//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+//        tokenRt.setRequestFactory(factory);
 
         HttpHeaders tokenHeaders = new HttpHeaders();
         tokenHeaders.add("Content-Type", "application/x-www-form-urlencoded");
         MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
         tokenParams.add("grant_type", "authorization_code");
         tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
-        tokenParams.add("redirect_uri", "http://localhost:5173/redirection");
+//                tokenParams.add("redirect_uri", "http://localhost:5173/redirection");
 //        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
-//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
+        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
 //        tokenParams.add("redirect_uri", "http://ka1425de5708ea.user-app.krampoline.com/api/user/code");
         tokenParams.add("code", code);
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
@@ -179,9 +189,9 @@ public class UserService {
     private KakaoProfile getKakaoProfile(OAuthToken oAuthToken) throws JsonProcessingException {
 
         RestTemplate profileRt = new RestTemplate();
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
-        profileRt.setRequestFactory(factory);
+//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
+//        profileRt.setRequestFactory(factory);
 
         MultiValueMap<String, String> profileParams = new LinkedMultiValueMap<>();
         profileParams.add("Authorization", "Bearer " + oAuthToken.getAccess_token());
