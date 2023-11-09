@@ -9,13 +9,13 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
+import static com.betting.ground.auction.domain.AuctionStatus.AUCTION_PROGRESS;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
-@Builder
-@AllArgsConstructor
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,24 +41,6 @@ public class Auction {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    public Auction(User user, AuctionCreateRequest request) {
-        this.title = request.getTitle();
-        this.content = request.getContent();
-        this.itemCondition = ItemCondition.valueOf(request.getItemCondition());
-        this.startPrice = request.getStartPrice();
-        this.instantPrice = request.getInstantPrice();
-        this.currentPrice = request.getStartPrice();
-        this.auctionStatus = AuctionStatus.AUCTION_PROGRESS;
-        this.duration = Duration.valueOf(request.getDuration());
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.user = user;
-    }
-
-    public void calcEndAuctionTime(int duration) {
-        this.endAuctionTime = this.createdAt.plusHours(duration);
-    }
-
     public void updateAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
     }
@@ -74,4 +56,20 @@ public class Auction {
         this.auctionStatus = auctionStatus;
     }
 
+    @Builder
+    public Auction(String title, String content, ItemCondition itemCondition, Long startPrice, Long instantPrice, Duration duration, User user) {
+        this.title = title;
+        this.content = content;
+        this.itemCondition = itemCondition;
+        this.startPrice = startPrice;
+        this.instantPrice = instantPrice;
+        this.duration = duration;
+        this.user = user;
+
+        this.currentPrice = startPrice;
+        this.auctionStatus = AUCTION_PROGRESS;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.endAuctionTime = LocalDateTime.now().plusMinutes(5L + duration.getTime());
+    }
 }

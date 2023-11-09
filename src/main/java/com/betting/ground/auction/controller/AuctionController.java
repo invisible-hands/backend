@@ -1,6 +1,7 @@
 package com.betting.ground.auction.controller;
 
 import com.betting.ground.auction.dto.BidHistoryDto;
+import com.betting.ground.auction.dto.CreateAuctionDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.PayRequest;
@@ -101,8 +102,8 @@ public class AuctionController {
             @RequestPart AuctionCreateRequest request,
             @RequestPart(required = false) List<MultipartFile> images
     ) throws IOException {
-
-        auctionService.create(loginUser, request, images);
+        CreateAuctionDto createAuctionDto = request.toDto(images);
+        auctionService.create(loginUser.getUser().getId(), createAuctionDto);
 
         return Response.success("게시글 생성 성공", null);
     }

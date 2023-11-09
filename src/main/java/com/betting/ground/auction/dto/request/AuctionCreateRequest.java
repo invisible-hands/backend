@@ -1,10 +1,14 @@
 package com.betting.ground.auction.dto.request;
 
+import com.betting.ground.auction.domain.Duration;
+import com.betting.ground.auction.domain.ItemCondition;
+import com.betting.ground.auction.dto.CreateAuctionDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,4 +36,17 @@ public class AuctionCreateRequest {
     private String duration;
     @Schema(description = "태그", example = "")
     private List<String> tags;
+
+    public CreateAuctionDto toDto(List<MultipartFile> images) {
+        return CreateAuctionDto.builder()
+                .title(this.title)
+                .content(this.content)
+                .itemCondition(ItemCondition.valueOf(this.itemCondition))
+                .startPrice(this.startPrice)
+                .instantPrice(this.instantPrice)
+                .duration(Duration.valueOf(this.duration))
+                .images(images)
+                .tags(this.tags)
+                .build();
+    }
 }
