@@ -60,10 +60,7 @@ public class AdminService {
                 .id(report.getId())
                 .reportReason(report.getReportReason())
                 .reportDescription(report.getReportDescription())
-                .reportTime(report.getReportTime())
-                .reportStatus(report.getReportStatus())
                 .auctionId(report.getAuctionId())
-                .userId(report.getUserId())
                 .build();
     }
 
