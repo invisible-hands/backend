@@ -92,4 +92,9 @@ public class User {
     public void settle(Long price) {
         this.money += price;
     }
+
+    public User updatePassword(String password){
+        this.password = password;
+        return this;
+    }
 }

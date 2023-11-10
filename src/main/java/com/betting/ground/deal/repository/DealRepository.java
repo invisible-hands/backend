@@ -1,18 +1,35 @@
 package com.betting.ground.deal.repository;
 
-import com.betting.ground.deal.domain.Deal;
-import com.betting.ground.deal.domain.DealStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface DealRepository extends JpaRepository<Deal, Long>, DealRepositoryCustom {
-    Optional<Deal> findByAuctionId(Long auctionId);
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-    List<Deal> findAllByBuyerId(Long userId);
+import com.betting.ground.deal.domain.Deal;
+import com.betting.ground.deal.domain.DealStatus;
 
-    List<Deal> findAllBySellerId(Long userId);
+public interface DealRepository extends JpaRepository<Deal, Long> {
+	Optional<Deal> findByAuctionId(Long auctionId);
 
-    List<Deal> findAllByDealStatus(DealStatus deliveryWaiting);
+	List<Deal> findAllByBuyerId(Long userId);
+
+	List<Deal> findAllBySellerId(Long userId);
+
+	List<Deal> findAllByDealStatus(DealStatus deliveryWaiting);
+
+	List<Deal> findByBuyerIdAndDealStatusInAndDealTimeBetweenOrderByDealTimeDesc(Long userId, Pageable pageable,
+		List<DealStatus> status,
+		LocalDateTime startDate, LocalDateTime endDate);
+
+	List<Deal> findBySellerIdAndDealStatusInAndDealTimeBetweenOrderByDealTimeDesc(Long userId, Pageable pageable,
+		List<DealStatus> status,
+		LocalDateTime startDate, LocalDateTime endDate);
+
+	List<Deal> findByBuyerIdAndDealStatusInAndDealTimeBetween(Long userId, List<DealStatus> status,
+		LocalDateTime localDateTime, LocalDateTime localDateTime1);
+
+	List<Deal> findBySellerIdAndDealStatusInAndDealTimeBetween(Long userId, List<DealStatus> status,
+		LocalDateTime startDate, LocalDateTime endDate);
 }
