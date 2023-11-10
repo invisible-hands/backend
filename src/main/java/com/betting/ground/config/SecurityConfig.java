@@ -2,7 +2,6 @@ package com.betting.ground.config;
 
 import com.betting.ground.config.filter.JwtTokenFilter;
 import com.betting.ground.config.jwt.JwtUtils;
-import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.dto.login.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -68,7 +67,9 @@ public class SecurityConfig {
                 .addFilter(corsFilter())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/api/health/**").permitAll()
                         .requestMatchers("/api/user/code").permitAll()
                         .requestMatchers("/api/user/login/kakao").permitAll()
                         .requestMatchers("/api/user/reissue").permitAll()
