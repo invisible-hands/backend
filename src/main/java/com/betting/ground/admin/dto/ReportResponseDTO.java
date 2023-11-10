@@ -21,7 +21,11 @@ public class ReportResponseDTO {
     @Schema(description = "신고 설명", example = "진우라는 유저가 마약을 팔고 있습니다.")
     private String reportDescription;
 
+    @Schema(description = "신고 상태", example = "PROGRESS")
+    private ReportStatus reportStatus;
+
     @Schema(description = "경매글 Id", example = "12")
     private Long auctionId;
+
 
 }

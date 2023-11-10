@@ -61,6 +61,7 @@ public class AdminService {
                 .reportReason(report.getReportReason())
                 .reportDescription(report.getReportDescription())
                 .auctionId(report.getAuctionId())
+                .reportStatus(report.getReportStatus())
                 .build();
     }
 
