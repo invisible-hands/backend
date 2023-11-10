@@ -26,9 +26,8 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<ReportResponseDTO> searchReport() {
         List<Report> reports = reportRepository.findAll();
-
         return reports.stream()
-                .map(this::entityToDTO)
+                .map(ReportResponseDTO::from)
                 .toList();
     }
 
@@ -37,33 +36,19 @@ public class AdminService {
     public ReportResponseDTO detailReport(Long id) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
-
-        return entityToDTO(report);
+        return ReportResponseDTO.from(report);
     }
 
     //신고 완료 처리
     public ReportResponseDTO reportStatusUpdate(ReportRequestDTO reportRequestDTO) {
         Report report = reportRepository.findById(reportRequestDTO.getId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
-
-        //변경 감지
+        //변경감지
         report.updateReportStatus();
 
-        return entityToDTO(report);
+        return ReportResponseDTO.from(report); // Changed to use the static method
     }
 
-    //entity -> dto 반환
-    public ReportResponseDTO entityToDTO(Report report) {
-        if(report == null) throw new GlobalException(ErrorCode.NOT_REPORT);
-
-        return ReportResponseDTO.builder()
-                .id(report.getId())
-                .reportReason(report.getReportReason())
-                .reportDescription(report.getReportDescription())
-                .auctionId(report.getAuctionId())
-                .reportStatus(report.getReportStatus())
-                .build();
-    }
 
     //관리자 권한체크
     public boolean roleCheck(LoginUser loginUser) {

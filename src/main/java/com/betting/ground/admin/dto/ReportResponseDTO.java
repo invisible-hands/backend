@@ -27,5 +27,17 @@ public class ReportResponseDTO {
     @Schema(description = "경매글 Id", example = "12")
     private Long auctionId;
 
+    public static ReportResponseDTO from(Report report) {
+        if (report == null) {
+            throw new GlobalException(ErrorCode.NOT_REPORT);
+        }
+        return ReportResponseDTO.builder()
+                .id(report.getId())
+                .reportReason(report.getReportReason())
+                .reportDescription(report.getReportDescription())
+                .auctionId(report.getAuctionId())
+                .reportStatus(report.getReportStatus())
+                .build();
+    }
 
 }
