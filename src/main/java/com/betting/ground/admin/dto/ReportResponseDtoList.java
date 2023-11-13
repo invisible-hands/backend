@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportResponseDTOList {
-    private List<ReportResponseDTO> reportResDTOS;
+public class ReportResponseDtoList {
+    private List<ReportResponseDto> reportResDTOS;
 }

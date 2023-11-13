@@ -1,12 +1,10 @@
 package com.betting.ground.user.controller;
 
-import com.betting.ground.admin.domain.Report;
-import com.betting.ground.admin.domain.ReportStatus;
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.dto.UserAccountDTO;
-import com.betting.ground.user.dto.UserAddressDTO;
-import com.betting.ground.user.dto.UserDTO;
-import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.UserAccountDto;
+import com.betting.ground.user.dto.UserAddressDto;
+import com.betting.ground.user.dto.UserDto;
+import com.betting.ground.user.dto.UserNicknameDto;
 import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.service.UserService;
@@ -63,14 +61,14 @@ public class UserController {
     //프로필 관련 API
     @GetMapping
     @Operation(summary = "유저 프로필 조회")
-    public Response<UserDTO> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
+    public Response<UserDto> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
         return Response.success("유저 프로필 조회 완료.", userService.selectUserProfileById(loginUser.getUser().getId()));
     }
 
     @PutMapping("/nickname")
     @Operation(summary = "닉네임 등록,수정")
-    public Response<UserNicknameDTO> editNickname(
-            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDTO userNicknameDTO,
+    public Response<UserNicknameDto> editNickname(
+            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDto userNicknameDTO,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
         log.info("입력값 : {}", userNicknameDTO);
@@ -79,8 +77,8 @@ public class UserController {
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 등록,수정")
-    public Response<UserAccountDTO> editAccountNumber(
-            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDTO userAccountDTO,
+    public Response<UserAccountDto> editAccountNumber(
+            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDto userAccountDTO,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
         log.info("입력값 : {}", userAccountDTO);
@@ -89,8 +87,8 @@ public class UserController {
 
     @PutMapping("/address")
     @Operation(summary = "주소 등록,수정")
-    public Response<UserAddressDTO> editAddress(
-            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDTO userAddressDTO,
+    public Response<UserAddressDto> editAddress(
+            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDto userAddressDTO,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
         log.info("입력값 : {}", userAddressDTO);
@@ -109,8 +107,8 @@ public class UserController {
 
     @PutMapping("/report")
     @Operation(summary = "회원신고 등록")
-    public Response<UserReportDTO> editReport(
-            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDTO userReportDTO
+    public Response<UserReportDto> editReport(
+            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDto userReportDTO
     ) {
         log.info("입력값 : {}", userReportDTO);
         return Response.success("회원 신고 완료", userService.saveUserReport(userReportDTO));

@@ -57,15 +57,15 @@ public class UserService {
 
     //유저 프로필 조회
     @Transactional(readOnly = true)
-    public UserDTO selectUserProfileById(Long userId) {
+    public UserDto selectUserProfileById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
 
-        return new UserDTO(user);
+        return new UserDto(user);
     }
 
     //닉네임 변경
-    public UserNicknameDTO updateUserNickName(Long userId, UserNicknameDTO userNicknameDTO) {
+    public UserNicknameDto updateUserNickName(Long userId, UserNicknameDto userNicknameDTO) {
         //닉네임 중복 확인
         userRepository.findByNickname(userNicknameDTO.getNickname()).ifPresent(
                 a -> {
@@ -82,7 +82,7 @@ public class UserService {
 
 
     //계좌 번호 등록 및 수정
-    public UserAccountDTO updateUserAccount(Long userId, UserAccountDTO userAccountDTO) {
+    public UserAccountDto updateUserAccount(Long userId, UserAccountDto userAccountDTO) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
@@ -92,7 +92,7 @@ public class UserService {
     }
 
     //주소 등록 및 수정
-    public UserAddressDTO updateUserAddress(Long userId, UserAddressDTO userAddressDTO) {
+    public UserAddressDto updateUserAddress(Long userId, UserAddressDto userAddressDTO) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
@@ -129,7 +129,7 @@ public class UserService {
     }
 
     //게시글 신고하기
-    public UserReportDTO saveUserReport(UserReportDTO userReportDTO) {
+    public UserReportDto saveUserReport(UserReportDto userReportDTO) {
         //경매글 조회
         Auction auction = auctionRepository.findById(userReportDTO.getAuctionId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND));
@@ -139,7 +139,7 @@ public class UserService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
         //유저정보 조회
-        reportRepository.save(UserReportDTO.toReportEntity(userReportDTO, auction, user));
+        reportRepository.save(UserReportDto.toReportEntity(userReportDTO, auction, user));
         return userReportDTO;
     }
 

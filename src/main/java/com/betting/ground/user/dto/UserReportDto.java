@@ -4,7 +4,6 @@ import com.betting.ground.admin.domain.Report;
 import com.betting.ground.admin.domain.ReportStatus;
 import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.user.domain.User;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,13 +12,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @Getter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserReportDTO {
+public class UserReportDto {
 
     @NotBlank(message = "신고하시는 이유를 작성해 주세요.")
     @Schema(description = "신고 이유", example = "불법거래")
@@ -38,7 +35,7 @@ public class UserReportDTO {
     private Long userId;
 
     //dto -> entity
-    public static Report toReportEntity(UserReportDTO userReportDTO, Auction auction, User user) {
+    public static Report toReportEntity(UserReportDto userReportDTO, Auction auction, User user) {
         return Report.builder()
                 .reportReason(userReportDTO.getReportReason())
                 .reportDescription(userReportDTO.getReportDescription())

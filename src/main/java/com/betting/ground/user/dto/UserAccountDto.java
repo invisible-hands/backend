@@ -1,7 +1,6 @@
 package com.betting.ground.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAccountDTO {
+public class UserAccountDto {
     //계좌번호 등록,수정
     @NotBlank(message = "은행명을 입력해 주세요.")
     @Schema(description = "은행명", example = "국민은행")

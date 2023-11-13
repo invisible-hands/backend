@@ -18,9 +18,9 @@ public class Report {
     private String reportDescription;
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Auction auction;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public void updateReportStatus() {

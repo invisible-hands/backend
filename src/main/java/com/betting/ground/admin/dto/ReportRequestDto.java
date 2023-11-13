@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReportRequestDTO {
+public class ReportRequestDto {
 
     @NotNull(message = "해당 신고건의 id가 누락되었습니다.")
     @Schema(description = "신고 id", example = "12")

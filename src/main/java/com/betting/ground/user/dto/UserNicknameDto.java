@@ -14,7 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class UserNicknameDTO {
+public class UserNicknameDto {
     //닉네임수정
     @NotBlank(message = "닉네임을 입력해 주세요. (공백은 허용되지 않습니다)")
     @Size(min = 1, max = 12, message = "닉네임의 최대길이는 12자 입니다.")
