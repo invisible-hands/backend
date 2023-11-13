@@ -57,6 +57,10 @@ public class User {
         this.role = Role.USER;
     }
 
+    public void updateGuest() {
+        this.role = Role.GUEST;
+    }
+
     public void increaseMoney(Long money) {
         this.money += money;
     }
