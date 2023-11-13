@@ -10,7 +10,7 @@ public enum DealStatus {
 	PURCHASE_CANCEL("판매자 귀책으로 인한 취소"),
 	SALE_FAIL("판매 실패");
 
-	private String status;
+	private final String status;
 
 	DealStatus(String status) {
 		this.status = status;

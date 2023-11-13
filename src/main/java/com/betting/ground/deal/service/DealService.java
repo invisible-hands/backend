@@ -51,7 +51,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class DealService {
 
 	private final DealRepository dealRepository;
@@ -87,6 +86,7 @@ public class DealService {
 		return getPurchaseInfoResponse(userId, pageable, startDate, endDate, status);
 	}
 
+	@Transactional
 	public void purchaseComplete(Long dealId) {
 		Deal deal = dealRepository.findById(dealId).orElseThrow(
 			() -> new GlobalException(ErrorCode.DEAL_NOT_FOUND)
@@ -330,6 +330,7 @@ public class DealService {
 	}
 
 	@NotNull
+	@Transactional(readOnly = true)
 	private PurchaseInfoResponse getPurchaseInfoResponse(Long userId, Pageable pageable, LocalDate startDate,
 		LocalDate endDate, List<DealStatus> status) {
 		int size = dealRepository.findByBuyerIdAndDealStatusInAndDealTimeBetween(userId,
@@ -355,6 +356,7 @@ public class DealService {
 	}
 
 	@NotNull
+	@Transactional(readOnly = true)
 	private SalesInfoResponse getSalesInfoResponse(Long userId, Pageable pageable, LocalDate startDate,
 		LocalDate endDate, List<DealStatus> status) {
 		int size = dealRepository.findBySellerIdAndDealStatusInAndDealTimeBetween(userId,
