@@ -39,8 +39,8 @@ public enum ErrorCode {
     LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
 
     NOT_ENOUGH_INFO(HttpStatus.BAD_REQUEST, "배송지 또는 은행 정보가 없습니다."),
-
-    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다.")
+    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
+    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다.")
     ;
 
 

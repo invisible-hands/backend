@@ -1,6 +1,7 @@
 package com.betting.ground.auction.controller;
 
 import com.betting.ground.auction.dto.BidHistoryDto;
+import com.betting.ground.auction.dto.CreateAuctionDto;
 import com.betting.ground.auction.dto.SellerInfo;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.PayRequest;
@@ -99,10 +100,10 @@ public class AuctionController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "request는 json으로 보내주셔야 합니다!")
             @RequestPart AuctionCreateRequest request,
-            @RequestPart List<MultipartFile> images
+            @RequestPart(required = false) List<MultipartFile> images
     ) throws IOException {
-
-        auctionService.create(loginUser, request, images);
+        CreateAuctionDto createAuctionDto = request.toDto(images);
+        auctionService.create(loginUser.getUser().getId(), createAuctionDto);
 
         return Response.success("게시글 생성 성공", null);
     }
