@@ -4,11 +4,8 @@ import java.time.LocalDateTime;
 
 import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.domain.AuctionImage;
-import com.betting.ground.auction.domain.AuctionStatus;
 import com.betting.ground.auction.domain.BidHistory;
-import com.betting.ground.auction.domain.Duration;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.querydsl.core.annotations.QueryProjection;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -44,22 +41,6 @@ public class BiddingInfo {
 	private Long myBidPrice;
 	@Schema(description = "상태", example = "AUCTION_PROGRESS")
 	private String status;
-
-	@QueryProjection
-	public BiddingInfo(Long auctionId, String imageUrl, String title, LocalDateTime bidTime, LocalDateTime createdAt,
-		Duration duration, LocalDateTime endAuctionTime, Long currentPrice, Long myBidPrice, AuctionStatus status) {
-		this.auctionId = auctionId;
-		this.imageUrl = imageUrl;
-		this.title = title;
-		this.bidTime = bidTime;
-		this.createdAt = createdAt;
-		this.duration = duration.getTime();
-		this.startAuctionTime = createdAt.plusMinutes(5L);
-		this.endAuctionTime = endAuctionTime;
-		this.currentPrice = currentPrice;
-		this.myBidPrice = myBidPrice;
-		this.status = status.name();
-	}
 
 	public BiddingInfo(Auction auction, AuctionImage image, BidHistory history) {
 		this.auctionId = auction.getId();

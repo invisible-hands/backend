@@ -4,11 +4,8 @@ import java.time.LocalDateTime;
 
 import com.betting.ground.auction.domain.Auction;
 import com.betting.ground.auction.domain.AuctionImage;
-import com.betting.ground.auction.domain.Duration;
 import com.betting.ground.deal.domain.Deal;
-import com.betting.ground.deal.domain.DealStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.querydsl.core.annotations.QueryProjection;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -41,21 +38,6 @@ public class PurchaseInfo {
 	private Long purchasePrice;
 	@Schema(description = "상태", example = "DELIVERY_WAITING")
 	private String status;
-
-	@QueryProjection
-	public PurchaseInfo(Long auctionId, Long dealId, String imageUrl, String title, LocalDateTime createdAt,
-		Duration duration, LocalDateTime endAuctionTime, Long purchasePrice, DealStatus status) {
-		this.auctionId = auctionId;
-		this.dealId = dealId;
-		this.imageUrl = imageUrl;
-		this.title = title;
-		this.createdAt = createdAt;
-		this.duration = duration.getTime();
-		this.startAuctionTime = createdAt.plusMinutes(5L);
-		this.endAuctionTime = endAuctionTime;
-		this.purchasePrice = purchasePrice;
-		this.status = status.name();
-	}
 
 	public PurchaseInfo(Deal deal, Auction auction, AuctionImage image) {
 		this.auctionId = auction.getId();
