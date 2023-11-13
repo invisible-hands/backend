@@ -2,6 +2,8 @@ package com.betting.ground.user.service;
 
 import com.betting.ground.RefreshToken.domain.RefreshToken;
 import com.betting.ground.RefreshToken.repository.RefreshTokenRepository;
+import com.betting.ground.auction.domain.Auction;
+import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.config.jwt.JwtUtils;
@@ -42,6 +44,7 @@ import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKE
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuctionRepository auctionRepository;
     private final ReportRepository reportRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
@@ -127,7 +130,16 @@ public class UserService {
 
     //게시글 신고하기
     public UserReportDTO saveUserReport(UserReportDTO userReportDTO) {
-        reportRepository.save(UserReportDTO.toReportEntity(userReportDTO));
+        //경매글 조회
+        Auction auction = auctionRepository.findById(userReportDTO.getAuctionId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND));
+
+        //신고자 정보 조회
+        User user = userRepository.findById(userReportDTO.getUserId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+
+        //유저정보 조회
+        reportRepository.save(UserReportDTO.toReportEntity(userReportDTO, auction, user));
         return userReportDTO;
     }
 

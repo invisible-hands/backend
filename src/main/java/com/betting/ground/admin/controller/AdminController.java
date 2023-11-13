@@ -2,6 +2,7 @@ package com.betting.ground.admin.controller;
 
 import com.betting.ground.admin.dto.ReportRequestDTO;
 import com.betting.ground.admin.dto.ReportResponseDTO;
+import com.betting.ground.admin.dto.ReportResponseDTOList;
 import com.betting.ground.admin.service.AdminService;
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.common.exception.ErrorCode;
@@ -31,7 +32,7 @@ public class AdminController {
 
     @GetMapping("/reportList")
     @Operation(summary = "신고 전체조회")
-    public Response<List<ReportResponseDTO>> getReportList(@AuthenticationPrincipal LoginUser loginUser) {
+    public Response<ReportResponseDTOList> getReportList(@AuthenticationPrincipal LoginUser loginUser) {
         if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
 
         return Response.success("신고내역 전체 조회 완료", adminService.searchReport());
@@ -56,5 +57,4 @@ public class AdminController {
 
         return Response.success("신고처리 완료", adminService.reportStatusUpdate(reportRequestDTO));
     }
-
 }

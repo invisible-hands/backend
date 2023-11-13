@@ -3,6 +3,7 @@ package com.betting.ground.admin.service;
 import com.betting.ground.admin.domain.Report;
 import com.betting.ground.admin.dto.ReportRequestDTO;
 import com.betting.ground.admin.dto.ReportResponseDTO;
+import com.betting.ground.admin.dto.ReportResponseDTOList;
 import com.betting.ground.admin.repository.ReportRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
@@ -24,11 +25,16 @@ public class AdminService {
 
     //신고내역 전체 조회(게시판)
     @Transactional(readOnly = true)
-    public List<ReportResponseDTO> searchReport() {
+    public ReportResponseDTOList searchReport() {
         List<Report> reports = reportRepository.findAll();
-        return reports.stream()
-                .map(ReportResponseDTO::from)
+
+        List<ReportResponseDTO> reportResponseDTOS = reports.stream()
+                .map(ReportResponseDTO::entityToDTO)
                 .toList();
+
+        return ReportResponseDTOList.builder()
+                .reportResDTOS(reportResponseDTOS)
+                .build();
     }
 
     //신고 내용확인
@@ -36,19 +42,20 @@ public class AdminService {
     public ReportResponseDTO detailReport(Long id) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
-        return ReportResponseDTO.from(report);
+
+        return ReportResponseDTO.entityToDTO(report);
     }
 
     //신고 완료 처리
     public ReportResponseDTO reportStatusUpdate(ReportRequestDTO reportRequestDTO) {
         Report report = reportRepository.findById(reportRequestDTO.getId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
-        //변경감지
+
+        //변경 감지
         report.updateReportStatus();
 
-        return ReportResponseDTO.from(report); // Changed to use the static method
+        return ReportResponseDTO.entityToDTO(report);
     }
-
 
     //관리자 권한체크
     public boolean roleCheck(LoginUser loginUser) {
@@ -63,5 +70,4 @@ public class AdminService {
         }
         return true;
     }
-
 }
