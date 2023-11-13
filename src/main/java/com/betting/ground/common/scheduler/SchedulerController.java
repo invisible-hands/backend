@@ -11,6 +11,7 @@ import com.betting.ground.deal.domain.DealEvent;
 import com.betting.ground.deal.domain.DealStatus;
 import com.betting.ground.deal.repository.DealEventRepository;
 import com.betting.ground.deal.repository.DealRepository;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/api/schedule")
 @Slf4j
+@Hidden
 public class SchedulerController {
     private final AuctionRepository auctionRepository;
     private final DealRepository dealRepository;
@@ -57,8 +59,10 @@ public class SchedulerController {
     @GetMapping("/deal")
     @Transactional
     public void update2() {
+        log.info("deal");
         List<Deal> deals = dealRepository.findAllByDealStatus(DealStatus.DELIVERY_WAITING);
         deals.stream()
+                .filter(deal -> deal.getDealDeadLine() != null)
                 .filter(deal -> deal.getDealDeadLine().isBefore(LocalDateTime.now()))
                 .forEach(deal -> deal.updateStatus(DealStatus.PURCHASE_CANCEL));
         dealRepository.saveAll(deals);
@@ -66,10 +70,10 @@ public class SchedulerController {
 
     @GetMapping("/migration")
     @Transactional
-    public void migration(){
+    public void migration() {
         log.info("migration");
         Set<String> allAuctions = viewCacheRepository.getAllAuctions();
-        if(allAuctions.isEmpty()){
+        if (allAuctions.isEmpty()) {
             return;
         }
 
