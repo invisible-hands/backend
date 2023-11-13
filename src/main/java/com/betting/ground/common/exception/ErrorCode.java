@@ -42,9 +42,12 @@ public enum ErrorCode {
 
     NOT_ENOUGH_INFO(HttpStatus.BAD_REQUEST, "배송지 또는 은행 정보가 없습니다."),
 
-    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
-
     NOT_REPORT(HttpStatus.BAD_REQUEST, "신고내역이 없습니다.");
+    NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 부족합니다."),
+    NOT_FOUND_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
+    CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
+    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다.")
+
     ;
 
 

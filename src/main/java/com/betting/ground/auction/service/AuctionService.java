@@ -2,10 +2,7 @@ package com.betting.ground.auction.service;
 
 
 import com.betting.ground.auction.domain.*;
-import com.betting.ground.auction.dto.BidHistoryDto;
-import com.betting.ground.auction.dto.BidInfo;
-import com.betting.ground.auction.dto.SellerInfo;
-import com.betting.ground.auction.dto.SellerItemDto;
+import com.betting.ground.auction.dto.*;
 import com.betting.ground.auction.dto.request.AuctionCreateRequest;
 import com.betting.ground.auction.dto.request.PayRequest;
 import com.betting.ground.auction.dto.response.AuctionInfo;
@@ -124,28 +121,34 @@ public class AuctionService {
         return auctionRepository.findDetailAuctionById(loginUser, auctionId);
     }
 
-    public void create(LoginUser loginUser, AuctionCreateRequest request, List<MultipartFile> images) throws IOException {
-        // 경매글 작성자 찾기
-        User user = userRepository.findById(loginUser.getUser().getId()).orElseThrow(
+    public void create(Long userId, CreateAuctionDto createAuctionDto) throws IOException {
+        // 경매글을 작성할 유저가 존재하는지 확인
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new GlobalException(ErrorCode.USER_NOT_FOUND)
         );
 
-        // 경매 저장
-        Auction auction = new Auction(user, request);
-        auction.calcEndAuctionTime(Duration.valueOf(request.getDuration()).getTime());
+        // 경매글 저장
+        Auction auction = createAuctionDto.toEntity(user);
         auctionRepository.save(auction);
 
         //경매 사진 저장
-        for (MultipartFile image : images) {
-            String s3Url = s3Utils.upload(image);
-            auctionImageRepository.save(new AuctionImage(s3Url, auction));
+        List<MultipartFile> images = createAuctionDto.getImages();
+        if(images != null) {
+            for (MultipartFile image : images) {
+                String s3Url = s3Utils.upload(image);
+                auctionImageRepository.save(new AuctionImage(s3Url, auction));
+            }
+        } else {
+            throw new GlobalException(ErrorCode.NEED_IMAGES);
         }
 
-        // 태그 저장
-        List<String> tags = request.getTags();
-        for (String tagName : tags) {
-            Tag auctionTag = new Tag(tagName, auction);
-            tagRepository.save(auctionTag);
+
+        // 경매 태그 저장
+        List<String> tags = createAuctionDto.getTags();
+        if(tags != null) {
+            for (String tagName : tags) {
+                tagRepository.save(new Tag(tagName, auction));
+            }
         }
 
         // 조회수 저장

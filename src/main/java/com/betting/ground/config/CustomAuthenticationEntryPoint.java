@@ -9,10 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 
@@ -24,12 +26,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+
         if (authException.getClass().equals(UsernameNotFoundException.class)) {
             setResponse(response, USERNAME_NOT_FOUND);
         } else if (authException.getClass().equals(BadCredentialsException.class)) {
             setResponse(response, BAD_CREDENTIALS);
+        } else if(authException.getClass().equals(InsufficientAuthenticationException.class)) {
+            setResponse(response, NOT_FOUND_TOKEN);
         }
-
     }
 
     private void setResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException, IOException {
