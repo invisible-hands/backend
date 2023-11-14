@@ -401,46 +401,16 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 	@Override
 	public PageImpl<SalesInfo> getProgressSales(Long userId, Pageable pageable, LocalDate startDate,
 		LocalDate endDate) {
-		List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
-				auction.id,
-				deal.id,
-				getAuctionImage(),
-				auction.title,
-				auction.createdAt,
-				auction.duration,
-				deal.dealTime,
-				deal.dealDeadLine,
-				deal.dealPrice,
-				deal.dealStatus
-			))
+
+		List<Long> ids = jpaQueryFactory.select(deal.id)
 			.from(deal)
-			.leftJoin(auction).on(deal.auction.id.eq(auction.id))
 			.where(
 				deal.sellerId.eq(userId),
 				dealPeriodDate(startDate, endDate),
 				dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING)
 			)
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
-			.orderBy(deal.dealTime.desc())
 			.fetch();
 
-		Long count = jpaQueryFactory.select(deal.countDistinct())
-			.from(deal)
-			.where(
-				deal.sellerId.eq(userId),
-				dealPeriodDate(startDate, endDate),
-				dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING),
-				dealStatusEq(DealStatus.PURCHASE_CANCEL)
-			)
-			.fetchOne();
-
-		return new PageImpl<>(sales, pageable, count);
-	}
-
-	@Override
-	public PageImpl<SalesInfo> getCompleteSales(Long userId, Pageable pageable, LocalDate startDate,
-		LocalDate endDate) {
 		List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
 				auction.id,
 				deal.id,
@@ -456,25 +426,52 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 			.from(deal)
 			.leftJoin(auction).on(deal.auction.id.eq(auction.id))
 			.where(
-				deal.sellerId.eq(userId),
-				dealPeriodDate(startDate, endDate),
-				dealStatusEq(DealStatus.PURCHASE_COMPLETE),
-				dealStatusEq(DealStatus.PURCHASE_CANCEL)
+				deal.sellerId.in(ids)
 			)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.orderBy(deal.dealTime.desc())
 			.fetch();
 
-		Long count = jpaQueryFactory.select(deal.countDistinct())
+		return new PageImpl<>(sales, pageable, ids.size());
+	}
+
+	@Override
+	public PageImpl<SalesInfo> getCompleteSales(Long userId, Pageable pageable, LocalDate startDate,
+		LocalDate endDate) {
+
+		List<Long> ids = jpaQueryFactory.select(deal.id)
 			.from(deal)
 			.where(
 				deal.sellerId.eq(userId),
 				dealPeriodDate(startDate, endDate),
-				dealStatusEq(DealStatus.PURCHASE_COMPLETE)
+				dealStatusEq(DealStatus.PURCHASE_COMPLETE).or(
+					dealStatusEq(DealStatus.PURCHASE_CANCEL).or(dealStatusEq(DealStatus.SALE_FAIL)))
 			)
-			.fetchOne();
+			.fetch();
 
-		return new PageImpl<>(sales, pageable, count);
+		List<SalesInfo> sales = jpaQueryFactory.select(new QSalesInfo(
+				auction.id,
+				deal.id,
+				getAuctionImage(),
+				auction.title,
+				auction.createdAt,
+				auction.duration,
+				deal.dealTime,
+				deal.dealDeadLine,
+				deal.dealPrice,
+				deal.dealStatus
+			))
+			.from(deal)
+			.leftJoin(auction).on(deal.auction.id.eq(auction.id))
+			.where(
+				deal.id.in(ids)
+			)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.orderBy(deal.dealTime.desc())
+			.fetch();
+
+		return new PageImpl<>(sales, pageable, ids.size());
 	}
 }
