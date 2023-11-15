@@ -34,6 +34,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
@@ -143,6 +144,7 @@ public class UserService {
         return userReportDTO;
     }
 
+
     public LoginResponseDto login(String code) throws JsonProcessingException {
         // 토큰 받아오기
         OAuthToken oAuthToken = getOAuthToken(code);
@@ -216,7 +218,6 @@ public class UserService {
         );
         return objectMapper.readValue(infoResponse.getBody(), KakaoProfile.class);
     }
-
 
     public LoginResponseDto reissue(ReissueRequestDto request) {
         String refreshToken = request.getRefreshToken();

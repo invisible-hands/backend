@@ -24,6 +24,12 @@ public class ReportResponseDto {
     @Schema(description = "신고 상태", example = "PROGRESS")
     private ReportStatus reportStatus;
 
+    @Schema(description = "옥션 id", example = "3")
+    private Long auctionId;
+
+    @Schema(description = "유저 id", example = "3")
+    private Long userId;
+
     //entity -> dto
     public static ReportResponseDto entityToDTO(Report report) {
         if(report == null) throw new GlobalException(ErrorCode.NOT_REPORT);
@@ -33,6 +39,8 @@ public class ReportResponseDto {
                 .reportReason(report.getReportReason())
                 .reportDescription(report.getReportDescription())
                 .reportStatus(report.getReportStatus())
+                .auctionId(report.getAuction() != null ? report.getAuction().getId() : null)
+                .userId(report.getUser() != null ? report.getUser().getId() : null)
                 .build();
     }
 }

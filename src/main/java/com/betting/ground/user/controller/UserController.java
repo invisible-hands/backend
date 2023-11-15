@@ -68,50 +68,50 @@ public class UserController {
     @PutMapping("/nickname")
     @Operation(summary = "닉네임 등록,수정")
     public Response<UserNicknameDto> editNickname(
-            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDto userNicknameDTO,
+            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDto userNicknameDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userNicknameDTO);
-        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDTO));
+        log.info("입력값 : {}", userNicknameDto);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDto));
     }
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 등록,수정")
     public Response<UserAccountDto> editAccountNumber(
-            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDto userAccountDTO,
+            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDto userAccountDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userAccountDTO);
-        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDTO));
+        log.info("입력값 : {}", userAccountDto);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDto));
     }
 
     @PutMapping("/address")
     @Operation(summary = "주소 등록,수정")
     public Response<UserAddressDto> editAddress(
-            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDto userAddressDTO,
+            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDto userAddressDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userAddressDTO);
-        return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDTO));
+        log.info("입력값 : {}", userAddressDto);
+        return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDto));
     }
 
     @PutMapping("/role")
-    @Operation(summary = "활성 유저 전환")
+    @Operation(summary = "활성 유저 전환 가입일은 (yyyy-MM-dd HH:mm:ss)로 요청해주세요")
     public Response<LoginResponseDto> editRole(
-//            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
+            @RequestBody @Valid @Parameter(description = "유저 정보") UserDto userDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-//        log.info("입력값 : {}", userDTO);
+        log.info("입력값 : {}", userDto);
         return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
 
     @PutMapping("/report")
     @Operation(summary = "회원신고 등록")
     public Response<UserReportDto> editReport(
-            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDto userReportDTO
+            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDto userReportDto
     ) {
-        log.info("입력값 : {}", userReportDTO);
-        return Response.success("회원 신고 완료", userService.saveUserReport(userReportDTO));
+        log.info("입력값 : {}", userReportDto);
+        return Response.success("회원 신고 완료", userService.saveUserReport(userReportDto));
     }
 
 }

@@ -53,4 +53,14 @@ public class AdminController {
 
         return Response.success("신고처리 완료", adminService.reportStatusUpdate(reportRequestDTO));
     }
+
+    @PostMapping("/userReports")
+    @Operation(summary = "해당 유저 신고목록 조회")
+    public Response<ReportResponseDtoList> userReports(
+            @RequestBody @Valid @Parameter(description = "회원 신고 정보") ReportRequestDto reportRequestDTO,
+            @AuthenticationPrincipal LoginUser loginUser) {
+        if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
+
+        return Response.success("신고목록 조회 완료", adminService.userReports(reportRequestDTO));
+    }
 }

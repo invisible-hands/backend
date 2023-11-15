@@ -57,6 +57,27 @@ public class AdminService {
         return ReportResponseDto.entityToDTO(report);
     }
 
+    //특정 유저의 신고한 내역 조회
+    @Transactional(readOnly = true)
+    public ReportResponseDtoList userReports(ReportRequestDto reportRequestDTO) {
+        //1. 전체조회
+        List<Report> reports = reportRepository.findAll();
+
+        //2. 해당 유저가 신고한 건수만 추출
+        reports.stream()
+                .filter(r -> !r.getUser().getId().equals(reportRequestDTO.getId()))
+                .toList()
+                .forEach(reports::remove);
+
+        List<ReportResponseDto> reportResponseDTOS = reports.stream()
+                .map(ReportResponseDto::entityToDTO)
+                .toList();
+
+        return ReportResponseDtoList.builder()
+                .reportResDTOS(reportResponseDTOS)
+                .build();
+    }
+
     //관리자 권한체크
     public boolean roleCheck(LoginUser loginUser) {
         List<String> authorityValues = loginUser.getAuthorities().stream()
