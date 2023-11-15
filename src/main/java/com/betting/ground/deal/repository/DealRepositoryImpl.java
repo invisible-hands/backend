@@ -193,7 +193,7 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 				auction.auctionStatus
 			))
 			.from(auction)
-			.leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id), bidHistory.price.eq(getMaxPrice(userId)))
+			.leftJoin(bidHistory).on(bidHistory.id.eq(getMaxPrice(userId)))
 			.where(
 				auction.id.in(ids)
 			)
@@ -207,13 +207,14 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 
 	private static JPQLQuery<Long> getMaxPrice(Long userId) {
 		return JPAExpressions.select(
-				bidHistory.price.max()
+				bidHistory.id.max()
 			)
 			.from(bidHistory)
 			.where(
 				bidHistory.bidderId.eq(userId),
 				bidHistory.auction.id.eq(auction.id)
-			);
+			)
+			.groupBy(bidHistory.auction.id);
 	}
 
 	private BooleanExpression bidPeriodTime(LocalDate startDate, LocalDate endDate) {
@@ -248,7 +249,7 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 				auction.auctionStatus
 			))
 			.from(auction)
-			.leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id), bidHistory.price.eq(getMaxPrice(userId)))
+			.leftJoin(bidHistory).on(bidHistory.id.eq(getMaxPrice(userId)))
 			.where(
 				auction.id.in(ids),
 				auctionStatusEq(AuctionStatus.AUCTION_PROGRESS)
@@ -294,7 +295,7 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 				auction.auctionStatus
 			))
 			.from(auction)
-			.leftJoin(bidHistory).on(bidHistory.auction.id.eq(auction.id), bidHistory.price.eq(getMaxPrice(userId)))
+			.leftJoin(bidHistory).on(bidHistory.id.eq(getMaxPrice(userId)))
 			.where(
 				auction.id.in(ids),
 				auctionStatusNe(AuctionStatus.AUCTION_PROGRESS)
