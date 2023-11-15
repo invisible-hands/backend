@@ -64,15 +64,22 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			)
 			.from(auction);
 
-		if (Boolean.TRUE.equals(progressFilter)) {
-			query.where(auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS));
-		}
+		setAuctionStatusFilter(progressFilter, query, countQuery);
+
 		setSorting(pageable, query, countQuery);
 
 		List<AuctionInfo> auctions = query.fetch();
 		Long count = countQuery.fetchOne();
 
 		return new PageImpl<>(auctions, pageable, count);
+	}
+
+	private void setAuctionStatusFilter(Boolean progressFilter, JPAQuery<AuctionInfo> query,
+		JPAQuery<Long> countQuery) {
+		if (Boolean.TRUE.equals(progressFilter)) {
+			query.where(auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS));
+			countQuery.where(auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS));
+		}
 	}
 
 	private void setSorting(Pageable pageable, JPAQuery<AuctionInfo> query, JPAQuery<Long> countQuery) {
