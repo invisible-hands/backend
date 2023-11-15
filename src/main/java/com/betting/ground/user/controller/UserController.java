@@ -96,7 +96,7 @@ public class UserController {
     }
 
     @PutMapping("/role")
-    @Operation(summary = "활성 유저 전환 가입일은 (yyyy-MM-dd HH:mm:ss)로 요청해주세요")
+    @Operation(summary = "활성 유저 전환")
     public Response<LoginResponseDto> editRole(
             @RequestBody @Valid @Parameter(description = "유저 정보") UserDto userDto,
             @AuthenticationPrincipal LoginUser loginUser
