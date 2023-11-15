@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,16 +62,22 @@ public class AdminService {
     //특정 유저의 신고한 내역 조회
     @Transactional(readOnly = true)
     public ReportResponseDtoList userReports(ReportRequestDto reportRequestDto) {
-        //전체 조회후 해당 userID로 신고한 건수만 추출
-        List<Report> reports = reportRepository.findAllByUserId(reportRequestDto.getId());
+        Optional<List<Report>> optionalReports = reportRepository.findAllByUserId(reportRequestDto.getId());
 
-        List<ReportResponseDto> reportResponseDtos = reports.stream()
-                .map(ReportResponseDto::entityToDTO)
-                .toList();
+        if (optionalReports.isPresent()) {
+            List<ReportResponseDto> reportResponseDtos = optionalReports.get().stream()
+                    .map(ReportResponseDto::entityToDTO)
+                    .toList();
 
-        return ReportResponseDtoList.builder()
-                .reportResDtos(reportResponseDtos)
-                .build();
+            return ReportResponseDtoList.builder()
+                    .reportResDtos(reportResponseDtos)
+                    .build();
+        } else {
+            // Handle the case where no reports are found - return an empty list
+            return ReportResponseDtoList.builder()
+                    .reportResDtos(Collections.emptyList())
+                    .build();
+        }
     }
 
     //관리자 권한체크
