@@ -4,7 +4,9 @@ import com.betting.ground.admin.domain.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    List<Report> searchReportById(Long id);
+    //userID로 조회
+    List<Report> findAllByUserId(Long userId);
 }

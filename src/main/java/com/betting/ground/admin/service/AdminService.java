@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +29,12 @@ public class AdminService {
     public ReportResponseDtoList searchReport() {
         List<Report> reports = reportRepository.findAll();
 
-        List<ReportResponseDto> reportResponseDTOS = reports.stream()
+        List<ReportResponseDto> reportResponseDtos = reports.stream()
                 .map(ReportResponseDto::entityToDTO)
                 .toList();
 
         return ReportResponseDtoList.builder()
-                .reportResDTOS(reportResponseDTOS)
+                .reportResDtos(reportResponseDtos)
                 .build();
     }
 
@@ -47,8 +48,8 @@ public class AdminService {
     }
 
     //신고 완료 처리
-    public ReportResponseDto reportStatusUpdate(ReportRequestDto reportRequestDTO) {
-        Report report = reportRepository.findById(reportRequestDTO.getId())
+    public ReportResponseDto reportStatusUpdate(ReportRequestDto reportRequestDto) {
+        Report report = reportRepository.findById(reportRequestDto.getId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
 
         //변경 감지
@@ -59,22 +60,16 @@ public class AdminService {
 
     //특정 유저의 신고한 내역 조회
     @Transactional(readOnly = true)
-    public ReportResponseDtoList userReports(ReportRequestDto reportRequestDTO) {
-        //1. 전체조회
-        List<Report> reports = reportRepository.findAll();
+    public ReportResponseDtoList userReports(ReportRequestDto reportRequestDto) {
+        //전체 조회후 해당 userID로 신고한 건수만 추출
+        List<Report> reports = reportRepository.findAllByUserId(reportRequestDto.getId());
 
-        //2. 해당 유저가 신고한 건수만 추출
-        reports.stream()
-                .filter(r -> !r.getUser().getId().equals(reportRequestDTO.getId()))
-                .toList()
-                .forEach(reports::remove);
-
-        List<ReportResponseDto> reportResponseDTOS = reports.stream()
+        List<ReportResponseDto> reportResponseDtos = reports.stream()
                 .map(ReportResponseDto::entityToDTO)
                 .toList();
 
         return ReportResponseDtoList.builder()
-                .reportResDTOS(reportResponseDTOS)
+                .reportResDtos(reportResponseDtos)
                 .build();
     }
 
