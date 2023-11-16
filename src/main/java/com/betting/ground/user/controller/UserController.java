@@ -105,13 +105,15 @@ public class UserController {
         return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
 
-    @PutMapping("/report")
+    @PostMapping("/auction/{auctionId}/report")
     @Operation(summary = "회원신고 등록")
-    public Response<UserReportDto> editReport(
+    public Response<UserReportDto> createReport(
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal LoginUser loginUser,
             @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDto userReportDto
     ) {
         log.info("입력값 : {}", userReportDto);
-        return Response.success("회원 신고 완료", userService.saveUserReport(userReportDto));
+        return Response.success("회원 신고 완료", userService.saveUserReport(loginUser.getUser().getId(), auctionId, userReportDto));
     }
 
 }

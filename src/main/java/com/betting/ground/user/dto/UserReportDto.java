@@ -26,14 +26,6 @@ public class UserReportDto {
     @Schema(description = "신고 설명", example = "영희라는 유저가 마약을 싸게 팔고 있습니다.")
     private String reportDescription;
 
-    @NotNull(message = "경매글 id")
-    @Schema(description = "auctionId", example = "3")
-    private Long auctionId;
-
-    @NotNull(message = "신고자 id")
-    @Schema(description = "userId", example = "3")
-    private Long userId;
-
     //dto -> entity
     public static Report toReportEntity(UserReportDto userReportDTO, Auction auction, User user) {
         return Report.builder()

@@ -1,6 +1,5 @@
 package com.betting.ground.admin.controller;
 
-import com.betting.ground.admin.dto.ReportRequestDto;
 import com.betting.ground.admin.dto.ReportResponseDto;
 import com.betting.ground.admin.dto.ReportResponseDtoList;
 import com.betting.ground.admin.service.AdminService;
@@ -26,41 +25,37 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping("/reportList")
+    @GetMapping("/report")
     @Operation(summary = "신고 전체조회")
-    public Response<ReportResponseDtoList> getReportList(@AuthenticationPrincipal LoginUser loginUser) {
-        if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
+    public Response<ReportResponseDtoList> getReportList(
+
+    ) {
 
         return Response.success("신고내역 전체 조회 완료", adminService.searchReport());
     }
 
-    @GetMapping("/report/{id}")
+    @GetMapping("/report/{reportId}")
     @Operation(summary = "신고 상세조회")
     public Response<ReportResponseDto> getReport(
-            @PathVariable Long id,
-            @AuthenticationPrincipal LoginUser loginUser) {
-        if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
+            @PathVariable Long reportId) {
 
-        return Response.success("해당 신고내역 조회 완료", adminService.detailReport(id));
+        return Response.success("해당 신고내역 조회 완료", adminService.detailReport(reportId));
     }
 
-    @PutMapping("/reportComplete")
+    @PutMapping("/report/{reportId}/complete")
     @Operation(summary = "신고 처리완료")
-    public Response<ReportResponseDto> completeReport(
-            @RequestBody @Valid @Parameter(description = "회원 신고 정보") ReportRequestDto reportRequestDto,
-            @AuthenticationPrincipal LoginUser loginUser) {
-        if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
+    public Response<Void> completeReport(
+            @PathVariable long reportId) {
+        adminService.reportStatusUpdate(reportId);
 
-        return Response.success("신고처리 완료", adminService.reportStatusUpdate(reportRequestDto));
+        return Response.success("신고처리 완료", null);
     }
 
-    @PostMapping("/userReports")
+    @PostMapping("/report/user/{userId}")
     @Operation(summary = "해당 유저 신고목록 조회")
     public Response<ReportResponseDtoList> userReports(
-            @RequestBody @Valid @Parameter(description = "회원 신고 정보") ReportRequestDto reportRequestDto,
-            @AuthenticationPrincipal LoginUser loginUser) {
-        if(adminService.roleCheck(loginUser)) throw new GlobalException(ErrorCode.NOT_ADMIN_ROLE);
+            @PathVariable long userId) {
 
-        return Response.success("신고목록 조회 완료", adminService.userReports(reportRequestDto));
+        return Response.success("신고목록 조회 완료", adminService.userReports(userId));
     }
 }

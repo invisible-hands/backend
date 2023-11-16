@@ -20,7 +20,6 @@ public enum ErrorCode {
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치 합니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     USER_ALREADY_ACTIVE(HttpStatus.BAD_REQUEST, "이미 활성된 유저입니다."),
-    NOT_ADMIN_ROLE(HttpStatus.BAD_REQUEST, "유저 권한은 조회할 수 없습니다."),
 
     AUCTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재 하지 않는 게시글입니다."),
     AUCTION_SOLD_OUT(HttpStatus.BAD_REQUEST,"이미 상품이 판매되었습니다."),

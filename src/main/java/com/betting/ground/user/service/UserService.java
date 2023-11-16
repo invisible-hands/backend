@@ -130,13 +130,13 @@ public class UserService {
     }
 
     //게시글 신고하기
-    public UserReportDto saveUserReport(UserReportDto userReportDTO) {
+    public UserReportDto saveUserReport(Long userId, Long auctionId, UserReportDto userReportDTO) {
         //경매글 조회
-        Auction auction = auctionRepository.findById(userReportDTO.getAuctionId())
+        Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.AUCTION_NOT_FOUND));
 
         //신고자 정보 조회
-        User user = userRepository.findById(userReportDTO.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
         //유저정보 조회
