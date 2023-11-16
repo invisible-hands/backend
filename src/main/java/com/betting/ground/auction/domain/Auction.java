@@ -70,6 +70,6 @@ public class Auction {
         this.auctionStatus = AUCTION_PROGRESS;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.endAuctionTime = LocalDateTime.now().plusMinutes(5L + duration.getTime());
+        this.endAuctionTime = LocalDateTime.now().plusMinutes(5L).plusHours(duration.getTime());
     }
 }
