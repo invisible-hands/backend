@@ -62,22 +62,16 @@ public class AdminService {
     //특정 유저의 신고한 내역 조회
     @Transactional(readOnly = true)
     public ReportResponseDtoList userReports(ReportRequestDto reportRequestDto) {
-        Optional<List<Report>> optionalReports = reportRepository.findAllByUserId(reportRequestDto.getId());
+        //전체 조회후 해당 userID로 신고한 건수만 추출
+        List<Report> reports = reportRepository.findAllByUserId(reportRequestDto.getId());
 
-        if (optionalReports.isPresent()) {
-            List<ReportResponseDto> reportResponseDtos = optionalReports.get().stream()
-                    .map(ReportResponseDto::entityToDTO)
-                    .toList();
+        List<ReportResponseDto> reportResponseDtos = reports.stream()
+                .map(ReportResponseDto::entityToDTO)
+                .toList();
 
-            return ReportResponseDtoList.builder()
-                    .reportResDtos(reportResponseDtos)
-                    .build();
-        } else {
-            // Handle the case where no reports are found - return an empty list
-            return ReportResponseDtoList.builder()
-                    .reportResDtos(Collections.emptyList())
-                    .build();
-        }
+        return ReportResponseDtoList.builder()
+                .reportResDtos(reportResponseDtos)
+                .build();
     }
 
     //관리자 권한체크

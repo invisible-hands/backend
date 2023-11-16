@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
     //userID로 조회
-    Optional<List<Report>> findAllByUserId(Long userId);
+    List<Report>findAllByUserId(Long userId);
 }
