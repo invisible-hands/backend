@@ -9,6 +9,9 @@ import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.domain.Role;
 import com.betting.ground.user.dto.login.LoginUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +27,11 @@ public class AdminService {
 
     //신고내역 전체 조회(게시판)
     @Transactional(readOnly = true)
-    public ReportResponseDtoList searchReport() {
-        List<Report> reports = reportRepository.findAll();
+    public ReportResponseDtoList searchReport(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Report> reportPage = reportRepository.findAll(pageable);
 
-        List<ReportResponseDto> reportResponseDtos = reports.stream()
+        List<ReportResponseDto> reportResponseDtos = reportPage.getContent().stream()
                 .map(ReportResponseDto::entityToDTO)
                 .toList();
 
@@ -36,7 +40,7 @@ public class AdminService {
                 .build();
     }
 
-    //신고 내용확인
+    //신고 상세조회
     @Transactional(readOnly = true)
     public ReportResponseDto detailReport(Long reportId) {
         Report report = reportRepository.findById(reportId)
@@ -45,7 +49,7 @@ public class AdminService {
         return ReportResponseDto.entityToDTO(report);
     }
 
-    //신고 완료 처리
+    //신고 완료 처리 (Progress -> Complete)
     public void reportStatusUpdate(Long reportId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.BAD_REQUEST));
@@ -55,7 +59,7 @@ public class AdminService {
         reportRepository.save(report);
     }
 
-    //특정 유저의 신고한 내역 조회
+    //특정 유저가 신고한 내역 조회
     @Transactional(readOnly = true)
     public ReportResponseDtoList userReports(Long userId) {
         //전체 조회후 해당 userID로 신고한 건수만 추출

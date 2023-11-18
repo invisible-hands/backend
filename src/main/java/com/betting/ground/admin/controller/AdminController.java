@@ -28,11 +28,12 @@ public class AdminController {
     @GetMapping("/report")
     @Operation(summary = "신고 전체조회")
     public Response<ReportResponseDtoList> getReportList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-    ) {
-
-        return Response.success("신고내역 전체 조회 완료", adminService.searchReport());
+        return Response.success("신고내역 전체 조회 완료", adminService.searchReport(page, size));
     }
+
 
     @GetMapping("/report/{reportId}")
     @Operation(summary = "신고 상세조회")
