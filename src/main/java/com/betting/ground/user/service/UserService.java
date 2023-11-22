@@ -168,7 +168,7 @@ public class UserService {
 		MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
 		tokenParams.add("grant_type", "authorization_code");
 		tokenParams.add("client_id", "962fb2b8640dcff588a7cf43ac11a64b");
-		tokenParams.add("redirect_uri", "https://k80d6e2c01ef6a.user-app.krampoline.com/redirection");
+		tokenParams.add("redirect_uri", "https://k1e3db7fd0a95a.user-app.krampoline.com/redirection");
 		//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/login/kakao");
 		//        tokenParams.add("redirect_uri", "http://localhost:8080/api/user/code");
 		//        tokenParams.add("redirect_uri", "http://ka1425de5708ea.user-app.krampoline.com/api/user/code");
