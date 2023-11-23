@@ -5,9 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.betting.ground.common.exception.ErrorCode;
+import com.betting.ground.common.exception.GlobalException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -111,6 +115,13 @@ public class AuctionController {
 		@RequestPart AuctionCreateRequest request,
 		@RequestPart(required = false) List<MultipartFile> images
 	) throws IOException {
+
+		if (request.getStartPrice() != null && request.getInstantPrice() != null) {
+			if (request.getInstantPrice() < request.getStartPrice()) {
+				throw new GlobalException(ErrorCode.INSTANT_PRICE_LESS_THAN_START_PRICE);
+			}
+		}
+
 		CreateAuctionDto createAuctionDto = request.toDto(images);
 		auctionService.create(loginUser.getUser().getId(), createAuctionDto);
 

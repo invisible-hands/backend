@@ -33,7 +33,7 @@ public enum ErrorCode {
 
     NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
     CAN_NOT_PURCHASE(HttpStatus.BAD_REQUEST, "본인이 올린 경매글은 구매할 수 없습니다."),
-    CAN_NOT_DELETE(HttpStatus.BAD_REQUEST, "본인이 올린 경매글은 삭제할 수 없습니다."),
+    CAN_NOT_DELETE(HttpStatus.BAD_REQUEST, "본인이 올리지 않은 경매글은 삭제할 수 없습니다."),
     ALREADY_TOP_PRICE_BIDDER(HttpStatus.BAD_REQUEST, "이미 최고 입찰가로 참여하셨습니다."),
     EXCEED_INSTANT_PRICE(HttpStatus.BAD_REQUEST, "즉시 구매가를 초과하였습니다."),
     LESS_THEN_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "입찰가가 현재가보다 작습니다"),
@@ -42,8 +42,8 @@ public enum ErrorCode {
     NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 부족합니다."),
     NOT_FOUND_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
     CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
-    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다.")
-    ;
+    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다."),
+    INSTANT_PRICE_LESS_THAN_START_PRICE(HttpStatus.BAD_REQUEST, "즉시구매가가 경매시작가보다 낮습니다.");
 
 
     private final HttpStatus status;
