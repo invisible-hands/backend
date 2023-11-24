@@ -159,7 +159,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.endAuctionTime,
 				auction.duration,
 				auction.auctionStatus,
-				bidHistory.count(),
+				bidHistory.bidderId.countDistinct(),
 				view.cnt
 			))
 			.from(auction)
