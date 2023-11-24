@@ -164,7 +164,7 @@ public class AuctionService {
 		);
 
 		// 본인이 작성한 경매글이 아니면 삭제 불가
-		if (auction.getUser().getId().equals(userId)) {
+		if (!auction.getUser().getId().equals(userId)) {
 			throw new GlobalException(ErrorCode.CAN_NOT_DELETE);
 		}
 
