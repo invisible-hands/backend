@@ -116,10 +116,8 @@ public class AuctionController {
 		@RequestPart(required = false) List<MultipartFile> images
 	) throws IOException {
 
-		if (request.getStartPrice() != null && request.getInstantPrice() != null) {
-			if (request.getInstantPrice() < request.getStartPrice()) {
-				throw new GlobalException(INSTANT_PRICE_LESS_THAN_START_PRICE);
-			}
+		if (request.getInstantPrice() < request.getStartPrice()) {
+			throw new GlobalException(INSTANT_PRICE_LESS_THAN_START_PRICE);
 		}
 
 		CreateAuctionDto createAuctionDto = request.toDto(images);
