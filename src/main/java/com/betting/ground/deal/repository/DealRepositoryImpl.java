@@ -128,6 +128,45 @@ public class DealRepositoryImpl implements DealRepositoryCustom {
 		return new PageImpl<>(purchases, pageable, count);
 	}
 
+	@Override
+	public PageImpl<PurchaseInfo> getWaitingPurchases(Long userId, Pageable pageable, LocalDate startDate,
+		LocalDate endDate) {
+		List<PurchaseInfo> purchases = jpaQueryFactory.select(new QPurchaseInfo(
+				deal.auction.id,
+				deal.id,
+				getAuctionImage(),
+				auction.title,
+				auction.createdAt,
+				auction.duration,
+				deal.dealTime,
+				deal.dealPrice,
+				deal.dealStatus
+			))
+			.from(deal)
+			.leftJoin(auction).on(deal.auction.id.eq(auction.id))
+			.where(
+				deal.buyerId.eq(userId),
+				dealPeriodDate(startDate, endDate),
+				dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING)
+			)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.orderBy(deal.dealTime.desc())
+			.fetch();
+
+		Long count = jpaQueryFactory
+			.select(deal.countDistinct())
+			.from(deal)
+			.where(
+				deal.buyerId.eq(userId),
+				dealPeriodDate(startDate, endDate),
+				dealStatusEq(DealStatus.PURCHASE_COMPLETE_WAITING)
+			)
+			.fetchOne();
+
+		return new PageImpl<>(purchases, pageable, count);
+	}
+
 	private BooleanExpression dealStatusEq(DealStatus status) {
 		return status != null ? deal.dealStatus.eq(status) : null;
 	}
