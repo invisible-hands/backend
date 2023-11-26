@@ -200,7 +200,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				.distinct()
 				.from(auction)
 				.leftJoin(auction.user, user)
-				.where(user.id.eq(sellerId))
+				.where(user.id.eq(sellerId),
+					auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
