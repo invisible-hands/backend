@@ -1,5 +1,13 @@
 package com.betting.ground.kakaopay.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.betting.ground.common.dto.Response;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
@@ -8,12 +16,10 @@ import com.betting.ground.kakaopay.dto.response.KakaoApproveResponse;
 import com.betting.ground.kakaopay.dto.response.KakaoReadyResponse;
 import com.betting.ground.kakaopay.service.KakaoPayService;
 import com.betting.ground.user.dto.login.LoginUser;
+
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,31 +27,30 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "카카오 페이 결제", description = "카카오 결제 요청")
 public class KakaoPayController {
 
-    private final KakaoPayService kakaoPayService;
+	private final KakaoPayService kakaoPayService;
 
-    @PostMapping("/ready")
-    public KakaoReadyResponse payReady(
-            @RequestBody KakaoReadyRequest request,
-            @AuthenticationPrincipal LoginUser loginUser,
-            HttpServletRequest http
-    ){
-        return kakaoPayService.kakaoPayReady(http, request, loginUser.getUser().getId());
-    }
+	@PostMapping("/ready")
+	public KakaoReadyResponse payReady(
+		@RequestBody KakaoReadyRequest request,
+		@AuthenticationPrincipal LoginUser loginUser
+	) {
+		return kakaoPayService.kakaoPayReady(request, loginUser.getUser().getId());
+	}
 
-    @GetMapping("/success")
-    public Response<KakaoApproveResponse> afterPayRequest(@RequestParam(value = "pg_token") String pgToken) {
-        return Response.success("결제 완료", kakaoPayService.approveResponse(pgToken));
-    }
+	@GetMapping("/success")
+	public Response<KakaoApproveResponse> afterPayRequest(@RequestParam(value = "pg_token") String pgToken) {
+		return Response.success("결제 완료", kakaoPayService.approveResponse(pgToken));
+	}
 
-    @Hidden
-    @GetMapping("/cancel")
-    public void cancel() {
-        throw new GlobalException(ErrorCode.PAY_CANCEL);
-    }
+	@Hidden
+	@GetMapping("/cancel")
+	public void cancel() {
+		throw new GlobalException(ErrorCode.PAY_CANCEL);
+	}
 
-    @Hidden
-    @GetMapping("/fail")
-    public void fail() {
-        throw new GlobalException(ErrorCode.PAY_FAILED);
-    }
+	@Hidden
+	@GetMapping("/fail")
+	public void fail() {
+		throw new GlobalException(ErrorCode.PAY_FAILED);
+	}
 }
