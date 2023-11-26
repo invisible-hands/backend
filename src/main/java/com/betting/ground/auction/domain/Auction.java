@@ -57,7 +57,7 @@ public class Auction {
 	}
 
 	public boolean hasBidder() {
-		return !(bidderId == null && (this.currentPrice == this.startPrice));
+		return !(bidderId == null && (currentPrice.equals(startPrice)));
 	}
 
 	public void updateBid(Long bidderId, Long price, AuctionStatus auctionStatus) {

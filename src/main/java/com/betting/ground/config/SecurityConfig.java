@@ -97,6 +97,8 @@ public class SecurityConfig {
 				.requestMatchers("/api/delivery").hasRole("USER")
 				.requestMatchers("/api/payment/ready").hasRole("USER")
 				.requestMatchers("/api/payment/success").hasRole("USER")
+				.requestMatchers("/api/payment/cancel").hasRole("USER")
+				.requestMatchers("/api/payment/fail").hasRole("USER")
 
 				.anyRequest().authenticated()
 			).build();
