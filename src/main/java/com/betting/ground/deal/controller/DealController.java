@@ -32,11 +32,6 @@ import lombok.RequiredArgsConstructor;
 public class DealController {
 	private final DealService dealService;
 
-	@GetMapping
-	public String test(String test) {
-		return test;
-	}
-
 	@GetMapping("/purchases")
 	@Operation(summary = "구매 목록 조회")
 	public Response<PurchaseInfoResponse> getPurchaseList(
