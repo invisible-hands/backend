@@ -16,7 +16,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
+@Table(indexes = @Index(name = "idx_title_is_deleted", columnList = "title, isDeleted"))
 public class Auction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +71,7 @@ public class Auction {
 
 	@Builder
 	public Auction(String title, String content, ItemCondition itemCondition, Long startPrice, Long instantPrice,
-		Duration duration, User user) {
+		Duration duration, User user, LocalDateTime createdAt) {
 		this.title = title;
 		this.content = content;
 		this.itemCondition = itemCondition;
@@ -76,10 +79,9 @@ public class Auction {
 		this.instantPrice = instantPrice;
 		this.duration = duration;
 		this.user = user;
-
 		this.currentPrice = startPrice;
 		this.auctionStatus = AUCTION_PROGRESS;
-		this.createdAt = LocalDateTime.now();
+		this.createdAt = createdAt;
 		this.updatedAt = LocalDateTime.now();
 		this.endAuctionTime = LocalDateTime.now().plusMinutes(5L).plusHours(duration.getTime());
 	}

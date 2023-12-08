@@ -82,7 +82,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/api/auction/{auctionId}").permitAll()
 				.requestMatchers("/api/auction/{auctionId}/seller").permitAll()
 				.requestMatchers("/api/auction/{auctionId}/bidHistory").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/auction").permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/auction/**").permitAll()
 				.requestMatchers("/api/auction/search").permitAll()
 				.requestMatchers("/api/schedule/**").permitAll()
 				.requestMatchers("/swagger-ui.html").permitAll()

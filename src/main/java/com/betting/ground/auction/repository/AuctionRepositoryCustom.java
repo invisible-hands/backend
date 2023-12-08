@@ -13,13 +13,13 @@ import com.betting.ground.user.dto.login.LoginUser;
 
 public interface AuctionRepositoryCustom {
 
-    PageImpl<AuctionInfo> findItems(Pageable pageable, Boolean progressFilter);
+	PageImpl<AuctionInfo> findItems(Pageable pageable, Boolean progressFilter);
 
-    PageImpl<AuctionInfo> findItemByKeywordByOrderByCreatedAtDesc(String keyword, Pageable pageable);
+	PageImpl<AuctionInfo> findItemByKeywordByOrderByCreatedAtDesc(String keyword, Pageable pageable);
 
-    ItemDetailDto findDetailAuctionById(LoginUser loginUser, Long auctionId);
+	ItemDetailDto findDetailAuctionById(LoginUser loginUser, Long auctionId);
 
-    PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);
+	PageImpl<SellerItemDto> findSellerItemBySellerId(Long sellerId, Pageable pageable);
 
-    List<AuctionStatus> getAuctionByBidderId(Long userId);
+	List<AuctionStatus> getAuctionByBidderId(Long userId);
 }
