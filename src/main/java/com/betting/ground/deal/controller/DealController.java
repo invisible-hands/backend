@@ -40,7 +40,7 @@ public class DealController {
 	@GetMapping("/purchases")
 	@Operation(summary = "구매 목록 조회")
 	public Response<PurchaseInfoResponse> getPurchaseList(
-		@Parameter(description = "all/progress/complete")
+		@Parameter(description = "all/progress/waiting/complete")
 		@RequestParam(defaultValue = "all") String status,
 		@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
 		@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
@@ -53,6 +53,8 @@ public class DealController {
 			response = dealService.getAllPurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
 		else if (status.equals("progress"))
 			response = dealService.getProgressPurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
+		else if (status.equals("waiting"))
+			response = dealService.getWaitingPurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
 		else
 			response = dealService.getCompletePurchases(loginUser.getUser().getId(), pageable, startDate, endDate);
 

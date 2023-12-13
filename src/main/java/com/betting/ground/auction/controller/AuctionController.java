@@ -1,14 +1,15 @@
 package com.betting.ground.auction.controller;
 
+import static com.betting.ground.common.exception.ErrorCode.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.betting.ground.common.exception.ErrorCode;
-import com.betting.ground.common.exception.GlobalException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,17 +32,15 @@ import com.betting.ground.auction.dto.response.ItemDetailDto;
 import com.betting.ground.auction.dto.response.ItemResponse;
 import com.betting.ground.auction.service.AuctionService;
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.login.LoginUser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-import static com.betting.ground.common.exception.ErrorCode.INSTANT_PRICE_LESS_THAN_START_PRICE;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,19 +59,26 @@ public class AuctionController {
 		HttpServletRequest request,
 		HttpServletResponse response
 	) {
-		Cookie cookie;
+		String uuid = UUID.randomUUID().toString();
+
+		ResponseCookie responseCookie = ResponseCookie.from("UserUUID", uuid)
+			.maxAge(24 * 60 * 60)
+			.httpOnly(false)
+			.sameSite("None")
+			.secure(true)
+			.path("/")
+			.build();
+
 		if (request.getCookies() == null) {
-			cookie = new Cookie("UserUUID", UUID.randomUUID().toString());
+			response.setHeader("Set-Cookie", responseCookie.toString());
 		} else {
-			cookie = Arrays.stream(request.getCookies())
+			uuid = Arrays.stream(request.getCookies())
 				.filter(c -> c.getName().equals("UserUUID"))
-				.findFirst().orElse(
-					new Cookie("UserUUID", UUID.randomUUID().toString())
-				);
+				.map(c -> c.getValue())
+				.findFirst().orElse(uuid);
 		}
-		cookie.setMaxAge(24 * 60 * 60);
-		response.addCookie(cookie);
-		return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, cookie.getValue()));
+
+		return Response.success("해당 경매글 보기 성공", auctionService.getItemDetail(loginUser, auctionId, uuid));
 	}
 
 	@GetMapping("/{auctionId}/bidHistory")

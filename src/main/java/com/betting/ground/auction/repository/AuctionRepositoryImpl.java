@@ -159,7 +159,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.endAuctionTime,
 				auction.duration,
 				auction.auctionStatus,
-				bidHistory.count(),
+				bidHistory.bidderId.countDistinct(),
 				view.cnt
 			))
 			.from(auction)
@@ -201,7 +201,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				.from(auction)
 				.leftJoin(auction.user, user)
 				.where(user.id.eq(sellerId),
-						auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
+					auction.auctionStatus.eq(AuctionStatus.AUCTION_PROGRESS))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();

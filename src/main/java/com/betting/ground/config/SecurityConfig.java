@@ -100,6 +100,8 @@ public class SecurityConfig {
 				.requestMatchers("/api/delivery").hasRole("USER")
 				.requestMatchers("/api/payment/ready").hasRole("USER")
 				.requestMatchers("/api/payment/success").hasRole("USER")
+				.requestMatchers("/api/payment/cancel").hasRole("USER")
+				.requestMatchers("/api/payment/fail").hasRole("USER")
 
 				.anyRequest().authenticated()
 			).build();
@@ -111,6 +113,8 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin("http://localhost:5173");
+		config.addAllowedOrigin("https://k1e3db7fd0a95a.user-app.krampoline.com");
+		config.addAllowedOrigin("https://betting-ground.netlify.app");
 		config.addExposedHeader("*");
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");

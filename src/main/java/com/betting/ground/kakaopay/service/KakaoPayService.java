@@ -19,7 +19,6 @@ import com.betting.ground.user.domain.User;
 import com.betting.ground.user.repository.PaymentRepository;
 import com.betting.ground.user.repository.UserRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,8 +36,7 @@ public class KakaoPayService {
 	private static final String cid = "TC0ONETIME";
 	private KakaoReadyResponse kakaoReady;
 
-	public KakaoReadyResponse kakaoPayReady(HttpServletRequest http, KakaoReadyRequest request, Long userId) {
-		// String path = http.getScheme() + "://" + http.getServerName() + ":" + 5173;
+	public KakaoReadyResponse kakaoPayReady(KakaoReadyRequest request, Long userId) {
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 		parameters.add("cid", cid);
 		parameters.add("partner_order_id", "partner_order_id");
