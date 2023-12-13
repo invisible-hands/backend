@@ -46,9 +46,8 @@ public enum ErrorCode {
     NOT_FOUND_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
     CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
   
-    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다.");
+    NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다."),
     INSTANT_PRICE_LESS_THAN_START_PRICE(HttpStatus.BAD_REQUEST, "즉시구매가가 경매시작가보다 낮습니다.");
-    ;
 
 
     private final HttpStatus status;
