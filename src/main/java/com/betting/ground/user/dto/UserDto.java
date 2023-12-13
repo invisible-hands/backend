@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserDto {
 
     //프로필조회
     @NotBlank
@@ -49,7 +49,7 @@ public class UserDTO {
     private String detailAddress;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    @Schema(description = "가입일", example = "2023-10-20")
+    @Schema(description = "가입일", example = "2023-10-20 19:54:00", type="string")
     private LocalDateTime registerDate;
 
     @Schema(description = "가상머니", example = "20000")
@@ -64,7 +64,7 @@ public class UserDTO {
     @Schema(description = "권한", example = "role")
     private String role;
 
-    public UserDTO(User user) {
+    public UserDto(User user) {
         this.nickname = user.getNickname();
         this.profileImage = user.getProfileImage();
         this.bankName = user.getBankInfo() != null ? user.getBankInfo().getBankName() : null;
