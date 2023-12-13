@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAddressDTO {
+public class UserAddressDto {
     //주소 등록,수정
     @NotNull(message = "도로명주소를 입력해주세요.")
     @Schema(description = "도로명주소", example = "서울특별시 양천구 목동중앙북로 1길")

@@ -41,14 +41,16 @@ spec:
               value: "root"
             - name: SPRING_DATASOURCE_PASSWORD
               value: "1234"
+            - name: TZ
+              value: "Asia/Seoul"
           resources:
             limits:
               cpu: 500m
-            requests: 
-              cpu: 200m 
+            requests:
+              cpu: 200m
           readinessProbe:
             httpGet:
               path: /api/health
-              port: 8080 
-            initialDelaySeconds: 5 
+              port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 10

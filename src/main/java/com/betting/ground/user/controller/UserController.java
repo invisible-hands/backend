@@ -1,10 +1,10 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
-import com.betting.ground.user.dto.UserAccountDTO;
-import com.betting.ground.user.dto.UserAddressDTO;
-import com.betting.ground.user.dto.UserDTO;
-import com.betting.ground.user.dto.UserNicknameDTO;
+import com.betting.ground.user.dto.UserAccountDto;
+import com.betting.ground.user.dto.UserAddressDto;
+import com.betting.ground.user.dto.UserDto;
+import com.betting.ground.user.dto.UserNicknameDto;
 import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.service.UserService;
@@ -61,47 +61,61 @@ public class UserController {
     //프로필 관련 API
     @GetMapping
     @Operation(summary = "유저 프로필 조회")
-    public Response<UserDTO> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
+    public Response<UserDto> getProfile(@AuthenticationPrincipal LoginUser loginUser) {
         return Response.success("유저 프로필 조회 완료.", userService.selectUserProfileById(loginUser.getUser().getId()));
     }
 
     @PutMapping("/nickname")
     @Operation(summary = "닉네임 등록,수정")
-    public Response<UserNicknameDTO> editNickname(
-            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDTO userNicknameDTO,
+    public Response<UserNicknameDto> editNickname(
+            @RequestBody @Valid @Parameter(description = "유저 닉네임 정보") UserNicknameDto userNicknameDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userNicknameDTO);
-        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDTO));
+        log.info("입력값 : {}", userNicknameDto);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserNickName(loginUser.getUser().getId(), userNicknameDto));
     }
 
     @PutMapping("/account")
     @Operation(summary = "계좌 번호 등록,수정")
-    public Response<UserAccountDTO> editAccountNumber(
-            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDTO userAccountDTO,
+    public Response<UserAccountDto> editAccountNumber(
+            @RequestBody @Valid @Parameter(description = "유저 계좌 정보") UserAccountDto userAccountDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userAccountDTO);
-        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDTO));
+        log.info("입력값 : {}", userAccountDto);
+        return Response.success("처리 완료 되었습니다.", userService.updateUserAccount(loginUser.getUser().getId(), userAccountDto));
     }
 
     @PutMapping("/address")
     @Operation(summary = "주소 등록,수정")
-    public Response<UserAddressDTO> editAddress(
-            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDTO userAddressDTO,
+    public Response<UserAddressDto> editAddress(
+            @RequestBody @Valid @Parameter(description = "유저 주소 정보") UserAddressDto userAddressDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-        log.info("입력값 : {}", userAddressDTO);
-        return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDTO));
+        log.info("입력값 : {}", userAddressDto);
+        return Response.success("주소 변경 완료.", userService.updateUserAddress(loginUser.getUser().getId(), userAddressDto));
     }
 
     @PutMapping("/role")
     @Operation(summary = "활성 유저 전환")
     public Response<LoginResponseDto> editRole(
-//            @RequestBody @Valid @Parameter(description = "유저 정보") UserDTO userDTO,
+            @RequestBody @Valid @Parameter(description = "유저 정보") UserDto userDto,
             @AuthenticationPrincipal LoginUser loginUser
     ) {
-//        log.info("입력값 : {}", userDTO);
+        log.info("입력값 : {}", userDto);
         return Response.success("활성 유저 전환 완료", userService.updateUserRole(loginUser.getUser().getId()));
     }
+
+    @PostMapping("/auction/{auctionId}/report")
+    @Operation(summary = "회원신고 등록")
+    public Response<UserReportDto> createReport(
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal LoginUser loginUser,
+            @RequestBody @Valid @Parameter(description = "회원 신고 정보") UserReportDto userReportDto
+    ) {
+        log.info("입력값 : {}", userReportDto);
+        return Response.success("회원 신고 완료", userService.saveUserReport(loginUser.getUser().getId(), auctionId, userReportDto));
+    }
+
 }
+
+

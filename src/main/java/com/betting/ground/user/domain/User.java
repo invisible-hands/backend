@@ -2,8 +2,8 @@ package com.betting.ground.user.domain;
 
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
-import com.betting.ground.user.dto.UserAccountDTO;
-import com.betting.ground.user.dto.UserAddressDTO;
+import com.betting.ground.user.dto.UserAccountDto;
+import com.betting.ground.user.dto.UserAddressDto;
 import com.betting.ground.user.dto.login.KakaoProfile;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor @Builder
 @SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
@@ -45,16 +45,20 @@ public class User {
         this.nickname = nickname;
     }
 
-    public void updateBank(UserAccountDTO userAccountDTO) {
+    public void updateBank(UserAccountDto userAccountDTO) {
         this.bankInfo = new Bank(userAccountDTO);
     }
 
-    public void updateAddress(UserAddressDTO dto){
+    public void updateAddress(UserAddressDto dto){
         this.address = new Address(dto);
     }
 
     public void updateRole() {
         this.role = Role.USER;
+    }
+
+    public void updateGuest() {
+        this.role = Role.GUEST;
     }
 
     public void increaseMoney(Long money) {

@@ -1,6 +1,6 @@
 package com.betting.ground.user.domain;
 
-import com.betting.ground.user.dto.UserAddressDTO;
+import com.betting.ground.user.dto.UserAddressDto;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class Address {
     private Integer zipcode;
     private String detailAddress;
 
-    public Address(UserAddressDTO dto){
+    public Address(UserAddressDto dto){
         this.roadName = dto.getRoadName();
         this.addressName = dto.getAddressName();
         this.zipcode = dto.getZipcode();
