@@ -7,17 +7,19 @@ import com.betting.ground.auction.repository.AuctionRepository;
 import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.config.jwt.JwtUtils;
-import com.betting.ground.user.domain.Role;
+import com.betting.ground.user.domain.Role; 
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.KakaoProfile;
 import com.betting.ground.user.dto.login.LoginUser;
 import com.betting.ground.user.dto.login.OAuthToken;
-import com.betting.ground.admin.repository.ReportRepository;
+import com.betting.ground.admin.repository.ReportRepository; 
 import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import static com.betting.ground.common.exception.ErrorCode.*; 
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,15 +36,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
-import java.util.UUID;
-
-import static com.betting.ground.common.exception.ErrorCode.EXPIRED_REFRESH_TOKEN;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+
 
     private final UserRepository userRepository;
     private final AuctionRepository auctionRepository;
