@@ -47,8 +47,11 @@ public enum ErrorCode {
     CAN_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "구매 확정을 누를 수 있는 상태가 아닙니다."),
   
     NEED_IMAGES(HttpStatus.BAD_REQUEST, "이미지는 필수 입니다."),
-    INSTANT_PRICE_LESS_THAN_START_PRICE(HttpStatus.BAD_REQUEST, "즉시구매가가 경매시작가보다 낮습니다.");
-
+    INSTANT_PRICE_LESS_THAN_START_PRICE(HttpStatus.BAD_REQUEST, "즉시구매가가 경매시작가보다 낮습니다."),
+    USER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."),
+    NICKNAME_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 잘못 입력하였습니다."),
+    INVALID_NICKNAME_FIELD(HttpStatus.BAD_REQUEST, "닉네임은 공백일 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

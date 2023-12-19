@@ -10,10 +10,8 @@ import com.betting.ground.config.jwt.JwtUtils;
 import com.betting.ground.user.domain.Role; 
 import com.betting.ground.user.domain.User;
 import com.betting.ground.user.dto.*;
-import com.betting.ground.user.dto.login.KakaoProfile;
-import com.betting.ground.user.dto.login.LoginUser;
-import com.betting.ground.user.dto.login.OAuthToken;
-import com.betting.ground.admin.repository.ReportRepository; 
+import com.betting.ground.user.dto.login.*;
+import com.betting.ground.admin.repository.ReportRepository;
 import com.betting.ground.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,11 +27,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +52,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper;
+
+    private final BCryptPasswordEncoder encoder;
 
     @Value("${kakao.login.password}")
     private String password;
@@ -144,35 +146,71 @@ public class UserService {
         return userReportDTO;
     }
 
+    //로그인 관련
+    @Transactional
+    public LoginResponseDto loginV2(final UserLoginRequestDto userLoginRequestDto) {
+        User user = userRepository.findByEmail(userLoginRequestDto.getEmail())
+                .orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
 
-    public LoginResponseDto login(String code) throws JsonProcessingException {
-        // 토큰 받아오기
-        OAuthToken oAuthToken = getOAuthToken(code);
-
-        // 카카오 유저 정보 받아오기
-        KakaoProfile kakaoProfile = getKakaoProfile(oAuthToken);
-
-        // 회원 가입 됐는지 확인
-        if (!userRepository.existsByEmail(kakaoProfile.getKakao_account().getEmail())) {
-            // 회원 가입
-            userRepository.save(new User(kakaoProfile, passwordEncoder.encode(password)));
+        if (!encoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
+            throw new GlobalException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // 로그인
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(kakaoProfile.getKakao_account().getEmail(), password));
+        return authenticateAndGenerateTokens(userLoginRequestDto.getEmail(), userLoginRequestDto.getPassword());
+    }
+
+    @Transactional
+    public LoginResponseDto signUp(final UserSignUpRequestDto userSignUpRequestDto) {
+        checkIfAlreadySignedUp(userSignUpRequestDto);
+        String originalPassword = userSignUpRequestDto.getPassword();
+        userSignUpRequestDto.setPassword(encoder.encode(originalPassword));
+        final User user = User.createUser(userSignUpRequestDto);
+
+        User savedUser = userRepository.save(user);
+
+        return authenticateAndGenerateTokens(savedUser.getEmail(), originalPassword);
+    }
+
+    private LoginResponseDto authenticateAndGenerateTokens(String email, String password) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // 엑세스 토큰 생성
-        String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
-
-        // 리프레시 토큰 생성
+        final String accessToken = jwtUtils.generateAccessTokenFromLoginUser(loginUser);
         RefreshToken refreshToken = new RefreshToken(loginUser, UUID.randomUUID().toString());
         refreshTokenRepository.save(refreshToken);
-
         return new LoginResponseDto(loginUser.getUser(), accessToken, refreshToken.getRefreshToken());
     }
+
+    private void checkIfAlreadySignedUp(UserSignUpRequestDto userSignUpRequestDto) {
+        userRepository.findByEmail(userSignUpRequestDto.getEmail()).ifPresent(it -> {
+            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
+        });
+
+        userRepository.findByNickname(userSignUpRequestDto.getNickname()).ifPresent(it -> {
+            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
+        });
+    }
+
+    //회원탈퇴
+    @Transactional
+    public void deleteUser(LoginUser loginUser) {
+        User user = loginUser.getUser();
+        userRepository.delete(user);
+    }
+
+    //닉네임중복확인
+    @Transactional(readOnly = true)
+    public void checkNickname(String nickname) {
+        userRepository.findByNickname(nickname).ifPresent(it -> {
+            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
+        });
+    }
+
 
     private OAuthToken getOAuthToken(String code) throws JsonProcessingException {
         RestTemplate tokenRt = new RestTemplate();
@@ -200,24 +238,6 @@ public class UserService {
         return objectMapper.readValue(response.getBody(), OAuthToken.class);
     }
 
-    private KakaoProfile getKakaoProfile(OAuthToken oAuthToken) throws JsonProcessingException {
-
-        RestTemplate profileRt = new RestTemplate();
-//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-//        factory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128)));
-//        profileRt.setRequestFactory(factory);
-
-        MultiValueMap<String, String> profileParams = new LinkedMultiValueMap<>();
-        profileParams.add("Authorization", "Bearer " + oAuthToken.getAccess_token());
-        HttpEntity<MultiValueMap<String, String>> profileRequest = new HttpEntity<>(profileParams);
-        ResponseEntity<String> infoResponse = profileRt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.GET,
-                profileRequest,
-                String.class
-        );
-        return objectMapper.readValue(infoResponse.getBody(), KakaoProfile.class);
-    }
 
     public LoginResponseDto reissue(ReissueRequestDto request) {
         String refreshToken = request.getRefreshToken();
@@ -230,5 +250,6 @@ public class UserService {
 
         return new LoginResponseDto(findRefreshToken.getLoginUser().getUser(), accessToken, refreshToken);
     }
+
 
 }

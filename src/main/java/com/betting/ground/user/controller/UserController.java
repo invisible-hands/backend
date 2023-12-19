@@ -1,12 +1,16 @@
 package com.betting.ground.user.controller;
 
 import com.betting.ground.common.dto.Response;
+import com.betting.ground.common.exception.ErrorCode;
+import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.UserAccountDto;
 import com.betting.ground.user.dto.UserAddressDto;
 import com.betting.ground.user.dto.UserDto;
 import com.betting.ground.user.dto.UserNicknameDto;
 import com.betting.ground.user.dto.*;
 import com.betting.ground.user.dto.login.LoginUser;
+import com.betting.ground.user.dto.login.UserLoginRequestDto;
+import com.betting.ground.user.dto.login.UserSignUpRequestDto;
 import com.betting.ground.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -16,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,20 +33,37 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/login/kakao")
-    @Operation(summary = "카카오 로그인")
-    public Response<LoginResponseDto> kakaoLogin(
-            @Parameter(description = "카카오에서 받은 code", example = "")
-            @RequestParam String code) throws JsonProcessingException {
+    @GetMapping("/nickname")
+    @Operation(summary = "닉네임 중복 확인")
+    public Response<String> checkNickname(@RequestParam String nickname) {
+        final String trimSafeNickname = StringUtils.trim(nickname);
+        if (StringUtils.isEmpty(trimSafeNickname)) {
+            throw new GlobalException(ErrorCode.INVALID_NICKNAME_FIELD);
+        }
+        userService.checkNickname(trimSafeNickname);
 
-        return Response.success("카카오 로그인 성공", userService.login(code));
+        return Response.success("닉네임 중복 확인 성공", trimSafeNickname);
     }
 
-    @Hidden
-    @GetMapping("/code")
-    public String code(String code) {
-        return code;
+    @PostMapping("/login")
+    @Operation(summary = "로그인")
+    public Response<LoginResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
+        return Response.success("로그인 성공", userService.loginV2(userLoginRequestDto));
     }
+
+    @PostMapping("/signup")
+    @Operation(summary = "회원가입")
+    public Response<LoginResponseDto> signUp(@Valid @RequestBody UserSignUpRequestDto userSignUpRequestDto) {
+        return Response.success("회원가입 성공", userService.signUp(userSignUpRequestDto));
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "회원탈퇴")
+    public Response<Void> deleteUser(@AuthenticationPrincipal LoginUser loginUser) {
+        userService.deleteUser(loginUser);
+        return Response.success("회원탈퇴 성공", null);
+    }
+
 
     @PostMapping("/reissue")
     @Operation(summary = "토큰 재발급")
