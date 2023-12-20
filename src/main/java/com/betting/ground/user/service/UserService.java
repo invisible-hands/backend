@@ -187,13 +187,10 @@ public class UserService {
     }
 
     private void checkIfAlreadySignedUp(UserSignUpRequestDto userSignUpRequestDto) {
-        userRepository.findByEmail(userSignUpRequestDto.getEmail()).ifPresent(it -> {
-            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
-        });
-
-        userRepository.findByNickname(userSignUpRequestDto.getNickname()).ifPresent(it -> {
-            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
-        });
+        userRepository.findByEmailOrNickname(userSignUpRequestDto.getEmail(), userSignUpRequestDto.getNickname())
+                .ifPresent(it -> {
+                    throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
+                });
     }
 
     //회원탈퇴
