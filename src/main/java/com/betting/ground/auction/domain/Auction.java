@@ -29,7 +29,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE auction SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
-@Table(indexes = @Index(name = "idx_title_is_deleted", columnList = "title, isDeleted"))
+@Table(indexes = {
+	@Index(name = "idx_title_is_deleted", columnList = "title, isDeleted"),
+	@Index(name = "idx_auction_status_is_deleted", columnList = "auctionStatus, isDeleted")
+})
 public class Auction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

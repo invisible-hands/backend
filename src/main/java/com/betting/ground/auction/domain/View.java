@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = @Index(name = "idx_auction_id", columnList = "auctionId"))
+@Table(indexes = {
+	@Index(name = "idx_auction_id_cnt", columnList = "auctionId, cnt")/*,
+	@Index(name = "idx_cnt", columnList = "cnt")*/
+})
 public class View {
 
 	@Id
