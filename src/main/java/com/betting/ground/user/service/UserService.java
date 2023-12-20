@@ -207,7 +207,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public void checkNickname(String nickname) {
         userRepository.findByNickname(nickname).ifPresent(it -> {
-            throw new GlobalException(ErrorCode.USER_ALREADY_EXIST);
+            throw new GlobalException(ErrorCode.NICKNAME_ALREADY_EXIST);
         });
     }
 
