@@ -66,14 +66,6 @@ public class User {
         this.money += money;
     }
 
-    public User(UserLoginRequestDto userLoginRequestDto, String password) {
-        this.email = userLoginRequestDto.getEmail();
-        this.password = password;
-        this.role = Role.GUEST;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
     public static User createUser(UserSignUpRequestDto userSignUpRequestDto) {
         return User.builder()
                 .email(userSignUpRequestDto.getEmail())
