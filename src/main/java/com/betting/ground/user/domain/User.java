@@ -4,7 +4,8 @@ import com.betting.ground.common.exception.ErrorCode;
 import com.betting.ground.common.exception.GlobalException;
 import com.betting.ground.user.dto.UserAccountDto;
 import com.betting.ground.user.dto.UserAddressDto;
-import com.betting.ground.user.dto.login.KakaoProfile;
+import com.betting.ground.user.dto.login.UserLoginRequestDto;
+import com.betting.ground.user.dto.login.UserSignUpRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -65,17 +66,14 @@ public class User {
         this.money += money;
     }
 
-    public User(KakaoProfile kakaoProfile, String password) {
-        this.username = kakaoProfile.getKakao_account().getName();
-        this.nickname = kakaoProfile.getKakao_account().getProfile().getNickname() + "(" + kakaoProfile.getId() + ")";
-        this.email = kakaoProfile.getKakao_account().getEmail();
-        this.password = password;
-        this.profileImage = kakaoProfile.getKakao_account().getProfile().getProfile_image_url();
-        this.phoneNumber = kakaoProfile.getKakao_account().getPhone_number();
-        this.money = 0L;
-        this.role = Role.GUEST;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    public static User createUser(UserSignUpRequestDto userSignUpRequestDto) {
+        return User.builder()
+                .email(userSignUpRequestDto.getEmail())
+                .username(userSignUpRequestDto.getUsername())
+                .nickname(userSignUpRequestDto.getNickname())
+                .password(userSignUpRequestDto.getPassword())
+                .role(Role.USER)
+                .build();
     }
 
     public void pay(Long price) {
